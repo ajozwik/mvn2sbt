@@ -13,9 +13,9 @@ class Mvn2SbtSpec extends WordSpecLike with Matchers with LazyLogging {
   "Mvn2Sbt " should {
 
     "Parse project line" in {
-      val g = "wsc-generic"
+      val g = "groupId"
       val v = "1.0-GEN"
-      val a = "iraq-web-test"
+      val a = "artifactId"
       val t = ProjectType.jar.name()
       val projectLine = s"$g:$a:$t:$v"
       val parsed = parseProjectLine(projectLine)
@@ -38,7 +38,7 @@ class Mvn2SbtSpec extends WordSpecLike with Matchers with LazyLogging {
     }
 
     "From command " in {
-      val rootDir = Paths.get("wsc")
+      val rootDir = Paths.get("exampleMavenProject")
       val projects = fromMavenCommand(rootDir)
       logger.debug(projects.mkString("\n"))
     }
