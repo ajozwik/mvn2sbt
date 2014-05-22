@@ -1,0 +1,22 @@
+*.log
+*.iml
+.idea*
+*~
+# sbt specific
+redminedb*
+dist/*
+target/
+lib_managed/
+src_managed/
+project/boot/
+project/plugins/project/
+logs/
+jndiserver/
+
+# Scala-IDE specific
+.scala_dependencies
+.target
+.cache
+.classpath
+.project
+*.class
