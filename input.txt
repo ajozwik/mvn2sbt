@@ -1,0 +1,165 @@
+[INFO] Scanning for projects...
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Build Order:
+[INFO] 
+[INFO] Logback-Parent
+[INFO] Logback Core Module
+[INFO] Logback Classic Module
+[INFO] Logback Access Module
+[INFO] Logback Site
+[INFO] Logback Examples Module
+[INFO] 
+[INFO] Using the builder org.apache.maven.lifecycle.internal.builder.singlethreaded.SingleThreadedBuilder with a thread count of 1
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building Logback-Parent 1.1.2
+[INFO] ------------------------------------------------------------------------
+[INFO] 
+[INFO] --- maven-dependency-plugin:2.8:tree (default-cli) @ logback-parent ---
+[INFO] ch.qos.logback:logback-parent:pom:1.1.2
+[INFO] +- junit:junit:jar:4.10:test
+[INFO] |  \- org.hamcrest:hamcrest-core:jar:1.1:test
+[INFO] \- org.easytesting:fest-assert:jar:1.2:test
+[INFO]    \- org.easytesting:fest-util:jar:1.1:test
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building Logback Core Module 1.1.2
+[INFO] ------------------------------------------------------------------------
+[INFO] 
+[INFO] --- maven-dependency-plugin:2.8:tree (default-cli) @ logback-core ---
+[INFO] ch.qos.logback:logback-core:jar:1.1.2
+[INFO] +- org.codehaus.janino:janino:jar:2.6.1:compile
+[INFO] |  \- org.codehaus.janino:commons-compiler:jar:2.6.1:compile
+[INFO] +- org.fusesource.jansi:jansi:jar:1.9:compile
+[INFO] +- javax.mail:mail:jar:1.4:compile
+[INFO] |  \- javax.activation:activation:jar:1.1:compile
+[INFO] +- org.apache.geronimo.specs:geronimo-jms_1.1_spec:jar:1.0:compile
+[INFO] +- org.mockito:mockito-core:jar:1.9.5:test
+[INFO] |  +- org.hamcrest:hamcrest-core:jar:1.1:test
+[INFO] |  \- org.objenesis:objenesis:jar:1.0:test
+[INFO] +- javax.servlet:servlet-api:jar:2.5:compile
+[INFO] +- junit:junit:jar:4.10:test
+[INFO] \- org.easytesting:fest-assert:jar:1.2:test
+[INFO]    \- org.easytesting:fest-util:jar:1.1:test
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building Logback Classic Module 1.1.2
+[INFO] ------------------------------------------------------------------------
+[INFO] 
+[INFO] --- maven-dependency-plugin:2.8:tree (default-cli) @ logback-classic ---
+[INFO] ch.qos.logback:logback-classic:jar:1.1.2
+[INFO] +- ch.qos.logback:logback-core:jar:1.1.2:compile
+[INFO] +- org.slf4j:slf4j-api:jar:1.7.7:compile
+[INFO] +- org.slf4j:slf4j-ext:jar:1.7.7:test
+[INFO] |  \- ch.qos.cal10n:cal10n-api:jar:0.8.1:test
+[INFO] +- org.slf4j:slf4j-api:test-jar:tests:1.7.7:test
+[INFO] +- org.slf4j:log4j-over-slf4j:jar:1.7.7:test
+[INFO] +- org.slf4j:jul-to-slf4j:jar:1.7.7:test
+[INFO] +- dom4j:dom4j:jar:1.6.1:test
+[INFO] |  \- xml-apis:xml-apis:jar:1.0.b2:test
+[INFO] +- hsqldb:hsqldb:jar:1.8.0.7:test
+[INFO] +- com.h2database:h2:jar:1.2.132:test
+[INFO] +- postgresql:postgresql:jar:8.4-701.jdbc4:test
+[INFO] +- mysql:mysql-connector-java:jar:5.1.9:test
+[INFO] +- javax.mail:mail:jar:1.4:compile
+[INFO] |  \- javax.activation:activation:jar:1.1:compile
+[INFO] +- org.codehaus.janino:janino:jar:2.6.1:compile
+[INFO] |  \- org.codehaus.janino:commons-compiler:jar:2.6.1:compile
+[INFO] +- org.codehaus.groovy:groovy-all:jar:2.0.7:compile
+[INFO] +- ch.qos.logback:logback-core:test-jar:tests:1.1.2:test
+[INFO] +- org.slf4j:integration:jar:1.7.7:test
+[INFO] |  \- ant:ant-junit:jar:1.6.5:test
+[INFO] +- org.apache.geronimo.specs:geronimo-jms_1.1_spec:jar:1.0:compile
+[INFO] +- javax.servlet:servlet-api:jar:2.5:compile
+[INFO] +- com.icegreen:greenmail:jar:1.3:test
+[INFO] +- org.subethamail:subethasmtp:jar:2.1.0:test
+[INFO] |  +- org.apache.mina:mina-filter-ssl:jar:1.1.7:test
+[INFO] |  |  \- org.apache.mina:mina-core:jar:1.1.7:test
+[INFO] |  \- org.apache.mina:mina-integration-jmx:jar:1.1.7:test
+[INFO] +- org.apache.felix:org.apache.felix.main:jar:2.0.2:test
+[INFO] |  +- org.apache.felix:org.apache.felix.framework:jar:2.0.2:test
+[INFO] |  +- org.apache.felix:org.apache.felix.shell:jar:1.4.1:test
+[INFO] |  +- org.apache.felix:org.apache.felix.shell.tui:jar:1.4.1:test
+[INFO] |  \- org.apache.felix:org.apache.felix.bundlerepository:jar:1.4.2:test
+[INFO] +- junit:junit:jar:4.10:test
+[INFO] |  \- org.hamcrest:hamcrest-core:jar:1.1:test
+[INFO] \- org.easytesting:fest-assert:jar:1.2:test
+[INFO]    \- org.easytesting:fest-util:jar:1.1:test
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building Logback Access Module 1.1.2
+[INFO] ------------------------------------------------------------------------
+[INFO] 
+[INFO] --- maven-dependency-plugin:2.8:tree (default-cli) @ logback-access ---
+[INFO] ch.qos.logback:logback-access:jar:1.1.2
+[INFO] +- ch.qos.logback:logback-core:jar:1.1.2:compile
+[INFO] +- ch.qos.logback:logback-core:test-jar:tests:1.1.2:test
+[INFO] +- org.apache.tomcat:tomcat-catalina:jar:7.0.21:compile
+[INFO] |  +- org.apache.tomcat:tomcat-servlet-api:jar:7.0.21:compile
+[INFO] |  +- org.apache.tomcat:tomcat-juli:jar:7.0.21:compile
+[INFO] |  +- org.apache.tomcat:tomcat-annotations-api:jar:7.0.21:compile
+[INFO] |  +- org.apache.tomcat:tomcat-api:jar:7.0.21:compile
+[INFO] |  \- org.apache.tomcat:tomcat-util:jar:7.0.21:compile
+[INFO] +- org.apache.tomcat:tomcat-coyote:jar:7.0.21:compile
+[INFO] +- org.eclipse.jetty:jetty-server:jar:7.5.1.v20110908:compile
+[INFO] |  +- javax.servlet:servlet-api:jar:2.5:compile
+[INFO] |  +- org.eclipse.jetty:jetty-continuation:jar:7.5.1.v20110908:compile
+[INFO] |  \- org.eclipse.jetty:jetty-http:jar:7.5.1.v20110908:compile
+[INFO] |     \- org.eclipse.jetty:jetty-io:jar:7.5.1.v20110908:compile
+[INFO] |        \- org.eclipse.jetty:jetty-util:jar:7.5.1.v20110908:compile
+[INFO] +- org.codehaus.janino:janino:jar:2.6.1:compile
+[INFO] |  \- org.codehaus.janino:commons-compiler:jar:2.6.1:compile
+[INFO] +- hsqldb:hsqldb:jar:1.8.0.7:test
+[INFO] +- javax.mail:mail:jar:1.4:compile
+[INFO] |  \- javax.activation:activation:jar:1.1:compile
+[INFO] +- junit:junit:jar:4.10:test
+[INFO] |  \- org.hamcrest:hamcrest-core:jar:1.1:test
+[INFO] \- org.easytesting:fest-assert:jar:1.2:test
+[INFO]    \- org.easytesting:fest-util:jar:1.1:test
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building Logback Site 1.1.2
+[INFO] ------------------------------------------------------------------------
+[INFO] 
+[INFO] --- maven-dependency-plugin:2.8:tree (default-cli) @ logback-site ---
+[INFO] ch.qos.logback:logback-site:jar:1.1.2
+[INFO] +- junit:junit:jar:4.10:test
+[INFO] |  \- org.hamcrest:hamcrest-core:jar:1.1:test
+[INFO] \- org.easytesting:fest-assert:jar:1.2:test
+[INFO]    \- org.easytesting:fest-util:jar:1.1:test
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building Logback Examples Module 1.1.2
+[INFO] ------------------------------------------------------------------------
+[INFO] 
+[INFO] --- maven-dependency-plugin:2.8:tree (default-cli) @ logback-examples ---
+[INFO] ch.qos.logback:logback-examples:jar:1.1.2
+[INFO] +- ch.qos.logback:logback-core:jar:1.1.2:compile
+[INFO] +- ch.qos.logback:logback-classic:jar:1.1.2:compile
+[INFO] |  \- org.slf4j:slf4j-api:jar:1.7.7:compile
+[INFO] +- ch.qos.logback:logback-access:jar:1.1.2:compile
+[INFO] +- org.slf4j:slf4j-ext:jar:1.7.7:compile
+[INFO] |  \- ch.qos.cal10n:cal10n-api:jar:0.8.1:compile
+[INFO] +- log4j:log4j:jar:1.2.17:compile
+[INFO] +- javax.servlet:servlet-api:jar:2.5:compile
+[INFO] +- org.fusesource.jansi:jansi:jar:1.9:compile
+[INFO] +- junit:junit:jar:4.10:test
+[INFO] |  \- org.hamcrest:hamcrest-core:jar:1.1:test
+[INFO] \- org.easytesting:fest-assert:jar:1.2:test
+[INFO]    \- org.easytesting:fest-util:jar:1.1:test
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary:
+[INFO] 
+[INFO] Logback-Parent .................................... SUCCESS [  0.930 s]
+[INFO] Logback Core Module ............................... SUCCESS [  0.445 s]
+[INFO] Logback Classic Module ............................ SUCCESS [  0.117 s]
+[INFO] Logback Access Module ............................. SUCCESS [  0.051 s]
+[INFO] Logback Site ...................................... SUCCESS [  0.010 s]
+[INFO] Logback Examples Module ........................... SUCCESS [  0.024 s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 2.918 s
+[INFO] Finished at: 2014-05-22T16:38:07+01:00
+[INFO] Final Memory: 17M/140M
+[INFO] ------------------------------------------------------------------------

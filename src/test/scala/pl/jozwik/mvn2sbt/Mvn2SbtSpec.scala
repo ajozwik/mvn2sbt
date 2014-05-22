@@ -38,7 +38,7 @@ class Mvn2SbtSpec extends WordSpecLike with Matchers with LazyLogging {
     }
 
     "From command " in {
-      val rootDir = Paths.get("exampleMavenProject")
+      val rootDir = Paths.get("logback")
       val projects = fromMavenCommand(rootDir)
       logger.debug(projects.mkString("\n"))
     }
