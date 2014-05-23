@@ -16,7 +16,7 @@ class PomSpec extends WordSpecLike with Matchers with LazyLogging {
       val hierarchy = scanHierarchy(rootDir)
       hierarchy should not be Map.empty
       val projects = projectsFromFile(new File("input.txt"))
-      createSbtFile(projects,hierarchy)
+      createSbtFile(projects,hierarchy,rootDir)
 
     }
 
