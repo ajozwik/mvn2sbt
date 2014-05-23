@@ -3,12 +3,12 @@ package pl.jozwik.mvn2sbt
 import java.io.File
 import scala.io.Source
 import com.typesafe.scalalogging.slf4j.StrictLogging
-import java.nio.file.Path
+import java.nio.file.{Paths, Path}
 
 object Mvn2Sbt extends StrictLogging {
+  final val BUILD_SBT = "build.sbt"
 
-
-  def projectSeq(inputFile: File) = {
+  def projectsFromFile(inputFile: File) = {
     val it = fileToIterator(inputFile)
     iteratorToProjects(it)
   }
@@ -27,4 +27,19 @@ object Mvn2Sbt extends StrictLogging {
   }
 
   def scanHierarchy(rootDir:Path):Map[MavenDepedency,Path] = DirProjectExtractor(rootDir).projectsMap
+
+
+
+  def createSbtFile(projects:Seq[Project],hierarchy:Map[MavenDepedency,Path]) = {
+???
+  }
+
+
+  def run(rootDir:Path){
+    val projects = fromMavenCommand(rootDir)
+    val hierarchy = scanHierarchy(rootDir)
+    createSbtFile(projects,hierarchy)
+  }
+
+  def sbtFile(rootDir:Path) = Paths.get(rootDir.toFile.getAbsolutePath,BUILD_SBT)
 }
