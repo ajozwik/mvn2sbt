@@ -42,7 +42,7 @@ object StreamProjectExtractor extends StrictLogging{
           logger.error(line)
           throw exp
       }
-      val dependency = Dependency(MavenDepedency(groupId, artifactId, versionId), sc)
+      val dependency = Dependency(MavenDependency(groupId, artifactId, versionId), sc)
       (projects, dependency +: dependencies, false, false)
     } else if (line.startsWith(PROJECT_END) && blankLine) {
       val project = Try(projects.head) match{
@@ -54,7 +54,7 @@ object StreamProjectExtractor extends StrictLogging{
       (project.copy(dependencies = dependencies) +: projects.tail, Seq(), false, false)
     } else if (started) {
       val (groupId, artifactId, projectType, versionId) = parseProjectLine(line)
-      val project = Project(MavenDepedency(groupId, artifactId, versionId), ProjectType.valueOf(projectType))
+      val project = Project(MavenDependency(groupId, artifactId, versionId), ProjectType.valueOf(projectType))
       (project +: projects, Seq(), false, false)
     } else {
       (projects, dependencies, false, line.trim.isEmpty && projects.nonEmpty)

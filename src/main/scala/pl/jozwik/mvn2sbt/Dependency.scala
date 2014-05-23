@@ -1,6 +1,9 @@
 package pl.jozwik.mvn2sbt
-case class MavenDepedency(groupId:String,artifactId:String,versionId:String)
 
-case class Dependency(mavenDepedency:MavenDepedency,scope:Scope)
+import java.io.File
 
-case class Project(mavenDepedency:MavenDepedency,projectType:ProjectType,dependencies:Seq[Dependency]=Seq())
+case class MavenDependency(groupId:String,artifactId:String,versionId:String)
+
+case class Dependency(mavenDependency:MavenDependency,scope:Scope)
+
+case class Project(mavenDependency:MavenDependency,projectType:ProjectType,dependencies:Seq[Dependency]=Seq(),path:Option[File]=None)

@@ -12,7 +12,7 @@ class PomSpec extends WordSpecLike with Matchers with LazyLogging {
   "PomSpec " should {
 
     "Integration with file" in {
-      val rootDir = Paths.get("logback")
+      val rootDir = Paths.get("logback").toFile
       val hierarchy = scanHierarchy(rootDir)
       hierarchy should not be Map.empty
       val projects = projectsFromFile(new File("input.txt"))

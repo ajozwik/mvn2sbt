@@ -4,6 +4,7 @@ import java.io.File
 import scala.io.Source
 import com.typesafe.scalalogging.slf4j.StrictLogging
 import java.nio.file.{Paths, Path}
+import java.io.PrintWriter
 
 object Mvn2Sbt extends StrictLogging {
   final val BUILD_SBT = "build.sbt"
@@ -13,9 +14,9 @@ object Mvn2Sbt extends StrictLogging {
     iteratorToProjects(it)
   }
 
-  def fromMavenCommand(rootDir: Path) = {
+  def fromMavenCommand(rootDir: File) = {
     import sys.process._
-    val stream = Process(Seq("mvn", "dependency:tree"), rootDir.toFile).lineStream
+    val stream = Process(Seq("mvn", "dependency:tree"), rootDir).lineStream
     iteratorToProjects(stream)
   }
 
@@ -26,20 +27,36 @@ object Mvn2Sbt extends StrictLogging {
     Source.fromFile(location).getLines()
   }
 
-  def scanHierarchy(rootDir:Path):Map[MavenDepedency,Path] = DirProjectExtractor(rootDir).projectsMap
+  def scanHierarchy(rootDir: File): Map[MavenDependency, File] = DirProjectExtractor(rootDir).projectsMap
 
 
+  def createSbtFile(projectsWithoutPath: Seq[Project], hierarchy: Map[MavenDependency, File]) = {
 
-  def createSbtFile(projects:Seq[Project],hierarchy:Map[MavenDepedency,Path]) = {
-???
+    val file = sbtFile(Paths.get("target")).toFile
+    file.delete()
+
+    writeToFile(file, SbtContent(projectsWithoutPath, hierarchy).write)
   }
 
 
-  def run(rootDir:Path){
-    val projects = fromMavenCommand(rootDir)
+  def run(rootDir: File) {
     val hierarchy = scanHierarchy(rootDir)
-    createSbtFile(projects,hierarchy)
+    val projectsWithoutPath = fromMavenCommand(rootDir)
+
+
+    createSbtFile(projectsWithoutPath, hierarchy)
   }
 
-  def sbtFile(rootDir:Path) = Paths.get(rootDir.toFile.getAbsolutePath,BUILD_SBT)
+
+  def sbtFile(rootDir: Path) = Paths.get(rootDir.toFile.getAbsolutePath, BUILD_SBT)
+
+
+  private def writeToFile(file: File, f: (PrintWriter) => Unit) = {
+    Some(new PrintWriter(file)).foreach { pw => try {
+      f(pw)
+    } finally {
+      pw.close
+    }
+    }
+  }
 }
