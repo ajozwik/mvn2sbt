@@ -1,6 +1,7 @@
 package pl.jozwik.mvn2sbt
 
 import java.io.{File, PrintWriter}
+import com.typesafe.scalalogging.slf4j.LazyLogging
 
 
 object SbtContent {
@@ -16,7 +17,7 @@ object SbtContent {
   }
 }
 
-case class SbtContent(private val projects: Seq[Project], private val hierarchy: Map[MavenDependency, File], private val rootDir: File) {
+case class SbtContent(private val projects: Seq[Project], private val hierarchy: Map[MavenDependency, FileParentDependency], private val rootDir: File) extends LazyLogging{
 
   import SbtContent._
 
@@ -27,9 +28,7 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
         |
         |version := "0.1-SNAPSHOTS"
         |
-        |def ProjectName(name: String,path:String): Project = (
-        |  Project(name, file(path))
-        |  )
+        |def ProjectName(name: String,path:String): Project =  Project(name, file(path))
         |
       """.stripMargin)
     projects.foreach { p =>
@@ -41,11 +40,17 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
 
   private def createProject(p: Project) = {
     val projectName = p.mavenDependency.artifactId
-    val path = toPath(hierarchy(p.mavenDependency), rootDir)
+    val path = toPath(hierarchy(p.mavenDependency).file, rootDir)
 
     val (dependsOn, ld) = p.dependencies.partition { d =>
       val m = d.mavenDependency
-      hierarchy.contains(m)
+      val contains = hierarchy.contains(m)
+      val parentMatch = hierarchy(p.mavenDependency).parent match{
+        case Some(parent) =>
+          parent == m
+        case _ => false
+      }
+      contains || parentMatch
     }
 
     val dependencies = ld.map { d =>
@@ -63,7 +68,7 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
         case Scope.test => """% "test -> test""""
         case _ => ""
       }
-      s"""`${hierarchy(d.mavenDependency).getName}`$test"""
+      s"""`${hierarchy(d.mavenDependency).file.getName}`$test"""
     }.mkString(",")
     if (path.isEmpty) {
       s"""|
