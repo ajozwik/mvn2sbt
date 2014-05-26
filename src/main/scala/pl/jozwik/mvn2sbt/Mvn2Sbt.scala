@@ -30,7 +30,7 @@ object Mvn2Sbt extends StrictLogging {
   def scanHierarchy(rootDir: File) = DirProjectExtractor(rootDir).projectsMap
 
 
-  def createSbtFile(projectsWithoutPath: Seq[Project], hierarchy: Map[MavenDependency, FileParentDependency], rootDir: File, outputFile: File) = {
+  def createSbtFile(projectsWithoutPath: Seq[Project], hierarchy: Map[MavenDependency, ProjectInformation], rootDir: File, outputFile: File) = {
 
     outputFile.delete()
 

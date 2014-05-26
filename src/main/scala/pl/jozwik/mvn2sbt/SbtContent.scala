@@ -17,7 +17,7 @@ object SbtContent {
   }
 }
 
-case class SbtContent(private val projects: Seq[Project], private val hierarchy: Map[MavenDependency, FileParentDependency], private val rootDir: File) extends LazyLogging{
+case class SbtContent(private val projects: Seq[Project], private val hierarchy: Map[MavenDependency, ProjectInformation], private val rootDir: File) extends LazyLogging {
 
   import SbtContent._
 
@@ -40,53 +40,67 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
 
   private def createProject(p: Project) = {
     val projectName = p.mavenDependency.artifactId
-    val path = toPath(hierarchy(p.mavenDependency).file, rootDir)
+    val information = hierarchy(p.mavenDependency)
+    val path = toPath(information.projectPath, rootDir)
 
-    val (dependsOn, ld) = p.dependencies.partition { d =>
-      val m = d.mavenDependency
-      val contains = hierarchy.contains(m)
-      val parentMatch = hierarchy(p.mavenDependency).parent match{
-        case Some(parent) =>
-          parent == m
-        case _ => false
-      }
-      contains || parentMatch
+    val (dependsOn, libraries) = splitToDependsOnLibraries(p,information)
+
+    val dependencies = toDependencies(libraries)
+
+    val dependsOnString = toDependsOnString(dependsOn, information)
+
+    val plugins = toPlugins(information.plugins)
+
+    toProjectString(projectName, path, dependencies, dependsOnString, plugins)
+  }
+
+  private def splitToDependsOnLibraries(p: Project, information: ProjectInformation) = p.dependencies.partition { d =>
+    val m = d.mavenDependency
+    val contains = hierarchy.contains(m)
+    val parentMatch = hierarchy(p.mavenDependency).parent match{
+      case Some(parent) =>
+        parent == m
+      case _ => false
     }
+    contains || parentMatch
+  }
 
-    val dependencies = ld.map { d =>
-      val m = d.mavenDependency
-      val scope = d.scope match {
-        case Scope.compile => ""
-        case x => s""" % "$x" """
-      }
-      s"""  "${m.groupId}" % "${m.artifactId}" % "${m.versionId}" $scope"""
+  private def toPlugins(plugins:Seq[PluginEnum]) = plugins.map(p => s".settings(${p.getSbtSetting})").mkString
 
-    }.mkString("", ",\n   ", "")
 
-    val dependsOnString = dependsOn.map { d =>
-      val test = d.scope match {
-        case Scope.test => """% "test -> test""""
-        case _ => ""
-      }
-      s"""`${hierarchy(d.mavenDependency).file.getName}`$test"""
-    }.mkString(",")
-    if (path.isEmpty) {
-      s"""|
+  def toDependencies(libraries: Seq[Dependency]) = libraries.map { d =>
+    val md = d.mavenDependency
+    val scope = d.scope match {
+      case Scope.compile => ""
+      case x => s""" % "$x" """
+    }
+    s"""  "${md.groupId}" % "${md.artifactId}" % "${md.versionId}" $scope"""
+
+  }.mkString("", ",\n   ", "")
+
+
+  private def toDependsOnString(dependsOn: Seq[Dependency], information: ProjectInformation) =dependsOn.map { d =>
+    val test = d.scope match {
+      case Scope.test => """% "test -> test""""
+      case _ => ""
+    }
+    s"""`${hierarchy(d.mavenDependency).projectPath.getName}`$test"""
+  }.mkString(",")
+
+  private def toProjectString(projectName: String, path: String, dependencies: String, dependsOnString: String, plugins: String) = if (path.isEmpty) {
+    s"""|
         |libraryDependencies in Global ++= Seq($dependencies
         |)
         |
         """.stripMargin
-    } else {
-      s"""
+  } else {
+    s"""
       |
       |lazy val `$projectName` = ProjectName("$projectName","$path").settings(
       |  libraryDependencies ++= Seq($dependencies
       |    )
-      |).dependsOn($dependsOnString)
+      |)$plugins.dependsOn($dependsOnString)
       |
     """.stripMargin
-    }
   }
-
-
 }

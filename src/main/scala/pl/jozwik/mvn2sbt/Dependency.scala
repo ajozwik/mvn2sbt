@@ -8,4 +8,4 @@ case class Dependency(mavenDependency:MavenDependency,scope:Scope)
 
 case class Project(mavenDependency:MavenDependency,projectType:ProjectType,dependencies:Seq[Dependency]=Seq(),path:Option[File]=None)
 
-case class FileParentDependency(file:File,parent:Option[MavenDependency])
+case class ProjectInformation(projectPath:File,parent:Option[MavenDependency],plugins:PluginEnum *)
