@@ -1,5 +1,7 @@
 import ScalaxbKeys._
 
+packSettings
+
 name := "mvn2sbt"
 
 organization := "pl.jozwik"

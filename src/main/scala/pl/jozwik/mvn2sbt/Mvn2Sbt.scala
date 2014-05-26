@@ -30,20 +30,20 @@ object Mvn2Sbt extends StrictLogging {
   def scanHierarchy(rootDir: File) = DirProjectExtractor(rootDir).projectsMap
 
 
-  def createSbtFile(projectsWithoutPath: Seq[Project], hierarchy: Map[MavenDependency, FileParentDependency],rootDir:File,outputFile:File) = {
+  def createSbtFile(projectsWithoutPath: Seq[Project], hierarchy: Map[MavenDependency, FileParentDependency], rootDir: File, outputFile: File) = {
 
     outputFile.delete()
 
-    writeToFile(outputFile, SbtContent(projectsWithoutPath, hierarchy,rootDir).write)
+    writeToFile(outputFile, SbtContent(projectsWithoutPath, hierarchy, rootDir).write)
   }
 
 
-  def run(rootDir: File,outputFile:File) {
+  def run(rootDir: File, outputFile: File) {
     val hierarchy = scanHierarchy(rootDir)
     val projectsWithoutPath = fromMavenCommand(rootDir)
 
 
-    createSbtFile(projectsWithoutPath, hierarchy,rootDir,outputFile)
+    createSbtFile(projectsWithoutPath, hierarchy, rootDir, outputFile)
   }
 
 
@@ -57,5 +57,17 @@ object Mvn2Sbt extends StrictLogging {
       pw.close()
     }
     }
+  }
+
+  def main(args: Array[String]) {
+    if (args.length == 2) {
+      val rootDir = new File(args(0))
+      val outputPath = new File(args(1))
+      if (rootDir.isDirectory) {
+        run(rootDir, outputPath)
+        sys.exit()
+      }
+    }
+    logger.error("Use <rootDirWithMavenProject> <outputSbtFileName>")
   }
 }
