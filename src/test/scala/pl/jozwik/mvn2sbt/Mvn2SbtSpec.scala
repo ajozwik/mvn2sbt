@@ -1,13 +1,10 @@
 package pl.jozwik.mvn2sbt
 
 import org.scalatest.{Matchers, WordSpecLike}
-import java.io.File
 import com.typesafe.scalalogging.slf4j.LazyLogging
-import java.nio.file.Paths
 
 class Mvn2SbtSpec extends WordSpecLike with Matchers with LazyLogging {
 
-  import Mvn2Sbt._
   import StreamProjectExtractor._
 
   "Mvn2Sbt " should {
