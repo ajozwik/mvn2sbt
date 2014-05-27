@@ -12,9 +12,9 @@ Quick start:
 1. Copy <outputDir>/plugins.sbt to <mavenProject>/project/plugins.sbt
 1. Go to <mavenProject> and run `sbt compile` for test
 
-Now only groovy plugin is supported. Maven contains a huge numbers of plugins. 
+Now only groovy/apache-thrift plugins are supported. Maven contains a huge numbers of plugins. 
 The mapping from maven plugin to corresponding sbt plugin (with configuration) has to be done manually.
 
-My roadmap is to support cxf/scala/apache-thrift plugins.
+My roadmap is to support cxf/scala plugins.
 
-Project is still in phase alfa - source will be rebuilded in spare time.
+Project is still in phase alfa - source will be rebuilt in spare time.
