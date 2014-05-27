@@ -14,3 +14,7 @@ Quick start:
 
 Now only groovy plugin is supported. Maven contains a huge numbers of plugins. 
 The mapping from maven plugin to corresponding sbt plugin (with configuration) has to be done manually.
+
+My roadmap is to support cxf/scala/apache-thrift plugins.
+
+Project is still in phase alfa - source will be rebuilded in spare time.
