@@ -1,5 +1,5 @@
-Convert maven project (pom.xml files) to sbt project (build.sbt with plugins).
-==============================================================================
+#### Convert maven project (pom.xml files) to sbt project (build.sbt with plugins).
+
 
 Logback and slf4j are used as reference projects.
 
