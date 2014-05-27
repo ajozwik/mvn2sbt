@@ -63,10 +63,13 @@ object Mvn2Sbt extends StrictLogging {
   }
 
   def main(args: Array[String]) {
+
+    def toAbsolutePath(f:File) = f.getAbsolutePath
+
     if (args.length == 2) {
       val rootDir = new File(args(0))
       val outputPath = new File(args(1))
-      println(s"Start with $rootDir, output to $outputPath")
+      println(s"Start with ${toAbsolutePath(rootDir)}, output to ${toAbsolutePath(outputPath)}")
       if (rootDir.isDirectory) {
         run(rootDir, outputPath)
         println(s"""Go to $outputPath and copy $BUILD_SBT to $rootDir and $PLUGINS_SBT to ${new File(rootDir,"project")}""")

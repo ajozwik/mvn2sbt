@@ -3,6 +3,7 @@ package pl.jozwik.mvn2sbt
 import com.typesafe.scalalogging.slf4j.LazyLogging
 import java.io.File
 import org.maven.{Plugins4, Parent, Model}
+import scala.util.{Try, Success, Failure}
 
 object DirProjectExtractor {
   final val POM_XML = "pom.xml"
@@ -17,7 +18,12 @@ case class DirProjectExtractor(rootDir: File) extends LazyLogging {
   private def toProjectMap(dir: File, parent: Option[MavenDependency]) =
     dir.listFiles().find(f => f.getName == POM_XML) match {
       case Some(pomXml) =>
-        val xmlFromFile = xml.XML.loadFile(pomXml)
+        val xmlFromFile = Try(xml.XML.loadFile(pomXml)) match {
+          case Success(pom) => pom
+          case Failure(th) =>
+            logger.error(s"${pomXml.getAbsolutePath} failed to be parse")
+            throw th
+        }
         val pomModel = scalaxb.fromXML[org.maven.Model](xmlFromFile)
         addToMap(dir, pomModel, parent)
       case None => sys.error(s"$POM_XML file missing in ${dir.getAbsolutePath}")
@@ -27,7 +33,6 @@ case class DirProjectExtractor(rootDir: File) extends LazyLogging {
     case Some(p) => Some(MavenDependency(p.groupId.get, p.artifactId.get, p.version.get))
     case _ => None
   }
-
 
 
   private def addToMap(dir: File, pomModel: Model, parent: Option[MavenDependency]): Map[MavenDependency, ProjectInformation] = {
