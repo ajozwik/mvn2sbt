@@ -98,7 +98,7 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
     s"""`${hierarchy(d.mavenDependency).projectPath.getName}`$test"""
   }.mkString(",")
 
-  private def createBuildSbt(p: Project, projectName: String, path: String, dependencies: String, dependsOnString: String, plugins: String) = if (path.isEmpty) {
+  private def createBuildSbt(p: Project, projectName: String, path: String, dependencies: String, dependsOnString: String, settings: String) = if (path.isEmpty) {
     s"""|
         |libraryDependencies in Global ++= Seq($dependencies
         |)
@@ -113,7 +113,7 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
       |    name := "${p.mavenDependency.artifactId}",
       |    version := "${p.mavenDependency.versionId}",
       |    organization := "${p.mavenDependency.groupId}"
-      |)$plugins.dependsOn($dependsOnString)
+      |)$settings.dependsOn($dependsOnString)
       |
     """.stripMargin
   }
