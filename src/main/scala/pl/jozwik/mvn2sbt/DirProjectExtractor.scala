@@ -28,23 +28,14 @@ case class DirProjectExtractor(rootDir: File) extends LazyLogging {
     case _ => None
   }
 
-  def extractPlugins(model: Model): Seq[PluginEnum] = {
-    model.build match {
-      case Some(build) => build.plugins.map(plugins => plugins.plugin) match {
-        case Some(pluginsSeq) => pluginsSeq.flatMap(plugin => PluginEnum.values().find(p =>
-          p.getArtifactId == plugin.artifactId.getOrElse("")))
-        case _ => Nil
-      }
-      case _ => Nil
-    }
-  }
+
 
   private def addToMap(dir: File, pomModel: Model, parent: Option[MavenDependency]): Map[MavenDependency, ProjectInformation] = {
     val groupId = valueFromOptions(pomModel.groupId, parent.map(_.groupId))
     val version = valueFromOptions(pomModel.version, parent.map(_.versionId))
     val dependency = MavenDependency(groupId, pomModel.artifactId.get, version)
     val pomParent = toPomParent(pomModel.parent)
-    val plugins = extractPlugins(pomModel)
+    val plugins = MavenSbtPluginMapper(pomModel).plugins
     val currMap = Map(dependency -> ProjectInformation(dir, pomParent, plugins: _*))
     pomModel.modules match {
       case None => currMap

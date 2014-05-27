@@ -28,29 +28,25 @@ object StreamProjectExtractor extends StrictLogging {
     (array(a), array(b), array(c), array(d))
   }
 
-  def addToAcc(acc: (Seq[Project], Boolean, Boolean), line: String): (Seq[Project], Boolean, Boolean) = {
-    val (projects, started, blankLine) = acc
-    if (line.startsWith(PROJECT_START)) {
-      (projects, true, false)
-    } else if (line.startsWith(START_DEPENDENCY)) {
-      val (groupId, artifactId, versionId, scope) = parseDependencyLine(line)
-      val sc = Try(Scope.valueOf(scope)) match {
-        case Success(el) => el
-        case Failure(exp) =>
-          logger.error(line)
-          throw exp
-      }
-      val dependency = Dependency(MavenDependency(groupId, artifactId, versionId), sc)
-      val h = projects.head
-      val newHead = h.copy(dependencies = dependency +: h.dependencies)
-      (newHead +: projects.tail, false, false)
-    } else if (started) {
-      val (groupId, artifactId, projectType, versionId) = parseProjectLine(line)
-      val project = Project(MavenDependency(groupId, artifactId, versionId), ProjectType.valueOf(projectType))
-      (project +: projects, false, false)
-    } else {
-      (projects, false, line.trim.isEmpty && projects.nonEmpty)
+
+  private def addProject(line: String, projects: Seq[Project]): (Seq[Project], Boolean) = {
+    val (groupId, artifactId, projectType, versionId) = parseProjectLine(line)
+    val project = Project(MavenDependency(groupId, artifactId, versionId), ProjectType.valueOf(projectType))
+    (project +: projects, false)
+  }
+
+  private def addDependency(line: String, projects: Seq[Project]): (Seq[Project], Boolean) = {
+    val (groupId, artifactId, versionId, scope) = parseDependencyLine(line)
+    val sc = Try(Scope.valueOf(scope)) match {
+      case Success(el) => el
+      case Failure(exp) =>
+        logger.error(line)
+        throw exp
     }
+    val dependency = Dependency(MavenDependency(groupId, artifactId, versionId), sc)
+    val project = projects.head
+    val projectWithNewDependency = project.copy(dependencies = dependency +: project.dependencies)
+    (projectWithNewDependency +: projects.tail, false)
   }
 }
 
@@ -58,13 +54,25 @@ case class StreamProjectExtractor(private val iterator: TraversableOnce[String])
 
   import StreamProjectExtractor._
 
-  val (projects, _, _) = iterator.flatMap { line =>
-    if (line.startsWith(INFO)) {
-      Some(line.substring(INFO.length))
+  val (projects, _) = cutInfo.foldLeft((Seq[Project](), false)) { (acc: (Seq[Project], Boolean), line: String) =>
+    val (projects, started) = acc
+    if (line.startsWith(PROJECT_START)) {
+      (projects, true)
+    } else if (line.startsWith(START_DEPENDENCY)) {
+      addDependency(line, projects)
+    } else if (started) {
+      addProject(line, projects)
     } else {
-      None
+      (projects, false)
     }
-  }.foldLeft((Seq[Project](), false, false))(addToAcc)
+  }
 
-
+  private def cutInfo = iterator.flatMap {
+    line =>
+      if (line.startsWith(INFO)) {
+        Some(line.substring(INFO.length))
+      } else {
+        None
+      }
+  }
 }

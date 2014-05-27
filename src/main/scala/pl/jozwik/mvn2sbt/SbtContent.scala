@@ -2,7 +2,7 @@ package pl.jozwik.mvn2sbt
 
 import java.io.{Writer, File}
 import com.typesafe.scalalogging.slf4j.LazyLogging
-
+import scala.collection.JavaConversions._
 
 object SbtContent {
   def toPath(path: File, rootDir: File) = {
@@ -30,7 +30,7 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
       """.stripMargin)
     projects.foreach { p =>
       val projectOutput = createProject(p)
-      val (buildSbt,pluginsSbt) = projectOutput
+      val (buildSbt, pluginsSbt) = projectOutput
       buildSbtWriter.write(buildSbt)
       pluginsSbtWriter.write(pluginsSbt)
     }
@@ -44,13 +44,15 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
 
     val (dependsOn, libraries) = splitToDependsOnLibraries(p, information)
 
-    val dependencies = toDependencies(libraries)
+    val (settings, plugins, pluginDependencies) = toPlugins(information.plugins)
+
+    val dependencies = toDependencies(pluginDependencies ++ libraries)
 
     val dependsOnString = toDependsOnString(dependsOn, information)
 
-    val (settings, plugins) = toPlugins(information.plugins)
 
-    (createBuildSbt(p, projectName, path, dependencies, dependsOnString, settings),plugins)
+
+    (createBuildSbt(p, projectName, path, dependencies, dependsOnString, settings), plugins)
   }
 
 
@@ -65,16 +67,16 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
     contains || parentMatch
   }
 
-  private def toPlugins(plugins: Seq[PluginEnum]): (String, String) = {
-    plugins.foldLeft(("", "")) { (tuple, p) =>
-      val (accSett, accPlug) = tuple
-      (accSett + s".settings(${p.getSbtSetting})",
+  private def toPlugins(plugins: Seq[PluginEnum]): (Seq[String], String, Seq[Dependency]) = {
+    plugins.foldLeft((Seq[String](), "", Seq[Dependency]())) { (tuple, p) =>
+      val (accSett, accPlug, accPluginDependencies) = tuple
+      (s"${p.getSbtSetting}" +: accSett,
         accPlug + s"""
          |${p.getPlugin}
          |
          |${p.getExtraRepository}
          |
-       """.stripMargin)
+       """.stripMargin, p.getDependencies ++ accPluginDependencies)
     }
   }
 
@@ -98,14 +100,24 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
     s"""`${hierarchy(d.mavenDependency).projectPath.getName}`$test"""
   }.mkString(",")
 
-  private def createBuildSbt(p: Project, projectName: String, path: String, dependencies: String, dependsOnString: String, settings: String) = if (path.isEmpty) {
-    s"""|
+  private def createBuildSbt(p: Project, projectName: String, path: String, dependencies: String, dependsOnString: String, settings: Seq[String]) = {
+
+    if (path.isEmpty) {
+      s"""|
+        |version := "${p.mavenDependency.versionId}"
+        |
+        |name := "${p.mavenDependency.artifactId}"
+        |
+        |organization := "${p.mavenDependency.groupId}"
+        |
         |libraryDependencies in Global ++= Seq($dependencies
         |)
         |
+        |${settings.mkString("", "\n\n", "")}
         """.stripMargin
-  } else {
-    s"""
+    } else {
+      val s = settings.mkString(".settings(", ").settings(", ")")
+      s"""
       |
       |lazy val `$projectName` = ProjectName("$projectName","$path").settings(
       |  libraryDependencies ++= Seq($dependencies
@@ -113,8 +125,10 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
       |    name := "${p.mavenDependency.artifactId}",
       |    version := "${p.mavenDependency.versionId}",
       |    organization := "${p.mavenDependency.groupId}"
-      |)$settings.dependsOn($dependsOnString)
+      |)$s.dependsOn($dependsOnString)
       |
     """.stripMargin
+    }
   }
+
 }
