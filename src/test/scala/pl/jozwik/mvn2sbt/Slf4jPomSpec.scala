@@ -15,7 +15,7 @@ class Slf4jPomSpec extends WordSpecLike with Matchers with LazyLogging {
       val hierarchy = scanHierarchy(rootDir)
       hierarchy should not be Map.empty
       val projects = projectsFromFile(new File(rootDir,"input.txt"))
-      createSbtFile(projects,hierarchy,rootDir,new File("target","slf4j-build.sbt"))
+      createSbtFile(projects,hierarchy,rootDir,new File("target","slf4j"))
 
     }
 

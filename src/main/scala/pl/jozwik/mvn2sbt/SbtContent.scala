@@ -1,6 +1,6 @@
 package pl.jozwik.mvn2sbt
 
-import java.io.{File, PrintWriter}
+import java.io.{Writer, File}
 import com.typesafe.scalalogging.slf4j.LazyLogging
 
 
@@ -21,19 +21,18 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
 
   import SbtContent._
 
-  def write(writer: PrintWriter) {
-    writer.println(
+  def write(buildSbtWriter: Writer, pluginsSbtWriter: Writer) {
+    buildSbtWriter.write(
       """
-        |name :="root"
-        |
-        |version := "0.1-SNAPSHOTS"
         |
         |def ProjectName(name: String,path:String): Project =  Project(name, file(path))
         |
       """.stripMargin)
     projects.foreach { p =>
       val projectOutput = createProject(p)
-      writer.write(projectOutput)
+      val (buildSbt,pluginsSbt) = projectOutput
+      buildSbtWriter.write(buildSbt)
+      pluginsSbtWriter.write(pluginsSbt)
     }
 
   }
@@ -43,21 +42,22 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
     val information = hierarchy(p.mavenDependency)
     val path = toPath(information.projectPath, rootDir)
 
-    val (dependsOn, libraries) = splitToDependsOnLibraries(p,information)
+    val (dependsOn, libraries) = splitToDependsOnLibraries(p, information)
 
     val dependencies = toDependencies(libraries)
 
     val dependsOnString = toDependsOnString(dependsOn, information)
 
-    val plugins = toPlugins(information.plugins)
+    val (settings, plugins) = toPlugins(information.plugins)
 
-    toProjectString(projectName, path, dependencies, dependsOnString, plugins)
+    (createBuildSbt(p, projectName, path, dependencies, dependsOnString, settings),plugins)
   }
+
 
   private def splitToDependsOnLibraries(p: Project, information: ProjectInformation) = p.dependencies.partition { d =>
     val m = d.mavenDependency
     val contains = hierarchy.contains(m)
-    val parentMatch = hierarchy(p.mavenDependency).parent match{
+    val parentMatch = hierarchy(p.mavenDependency).parent match {
       case Some(parent) =>
         parent == m
       case _ => false
@@ -65,7 +65,18 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
     contains || parentMatch
   }
 
-  private def toPlugins(plugins:Seq[PluginEnum]) = plugins.map(p => s".settings(${p.getSbtSetting})").mkString
+  private def toPlugins(plugins: Seq[PluginEnum]): (String, String) = {
+    plugins.foldLeft(("", "")) { (tuple, p) =>
+      val (accSett, accPlug) = tuple
+      (accSett + s".settings(${p.getSbtSetting})",
+        accPlug + s"""
+         |${p.getPlugin}
+         |
+         |${p.getExtraRepository}
+         |
+       """.stripMargin)
+    }
+  }
 
 
   def toDependencies(libraries: Seq[Dependency]) = libraries.map { d =>
@@ -79,7 +90,7 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
   }.mkString("", ",\n   ", "")
 
 
-  private def toDependsOnString(dependsOn: Seq[Dependency], information: ProjectInformation) =dependsOn.map { d =>
+  private def toDependsOnString(dependsOn: Seq[Dependency], information: ProjectInformation) = dependsOn.map { d =>
     val test = d.scope match {
       case Scope.test => """% "test -> test""""
       case _ => ""
@@ -87,7 +98,7 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
     s"""`${hierarchy(d.mavenDependency).projectPath.getName}`$test"""
   }.mkString(",")
 
-  private def toProjectString(projectName: String, path: String, dependencies: String, dependsOnString: String, plugins: String) = if (path.isEmpty) {
+  private def createBuildSbt(p: Project, projectName: String, path: String, dependencies: String, dependsOnString: String, plugins: String) = if (path.isEmpty) {
     s"""|
         |libraryDependencies in Global ++= Seq($dependencies
         |)
@@ -98,7 +109,10 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
       |
       |lazy val `$projectName` = ProjectName("$projectName","$path").settings(
       |  libraryDependencies ++= Seq($dependencies
-      |    )
+      |    ),
+      |    name := "${p.mavenDependency.artifactId}",
+      |    version := "${p.mavenDependency.versionId}",
+      |    organization := "${p.mavenDependency.groupId}"
       |)$plugins.dependsOn($dependsOnString)
       |
     """.stripMargin

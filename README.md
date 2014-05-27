@@ -1,6 +1,15 @@
-Convert maven project (pom.xml files) to sbt project (build.sbt with plugins). 
+## Convert maven project (pom.xml files) to sbt project (build.sbt with plugins). ## 
 
-Logback and slf4j as reference projects.
+Logback and slf4j are used as reference projects.
 
-When you run "sbt test" in target will be generated `logback-build.sbt` and `slf4j-build.sbt`.
-Still plugins supports is missing
+Quick start:
+
+1. Clone project
+1. Run  `sbt pack`
+1. Run target/pack/bin/mvn2sbt <mavenProject> <outputDir>
+1. Copy <outputDir>/build.sbt to <mavenProject>/build.sbt
+1. Copy <outputDir>/plugins.sbt to <mavenProject>/project/plugins.sbt
+1. Go to <mavenProject> and run `sbt compile` for test
+
+Now only groovy plugin is supported. Maven contains a huge numbers of plugins. 
+The mapping from maven plugin to corresponding sbt plugin (with configuration) has to be done manually.

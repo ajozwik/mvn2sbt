@@ -1,13 +1,14 @@
 package pl.jozwik.mvn2sbt
 
-import java.io.File
+import java.io.{Writer, File, PrintWriter}
 import scala.io.Source
 import com.typesafe.scalalogging.slf4j.StrictLogging
 import java.nio.file.{Paths, Path}
-import java.io.PrintWriter
+import org.apache.commons.io.IOUtils
 
 object Mvn2Sbt extends StrictLogging {
   final val BUILD_SBT = "build.sbt"
+  final val PLUGINS_SBT = "plugins.sbt"
 
   def projectsFromFile(inputFile: File) = {
     val it = fileToIterator(inputFile)
@@ -30,32 +31,34 @@ object Mvn2Sbt extends StrictLogging {
   def scanHierarchy(rootDir: File) = DirProjectExtractor(rootDir).projectsMap
 
 
-  def createSbtFile(projectsWithoutPath: Seq[Project], hierarchy: Map[MavenDependency, ProjectInformation], rootDir: File, outputFile: File) = {
-
-    outputFile.delete()
-
-    writeToFile(outputFile, SbtContent(projectsWithoutPath, hierarchy, rootDir).write)
+  def createSbtFile(projectsWithoutPath: Seq[Project], hierarchy: Map[MavenDependency, ProjectInformation], rootDir: File, outputDir: File) = {
+    outputDir.mkdirs()
+    val buildSbt = new File(outputDir, BUILD_SBT)
+    val pluginsSbt = new File(outputDir, PLUGINS_SBT)
+    writeToFiles(buildSbt, pluginsSbt, SbtContent(projectsWithoutPath, hierarchy, rootDir).write)
   }
 
 
-  def run(rootDir: File, outputFile: File) {
+  def run(rootDir: File, outputDir: File) {
     val hierarchy = scanHierarchy(rootDir)
     val projectsWithoutPath = fromMavenCommand(rootDir)
 
 
-    createSbtFile(projectsWithoutPath, hierarchy, rootDir, outputFile)
+    createSbtFile(projectsWithoutPath, hierarchy, rootDir, outputDir)
   }
 
 
   def sbtFile(rootDir: Path) = Paths.get(rootDir.toFile.getAbsolutePath, BUILD_SBT)
 
 
-  private def writeToFile(file: File, f: (PrintWriter) => Unit) = {
-    Some(new PrintWriter(file)).foreach { pw => try {
-      f(pw)
-    } finally {
-      pw.close()
-    }
+  private def writeToFiles(buildSbt: File, pluginsSbt: File, f: (Writer, Writer) => Unit) = {
+    Some((new PrintWriter(buildSbt), new PrintWriter(pluginsSbt))).foreach { case (bpw, ppw) =>
+      try {
+        f(bpw, ppw)
+      } finally {
+        IOUtils.closeQuietly(bpw)
+        IOUtils.closeQuietly(ppw)
+      }
     }
   }
 
@@ -63,11 +66,13 @@ object Mvn2Sbt extends StrictLogging {
     if (args.length == 2) {
       val rootDir = new File(args(0))
       val outputPath = new File(args(1))
+      println(s"Start with $rootDir, output to $outputPath")
       if (rootDir.isDirectory) {
         run(rootDir, outputPath)
+        println(s"""Go to $outputPath and copy $BUILD_SBT to $rootDir and $PLUGINS_SBT to ${new File(rootDir,"project")}""")
         sys.exit()
       }
     }
-    logger.error("Use <rootDirWithMavenProject> <outputSbtFileName>")
+    logger.error("Use <rootDirWithMavenProject> <outputDir>")
   }
 }

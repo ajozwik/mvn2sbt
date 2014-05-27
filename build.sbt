@@ -2,11 +2,13 @@ import ScalaxbKeys._
 
 packSettings
 
+packMain := Map("mvn2sbt" -> "pl.jozwik.mvn2sbt.Mvn2Sbt")
+
 name := "mvn2sbt"
 
 organization := "pl.jozwik"
 
-version := "0.1.0-SNAPSHOTS"
+version := "0.2.0"
 
 scalaVersion  := "2.11.1"
 
@@ -20,7 +22,8 @@ libraryDependencies in Global ++= Seq(
   "org.scalatest" %% "scalatest" % "2.1.7" % "test",
   "ch.qos.logback" % "logback-classic" % "1.1.2",
   "org.scala-lang.modules" %% "scala-xml" % "1.0.2",
-  "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.1"
+  "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.1",
+  "commons-io" % "commons-io" % "2.4"
 )
 
 scalaxbSettings
