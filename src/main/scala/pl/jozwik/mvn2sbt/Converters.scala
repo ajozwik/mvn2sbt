@@ -1,7 +1,8 @@
 package pl.jozwik.mvn2sbt
 
 import org.maven.{Configuration4, Plugin}
-import scala.xml.Node
+import scala.xml.{NodeSeq, Node}
+import scalaxb.DataRecord
 
 
 object Converters {
@@ -13,41 +14,56 @@ object Converters {
       ex.configuration.get
     }
     val confHead = configuration4.head
-    val wsdlOptionSeq = extractElement(confHead, "wsdlOptions") match {
-      case Some(wsdlOptions) => extract(wsdlOptions.value.asInstanceOf[Node])
-      case _ => Nil
+
+    val defaultOptions: Map[String, Seq[String]] = extractElement(confHead, "defaultOptions") match {
+      case Some(node) => extractWsdlOption(node.value.asInstanceOf[Node])
+      case _ => Map.empty
+    }
+
+    val wsdlOptionSeq: Map[String, Seq[String]] = extractElement(confHead, "wsdlOptions") match {
+      case Some(wsdlOptions) => extractWsdlOption(wsdlOptions.value.asInstanceOf[Node])
+      case _ => Map.empty
     }
 
     val wsdls = wsdlOptionSeq.map {
-      case (wsdl, packageName, extraOptions) =>
-        val pn = extraOptions ++ {
-          if (packageName.nonEmpty) {
-            Seq("-p", packageName)
-          } else Nil
-        }
-
-        s"""cxf.Wsdl("$wsdl", Seq(${pn.mkString("\"", "\",\"", "\"")}), None)"""
+      case (wsdl, seq) =>
+        val s = defaultOptions.getOrElse(wsdl, Nil) ++ seq
+        s"""cxf.Wsdl("$wsdl", Seq(${s.mkString("\"", "\",\"", "\"")}), None)"""
     }
 
-    Seq( s"""cxf.wsdls :=Seq(${wsdls.mkString(",")})""")
+    Seq( s"""cxf.wsdls :=Seq(${wsdls.mkString(",\n\t")})""")
   }
 
-  def extractElement(confHead: Configuration4, name: String) = {
+  def extractElement(confHead: Configuration4, name: String): Option[DataRecord[Any]] = {
     confHead.any.find { r =>
       r.key == Some(name)
     }
   }
 
-  private def extractNode(elem: Node, first: String, names: String*) = {
+  private def extractNode(elem: Node, first: String, names: String*): NodeSeq = {
     names.foldLeft(elem \ first)((acc, name) => acc \ name)
   }
 
 
-  private def extract(elem: Node, names: String*) = {
+  private def extractWsdlOption(elem: Node) = {
     val wsdlOption = extractNode(elem, "wsdlOption")
-    wsdlOption.map(w => (extractNode(w, "wsdl").text, extractNode(w, "packagenames", "packagename").text,
-      extractNode(w, "extraargs", "extraarg").map{_.text}))
+    wsdlOptionFromNode(wsdlOption)
   }
+
+  private def wsdlOptionFromNode(wsdlOption: NodeSeq): Map[String, Seq[String]] = {
+    wsdlOption.map(w => (extractNode(w, "wsdl").text, buildSeq(w))).toMap
+  }
+
+  private def buildSeq(node: Node) = {
+    buildPackage(node) ++ buildExtraArgs(node) ++ buildBindings(node)
+  }
+
+  private def buildPackage(node: Node) = extractNode(node, "packagenames", "packagename").flatMap(n => Seq("-p", n.text))
+
+  private def buildExtraArgs(node: Node) = extractNode(node, "extraargs", "extraarg").map(_.text)
+
+  private def buildBindings(node: Node) =
+    extractNode(node, "bindingFiles", "bindingFile").map(_.text)
 
   def thriftConverter: Converter = plugin => Nil
 
