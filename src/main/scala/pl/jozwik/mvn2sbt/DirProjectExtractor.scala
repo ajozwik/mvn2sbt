@@ -18,16 +18,20 @@ case class DirProjectExtractor(rootDir: File) extends LazyLogging {
   private def toProjectMap(dir: File, parent: Option[MavenDependency]) =
     dir.listFiles().find(f => f.getName == POM_XML) match {
       case Some(pomXml) =>
-        val xmlFromFile = Try(xml.XML.loadFile(pomXml)) match {
-          case Success(pom) => pom
-          case Failure(th) =>
-            logger.error(s"${pomXml.getAbsolutePath} failed to be parse")
-            throw th
-        }
-        val pomModel = scalaxb.fromXML[org.maven.Model](xmlFromFile)
-        addToMap(dir, pomModel, parent)
+        handlePomFile(pomXml,parent)
       case None => sys.error(s"$POM_XML file missing in ${dir.getAbsolutePath}")
     }
+
+  private def handlePomFile(pomXml:File, parent: Option[MavenDependency]) = {
+    val xmlFromFile = Try(xml.XML.loadFile(pomXml)) match {
+      case Success(pom) => pom
+      case Failure(th) =>
+        logger.error(s"${pomXml.getAbsolutePath} failed to be parse")
+        throw th
+    }
+    val pomModel = scalaxb.fromXML[org.maven.Model](xmlFromFile)
+    addToMap(pomXml.getParentFile, pomModel, parent)
+  }
 
   def toPomParent(parent: Option[Parent]) = parent match {
     case Some(p) => Some(MavenDependency(p.groupId.get, p.artifactId.get, p.version.get))

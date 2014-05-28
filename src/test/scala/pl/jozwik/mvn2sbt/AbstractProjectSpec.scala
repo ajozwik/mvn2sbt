@@ -1,12 +1,10 @@
 package pl.jozwik.mvn2sbt
 
-import org.scalatest.{Matchers, WordSpecLike}
-import com.typesafe.scalalogging.slf4j.LazyLogging
 import java.nio.file.Paths
 import java.io.File
 
 
-abstract class AbstractProjectSpec(project:String,inputFile:String = "input.txt")  extends WordSpecLike with Matchers with LazyLogging {
+abstract class AbstractProjectSpec(project:String,inputFile:String = "input.txt")  extends AbstractSpec {
   import Mvn2Sbt._
 
   getClass.getSimpleName should {

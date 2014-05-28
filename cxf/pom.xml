@@ -1,0 +1,89 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>cxf</artifactId>
+    <groupId>pl.jozwik</groupId>
+    <version>1.0.0</version>
+    <name>Cxf bindings</name>
+    <properties>
+        <wsdl.dir>${basedir}/src/main/resources/axis2</wsdl.dir>
+        <generateServerSide>false</generateServerSide>
+        <sourceRoot>target/generated/src/main/java</sourceRoot>
+    </properties>
+
+    <build>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.cxf</groupId>
+                    <artifactId>cxf-codegen-plugin</artifactId>
+                    <version>2.6.6</version>
+                    <executions>
+                        <execution>
+                            <id>generate-sources</id>
+                            <phase>generate-sources</phase>
+                            <configuration>
+                                <sourceRoot>${sourceRoot}</sourceRoot>
+                                <defaultOptions>
+                                    <bindingFiles>
+                                        <bindingFile>${wsdl.dir}/binding.xml</bindingFile>
+                                    </bindingFiles>
+                                </defaultOptions>
+                                <wsdlOptions>
+                                     <wsdlOption>
+                                        <wsdl>${wsdl.dir}/Subs.wsdl</wsdl>
+                                        <packagenames>
+                                            <packagename>pl.jozwik.subs</packagename>
+                                        </packagenames>
+                                        <extraargs>
+                                            <extraarg>-impl</extraarg>
+                                            <extraarg>-autoNameResolution</extraarg>
+                                            <extraarg>-wsdlLocation</extraarg>
+                                            <wsdlurl />
+                                        </extraargs>
+                                    </wsdlOption>
+                                    <wsdlOption>
+                                        <wsdl>${wsdl.dir}/Acc.wsdl</wsdl>
+                                        <packagenames>
+                                            <packagename>pl.jozwik.acc</packagename>
+                                        </packagenames>
+                                        <extraargs>
+                                            <extraarg>-impl</extraarg>
+                                            <extraarg>-autoNameResolution</extraarg>
+                                            <extraarg>-wsdlLocation</extraarg>
+                                            <wsdlurl />
+                                        </extraargs>
+                                    </wsdlOption>
+                                </wsdlOptions>
+                            </configuration>
+                            <goals>
+                                <goal>wsdl2java</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+
+
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>build-helper-maven-plugin</artifactId>
+                    <version>1.8</version>
+                    <executions>
+                        <execution>
+                            <id>add-source</id>
+                            <phase>generate-sources</phase>
+                            <goals>
+                                <goal>add-source</goal>
+                            </goals>
+                            <configuration>
+                                <sources>
+                                    <source>${sourceRoot}</source>
+                                </sources>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+    </build>
+
+
+</project>

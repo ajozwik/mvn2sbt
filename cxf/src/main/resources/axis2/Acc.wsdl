@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns2="http://api.services.jozwik.pl/xsd"
+                  xmlns:ns1="http://api.services.ns1.jozwik.pl/xsd"
+                  xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl"
+                  xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:ns0="http://api.services.jozwik.pl"
+                  xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/"
+                  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+                  xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/"
+                  targetNamespace="http://api.services.jozwik.pl">
+    <wsdl:documentation>Acc</wsdl:documentation>
+    <wsdl:types>
+        <xs:schema xmlns:ns="http://api.services.jozwik.pl" attributeFormDefault="qualified"
+                   elementFormDefault="qualified" targetNamespace="http://api.services.jozwik.pl">
+            <xs:complexType name="Exception">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="Exception" nillable="true" type="xs:anyType"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="WsdlException">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="WsdlException" nillable="true"
+                                    type="ns1:WsdlException"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="create">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="account" nillable="true" type="ns2:Acc"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="createResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ns2:Acc"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:schema>
+        <xs:schema xmlns:ax21="http://api.services.ns1.jozwik.pl/xsd" attributeFormDefault="qualified"
+                   elementFormDefault="qualified" targetNamespace="http://api.services.ns1.jozwik.pl/xsd">
+            <xs:complexType name="WsdlException">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="code" type="xs:int"/>
+                    <xs:element minOccurs="0" name="correlationIdentifier" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="notification" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="ticket" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:schema>
+        <xs:schema xmlns:ax22="http://api.services.jozwik.pl/xsd" attributeFormDefault="qualified"
+                   elementFormDefault="qualified" targetNamespace="http://api.services.jozwik.pl/xsd">
+            <xs:complexType name="Acc">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="cardNumber" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="msid" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="msidType" nillable="true" type="xs:int"/>
+                   </xs:sequence>
+            </xs:complexType>
+        </xs:schema>
+    </wsdl:types>
+
+    <wsdl:message name="createRequest">
+        <wsdl:part name="parameters" element="ns0:create"/>
+    </wsdl:message>
+    <wsdl:message name="createResponse">
+        <wsdl:part name="parameters" element="ns0:createResponse"/>
+    </wsdl:message>
+    <wsdl:message name="WsdlException">
+        <wsdl:part name="parameters" element="ns0:WsdlException"/>
+    </wsdl:message>
+    <wsdl:portType name="AccPortType">
+
+        <wsdl:operation name="create">
+            <wsdl:input message="ns0:createRequest" wsaw:Action="urn:create"/>
+            <wsdl:output message="ns0:createResponse" wsaw:Action="urn:createResponse"/>
+            <wsdl:fault message="ns0:WsdlException" name="WsdlException"
+                        wsaw:Action="urn:createWsdlException"/>
+        </wsdl:operation>
+
+    </wsdl:portType>
+    <wsdl:binding name="AccSOAP11Binding" type="ns0:AccPortType">
+        <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+
+        <wsdl:operation name="create">
+            <soap:operation soapAction="urn:create" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="WsdlException">
+                <soap:fault use="literal" name="WsdlException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+
+    </wsdl:binding>
+    <wsdl:binding name="AccSOAP12Binding" type="ns0:AccPortType">
+        <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+        <wsdl:operation name="create">
+            <soap12:operation soapAction="urn:create" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="WsdlException">
+                <soap12:fault use="literal" name="WsdlException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="AccHttpBinding" type="ns0:AccPortType">
+        <http:binding verb="POST"/>
+
+        <wsdl:operation name="create">
+            <http:operation location="Acc/create"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="create"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="create"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="Acc">
+        <wsdl:port name="AccSOAP11port_http" binding="ns0:AccSOAP11Binding">
+            <soap:address location="http://localhost:8080/axis/services/Acc"/>
+        </wsdl:port>
+        <wsdl:port name="AccSOAP12port_http" binding="ns0:AccSOAP12Binding">
+            <soap12:address location="http://localhost:8080/axis/services/Acc"/>
+        </wsdl:port>
+        <wsdl:port name="AccHttpport" binding="ns0:AccHttpBinding">
+            <http:address location="http://localhost:8080/axis/services/Acc"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>
