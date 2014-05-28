@@ -3,6 +3,7 @@ package pl.jozwik.mvn2sbt;
 
 import org.maven.Plugin;
 import scala.Function1;
+import scala.collection.Seq;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -23,9 +24,9 @@ public enum PluginEnum {
     private final String plugin;
     private final String extraRepository;
     private final List<Dependency> dependencies;
-    private final Function1<Plugin, String> function;
+    private final Function1<Plugin, Seq<String>> function;
 
-    private PluginEnum(String artifactId, String sbtSetting, String plugin, String extraRepository, List<Dependency> dependencies, Function1<Plugin, String> function) {
+    private PluginEnum(String artifactId, String sbtSetting, String plugin, String extraRepository, List<Dependency> dependencies, Function1<Plugin, Seq<String>> function) {
         this.artifactId = artifactId;
         this.sbtSetting = sbtSetting;
         this.plugin = plugin;
@@ -54,7 +55,7 @@ public enum PluginEnum {
         return dependencies;
     }
 
-    public Function1<Plugin, String> getFunction() {
+    public Function1<Plugin, Seq<String>> getFunction() {
         return function;
     }
 }

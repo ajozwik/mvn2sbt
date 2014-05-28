@@ -150,16 +150,16 @@
 [INFO] ------------------------------------------------------------------------
 [INFO] Reactor Summary:
 [INFO] 
-[INFO] Logback-Parent .................................... SUCCESS [  0.930 s]
-[INFO] Logback Core Module ............................... SUCCESS [  0.445 s]
-[INFO] Logback Classic Module ............................ SUCCESS [  0.117 s]
-[INFO] Logback Access Module ............................. SUCCESS [  0.051 s]
-[INFO] Logback Site ...................................... SUCCESS [  0.010 s]
-[INFO] Logback Examples Module ........................... SUCCESS [  0.024 s]
+[INFO] Logback-Parent .................................... SUCCESS [  1.526 s]
+[INFO] Logback Core Module ............................... SUCCESS [  0.915 s]
+[INFO] Logback Classic Module ............................ SUCCESS [  0.213 s]
+[INFO] Logback Access Module ............................. SUCCESS [  0.096 s]
+[INFO] Logback Site ...................................... SUCCESS [  0.015 s]
+[INFO] Logback Examples Module ........................... SUCCESS [  0.047 s]
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
 [INFO] ------------------------------------------------------------------------
-[INFO] Total time: 2.918 s
-[INFO] Finished at: 2014-05-22T16:38:07+01:00
+[INFO] Total time: 5.198 s
+[INFO] Finished at: 2014-05-28T16:11:18+01:00
 [INFO] Final Memory: 17M/140M
 [INFO] ------------------------------------------------------------------------

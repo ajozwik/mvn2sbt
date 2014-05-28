@@ -2,10 +2,10 @@ package pl.jozwik.mvn2sbt
 
 import java.nio.file.Paths
 import java.io.File
+import Mvn2Sbt._
 
+abstract class AbstractProjectSpec(project:String,inputFile:String = INPUT_TXT)  extends AbstractSpec {
 
-abstract class AbstractProjectSpec(project:String,inputFile:String = "input.txt")  extends AbstractSpec {
-  import Mvn2Sbt._
 
   getClass.getSimpleName should {
 

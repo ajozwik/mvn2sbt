@@ -10,6 +10,7 @@ import org.maven.Plugin
 object Mvn2Sbt extends StrictLogging {
   final val BUILD_SBT = "build.sbt"
   final val PLUGINS_SBT = "plugins.sbt"
+  final val INPUT_TXT = "input.txt"
 
   def projectsFromFile(inputFile: File) = {
     val it = fileToIterator(inputFile)
@@ -42,7 +43,7 @@ object Mvn2Sbt extends StrictLogging {
 
   def run(rootDir: File, outputDir: File) {
     val hierarchy = scanHierarchy(rootDir)
-    val projectsWithoutPath = fromMavenCommand(rootDir)
+    val projectsWithoutPath = projectsFromFile(new File(rootDir,INPUT_TXT))
 
 
     createSbtFile(projectsWithoutPath, hierarchy, rootDir, outputDir)

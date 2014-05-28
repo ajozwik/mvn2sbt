@@ -6,7 +6,7 @@ import org.maven.{Plugins4, Parent, Model}
 import scala.util.{Try, Success, Failure}
 
 object DirProjectExtractor {
-  final val POM_XML = "pom.xml"
+  final val POM_XML = "effective-pom.xml"
 }
 
 case class DirProjectExtractor(rootDir: File) extends LazyLogging {
@@ -19,7 +19,7 @@ case class DirProjectExtractor(rootDir: File) extends LazyLogging {
     dir.listFiles().find(f => f.getName == POM_XML) match {
       case Some(pomXml) =>
         handlePomFile(pomXml,parent)
-      case None => sys.error(s"$POM_XML file missing in ${dir.getAbsolutePath}")
+      case None => sys.error(s"$POM_XML file missing in ${dir.getAbsolutePath}, run scala Eff.sc <rootDir> first")
     }
 
   private def handlePomFile(pomXml:File, parent: Option[MavenDependency]) = {
@@ -56,8 +56,11 @@ case class DirProjectExtractor(rootDir: File) extends LazyLogging {
 
   private def valueFromOptions(option: Option[String], default: Option[String]) =
     (option, default) match {
-      case (Some(value), _) => value
-      case (_, Some(defaultValue)) => defaultValue
-      case _ => sys.error("Wrong configuration")
+      case (Some(value), _) =>
+        value
+      case (_, Some(defaultValue)) =>
+        defaultValue
+      case _ =>
+        sys.error("Wrong configuration")
     }
 }

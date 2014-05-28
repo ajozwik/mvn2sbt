@@ -3,6 +3,7 @@ package pl.jozwik.mvn2sbt
 import java.io.{Writer, File}
 import com.typesafe.scalalogging.slf4j.LazyLogging
 import scala.collection.JavaConversions._
+import org.maven.Plugin
 
 object SbtContent {
   def toPath(path: File, rootDir: File) = {
@@ -67,16 +68,19 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
     contains || parentMatch
   }
 
-  private def toPlugins(plugins: Seq[PluginEnum]): (Seq[String], String, Seq[Dependency]) = {
+  private def toPlugins(plugins: Seq[(PluginEnum, Plugin)]): (Seq[String], String, Seq[Dependency]) = {
     plugins.foldLeft((Seq[String](), "", Seq[Dependency]())) { (tuple, p) =>
       val (accSett, accPlug, accPluginDependencies) = tuple
-      (s"${p.getSbtSetting}" +: accSett,
-        accPlug + s"""
-         |${p.getPlugin}
+      val (pluginEnum, plugin) = p
+      val settings = s"${pluginEnum.getSbtSetting}" +: accSett
+      val customPluginSettings = pluginEnum.getFunction()(plugin)
+      val plugins = accPlug + s"""
+         |${pluginEnum.getPlugin}
          |
-         |${p.getExtraRepository}
+         |${pluginEnum.getExtraRepository}
          |
-       """.stripMargin, p.getDependencies ++ accPluginDependencies)
+       """.stripMargin
+      (customPluginSettings ++ settings, plugins, pluginEnum.getDependencies ++ accPluginDependencies)
     }
   }
 
