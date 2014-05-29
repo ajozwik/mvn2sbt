@@ -89,7 +89,8 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
       case Scope.test => """% "test -> test""""
       case _ => ""
     }
-    s"""`${hierarchy(d.mavenDependency).projectPath.getName}`$test"""
+//    val proj =hierarchy(d.mavenDependency)
+    s"""`${d.mavenDependency.artifactId}`$test"""
   }.mkString(",")
 
   private def createBuildSbt(p: Project, projectName: String, path: String, dependencies: String, dependsOnString: String, settings: Seq[String]) = {
