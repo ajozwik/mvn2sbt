@@ -30,7 +30,7 @@ case class DirProjectExtractor(rootDir: File) extends LazyLogging {
         throw th
     }
     val pomModel = scalaxb.fromXML[org.maven.Model](xmlFromFile)
-    addToMap(pomXml.getParentFile, pomModel, parent)
+    createProjectMap(pomXml.getParentFile, pomModel, parent)
   }
 
   def toPomParent(parent: Option[Parent]) = parent match {
@@ -39,13 +39,17 @@ case class DirProjectExtractor(rootDir: File) extends LazyLogging {
   }
 
 
-  private def addToMap(dir: File, pomModel: Model, parent: Option[MavenDependency]): Map[MavenDependency, ProjectInformation] = {
+  private def createProjectMap(dir: File, pomModel: Model, parent: Option[MavenDependency]): Map[MavenDependency, ProjectInformation] = {
     val groupId = valueFromOptions(pomModel.groupId, parent.map(_.groupId))
     val version = valueFromOptions(pomModel.version, parent.map(_.versionId))
     val dependency = MavenDependency(groupId, pomModel.artifactId.get, version)
     val pomParent = toPomParent(pomModel.parent)
     val plugins = MavenSbtPluginMapper(pomModel).plugins
-    val currMap = Map(dependency -> ProjectInformation(dir, pomParent, plugins: _*))
+    val resolvers = pomModel.repositories.map(r =>r.repository.flatMap(_.url)) match{
+      case Some(seq) => seq
+      case _ => Seq.empty[String]
+    }
+    val currMap = Map(dependency -> ProjectInformation(dir, pomParent,resolvers.toSet, plugins: _*))
     pomModel.modules match {
       case None => currMap
       case Some(modules) =>

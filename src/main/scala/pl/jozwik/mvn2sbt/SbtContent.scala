@@ -17,13 +17,14 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
         |def ProjectName(name: String,path:String): Project =  Project(name, file(path))
         |
       """.stripMargin)
-    projects.foreach { p =>
+    val contentOfPluginSbt = projects.foldLeft(Set[String]()) { (acc,p) =>
       val projectOutput = createProject(p)
       val (buildSbt, pluginsSbt) = projectOutput
       buildSbtWriter.write(buildSbt)
-      pluginsSbtWriter.write(pluginsSbt)
+      acc ++ pluginsSbt
     }
 
+    pluginsSbtWriter.write(contentOfPluginSbt.mkString("\n\n"))
   }
 
   private def createProject(p: Project) = {
@@ -41,7 +42,7 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
 
 
 
-    (createBuildSbt(p, projectName, path, dependencies, dependsOnString, settings), plugins.mkString("","\n\n",if(plugins.isEmpty)"" else "\n\n"))
+    (createBuildSbt(p, projectName, path, dependencies, dependsOnString, settings), plugins)
   }
 
 
