@@ -4,10 +4,21 @@
     <artifactId>thrift1</artifactId>
     <groupId>pl.jozwik</groupId>
     <version>1.0.0</version>
-    <name>Thrift interfaces</name>
+    <name>Thrift interfaces 1</name>
     <properties>
         <generated.sources>target/generated-sources/thrift</generated.sources>
     </properties>
+
+    <repositories>
+        <repository>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <id>repo</id>
+            <name>repo</name>
+            <url>http://repo.maven.apache.org/maven2</url>
+        </repository>
+    </repositories>
 
     <parent>
         <groupId>pl.jozwik</groupId>

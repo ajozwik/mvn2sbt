@@ -17,32 +17,38 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
         |def ProjectName(name: String,path:String): Project =  Project(name, file(path))
         |
       """.stripMargin)
-    val contentOfPluginSbt = projects.foldLeft(Set[String]()) { (acc,p) =>
-      val projectOutput = createProject(p)
-      val (buildSbt, pluginsSbt) = projectOutput
+    val (contentOfPluginSbt,resolvers) = projects.foldLeft((Set[String](),Set[String]())) { (acc,p) =>
+      val (accContent,accResolvers) = acc
+      val (buildSbt, pluginsSbt,resolvers) = handleProject(p)
       buildSbtWriter.write(buildSbt)
-      acc ++ pluginsSbt
+      (accContent ++ pluginsSbt,accResolvers ++ resolvers)
+    }
+    if(resolvers.nonEmpty){
+      buildSbtWriter.write("resolvers++=Seq(")
+    buildSbtWriter.write(resolvers.map(x =>
+      s""""$x" at "$x"""").mkString(",\n"))
+      buildSbtWriter.write(")\n\n")
     }
 
     pluginsSbtWriter.write(contentOfPluginSbt.mkString("\n\n"))
   }
 
-  private def createProject(p: Project) = {
+  private def handleProject(p: Project):(String,Set[String],Set[String]) = {
     val projectName = p.mavenDependency.artifactId
     val information = hierarchy(p.mavenDependency)
     val path = toPath(information.projectPath, rootDir)
 
     val (dependsOn, libraries) = splitToDependsOnLibraries(p, information)
 
-    val (settings, plugins, pluginDependencies) = toPlugins(information.plugins)
+    val (settings, plugins, pluginDependencies) = handlePlugins(information.plugins)
 
-    val dependencies = toDependencies(pluginDependencies ++ libraries)
+    val dependencies = dependenciesToString(pluginDependencies ++ libraries)
 
-    val dependsOnString = toDependsOnString(dependsOn, information)
+    val dependsOnString = dependsOnToString(dependsOn, information)
 
 
 
-    (createBuildSbt(p, projectName, path, dependencies, dependsOnString, settings), plugins)
+    (createBuildSbt(p, projectName, path, dependencies, dependsOnString, settings), plugins,information.resolvers)
   }
 
 
@@ -57,7 +63,7 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
     contains || parentMatch
   }
 
-  private def toPlugins(plugins: Seq[(PluginEnum, Plugin)]): (Seq[String], Set[String], Seq[Dependency]) = {
+  private def handlePlugins(plugins: Seq[(PluginEnum, Plugin)]): (Seq[String], Set[String], Seq[Dependency]) = {
     plugins.foldLeft((Seq[String](), Set.empty[String], Seq[Dependency]())) { (tuple, p) =>
       val (accSett, accPlug, accPluginDependencies) = tuple
       val (pluginEnum, plugin) = p
@@ -69,7 +75,7 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
   }
 
 
-  def toDependencies(libraries: Seq[Dependency]) = libraries.map { d =>
+  def dependenciesToString(libraries: Seq[Dependency]) = libraries.map { d =>
     val md = d.mavenDependency
     val scope = d.scope match {
       case Scope.compile => ""
@@ -80,7 +86,7 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
   }.mkString("", ",\n   ", "")
 
 
-  private def toDependsOnString(dependsOn: Seq[Dependency], information: ProjectInformation) = dependsOn.map { d =>
+  private def dependsOnToString(dependsOn: Seq[Dependency], information: ProjectInformation) = dependsOn.map { d =>
     val test = d.scope match {
       case Scope.test => """% "test -> test""""
       case _ => ""

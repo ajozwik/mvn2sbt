@@ -4,7 +4,7 @@
     <artifactId>thrift2</artifactId>
     <groupId>pl.jozwik</groupId>
     <version>1.0.0</version>
-    <name>Thrift interfaces</name>
+    <name>Thrift interfaces 2</name>
     <properties>
         <generated.sources>target/generated-sources/thrift</generated.sources>
     </properties>
@@ -14,6 +14,17 @@
         <version>1.1.2</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
+
+    <repositories>
+        <repository>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <id>repo</id>
+            <name>repo</name>
+            <url>http://repo.maven.apache.org/maven2</url>
+        </repository>
+    </repositories>
 
     <build>
         <plugins>

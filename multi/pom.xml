@@ -22,15 +22,23 @@
         <junit.version>4.10</junit.version>
 
     </properties>
-    
+
     <repositories>
         <repository>
-            <snapshots>
+            <releases>
                 <enabled>false</enabled>
+                <updatePolicy>always</updatePolicy>
+                <checksumPolicy>warn</checksumPolicy>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+                <checksumPolicy>fail</checksumPolicy>
             </snapshots>
-            <id>repo</id>
-            <name>repo</name>
-            <url>http://repo.maven.apache.org/maven2</url>
+            <id>codehausSnapshots</id>
+            <name>Codehaus Snapshots</name>
+            <url>http://snapshots.maven.codehaus.org/maven2</url>
+            <layout>default</layout>
         </repository>
     </repositories>
 

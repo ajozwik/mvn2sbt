@@ -4,6 +4,8 @@ packSettings
 
 packMain := Map("mvn2sbt" -> "pl.jozwik.mvn2sbt.Mvn2Sbt")
 
+incOptions := incOptions.value.withNameHashing(true)
+
 name := "mvn2sbt"
 
 organization := "pl.jozwik"
