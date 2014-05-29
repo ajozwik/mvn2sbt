@@ -1,6 +1,6 @@
 package pl.jozwik.mvn2sbt
 
-import java.io.{Writer, File, PrintWriter}
+import java.io.{File, PrintWriter}
 import scala.io.Source
 import com.typesafe.scalalogging.slf4j.StrictLogging
 import java.nio.file.{Paths, Path}
@@ -34,7 +34,9 @@ object Mvn2Sbt extends StrictLogging {
     val projectDir = new File(outputDir, PROJECT)
     projectDir.mkdirs()
     val pluginsSbt = new File(projectDir, PLUGINS_SBT)
-    writeToFiles(buildSbt, pluginsSbt, SbtContent(projectsWithoutPath, hierarchy, rootDir).write)
+    val (buildSbtContent, pluginSbtContent) = SbtContent(projectsWithoutPath, hierarchy, rootDir).write
+    writeToFile(buildSbt, buildSbtContent)
+    writeToFile(pluginsSbt, pluginSbtContent)
   }
 
 
@@ -50,17 +52,15 @@ object Mvn2Sbt extends StrictLogging {
   def sbtFile(rootDir: Path) = Paths.get(rootDir.toFile.getAbsolutePath, BUILD_SBT)
 
 
-  private def writeToFiles(buildSbt: File, pluginsSbt: File, f: (Writer, Writer) => Unit) = {
-    Some((new PrintWriter(buildSbt), new PrintWriter(pluginsSbt))).foreach {
-      case (bpw, ppw) =>
-        try {
-          f(bpw, ppw)
-        } finally {
-          IOUtils.closeQuietly(bpw)
-          IOUtils.closeQuietly(ppw)
-        }
-    }
+  private def writeToFile(file: File, content: String) = Some(new PrintWriter(file)).foreach {
+    writer =>
+      try {
+        writer.write(content)
+      } finally {
+        IOUtils.closeQuietly(writer)
+      }
   }
+
 
   def main(args: Array[String]) {
 

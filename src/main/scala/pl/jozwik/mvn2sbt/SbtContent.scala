@@ -1,6 +1,6 @@
 package pl.jozwik.mvn2sbt
 
-import java.io.{Writer, File}
+import java.io.File
 import com.typesafe.scalalogging.slf4j.LazyLogging
 import scala.collection.JavaConversions._
 import org.maven.Plugin
@@ -10,30 +10,37 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
 
   import Converters._
 
-  def write(buildSbtWriter: Writer, pluginsSbtWriter: Writer) {
-    buildSbtWriter.write(
-      """
-        |
-        |def ProjectName(name: String,path:String): Project =  Project(name, file(path))
-        |
-      """.stripMargin)
-    val (contentOfPluginSbt,resolvers) = projects.foldLeft((Set[String](),Set[String]())) { (acc,p) =>
-      val (accContent,accResolvers) = acc
-      val (buildSbt, pluginsSbt,resolvers) = handleProject(p)
-      buildSbtWriter.write(buildSbt)
-      (accContent ++ pluginsSbt,accResolvers ++ resolvers)
-    }
-    if(resolvers.nonEmpty){
-      buildSbtWriter.write("resolvers++=Seq(")
-    buildSbtWriter.write(resolvers.map(x =>
-      s""""$x" at "$x"""").mkString(",\n"))
-      buildSbtWriter.write(")\n\n")
-    }
+  def write: (String, String) = {
+    val buildSbtWriter = new StringBuilder
+    val pluginsSbtWriter = new StringBuilder
 
-    pluginsSbtWriter.write(contentOfPluginSbt.mkString("\n\n"))
+    buildSbtWriter.append("def ProjectName(name: String,path:String): Project =  Project(name, file(path))\n\n")
+    val (contentOfPluginSbt, resolvers, buildSbtProjects) = projects.foldLeft((Set[String](), Set[String](), new StringBuilder)) { (acc, p) =>
+      val (accContent, accResolvers, sb) = acc
+      val (projectContent, pluginsSbt, resolvers) = handleProject(p)
+      (accContent ++ pluginsSbt, accResolvers ++ resolvers, sb.append(projectContent))
+    }
+    resolversToOption(resolvers).foreach(buildSbtWriter.append)
+    buildSbtWriter.append(buildSbtProjects)
+    pluginsSbtWriter.append(contentOfPluginSbt.mkString("\n\n"))
+    (buildSbtWriter.toString(), pluginsSbtWriter.toString())
   }
 
-  private def handleProject(p: Project):(String,Set[String],Set[String]) = {
+  private def resolversToOption(resolvers: Set[String]) = if (resolvers.isEmpty) {
+    None
+  } else {
+    val start = "resolvers++=Seq("
+    val resolversString = resolvers.map { x =>
+      val name = doubleQuote(x)
+      s"$name at $name"
+    }.mkString(
+        """,
+        """.stripMargin)
+    val stop = ")\n"
+    Some(start + resolversString + stop)
+  }
+
+  private def handleProject(p: Project): (String, Set[String], Set[String]) = {
     val projectName = p.mavenDependency.artifactId
     val information = hierarchy(p.mavenDependency)
     val path = toPath(information.projectPath, rootDir)
@@ -48,7 +55,7 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
 
 
 
-    (createBuildSbt(p, projectName, path, dependencies, dependsOnString, settings), plugins,information.resolvers)
+    (createBuildSbt(p, projectName, path, dependencies, dependsOnString, settings), plugins, information.resolvers)
   }
 
 
@@ -67,10 +74,10 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
     plugins.foldLeft((Seq[String](), Set.empty[String], Seq[Dependency]())) { (tuple, p) =>
       val (accSett, accPlug, accPluginDependencies) = tuple
       val (pluginEnum, plugin) = p
-      val settings =  s"${pluginEnum.getSbtSetting}" +: accSett
-      val customPluginSettings = pluginEnum.getFunction()(rootDir,plugin)
-      val plugins = accPlug + (pluginEnum.getPlugin, pluginEnum.getExtraRepository)
-      (settings ++ customPluginSettings , plugins, pluginEnum.getDependencies ++ accPluginDependencies)
+      val settings = pluginEnum.getSbtSetting +: accSett
+      val customPluginSettings = pluginEnum.getFunction()(rootDir, plugin)
+      val plugins = accPlug +(pluginEnum.getPlugin, pluginEnum.getExtraRepository)
+      (settings ++ customPluginSettings, plugins, pluginEnum.getDependencies ++ accPluginDependencies)
     }
   }
 
@@ -79,16 +86,16 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
     val md = d.mavenDependency
     val scope = d.scope match {
       case Scope.compile => ""
-      case x => s""" % "$x" """
+      case x => s" % ${doubleQuote(x)}"
     }
-    s"""  "${md.groupId}" % "${md.artifactId}" % "${md.versionId}" $scope"""
+    s"""${doubleQuote(md.groupId)} % "${md.artifactId}" % "${md.versionId}"$scope"""
 
   }.mkString("", ",\n   ", "")
 
 
   private def dependsOnToString(dependsOn: Seq[Dependency], information: ProjectInformation) = dependsOn.map { d =>
     val test = d.scope match {
-      case Scope.test => """% "test -> test""""
+      case Scope.test => s"% ${doubleQuote("test -> test")}"
       case _ => ""
     }
     s"""`${d.mavenDependency.artifactId}`$test"""
@@ -97,32 +104,30 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
   private def createBuildSbt(p: Project, projectName: String, path: String, dependencies: String, dependsOnString: String, settings: Seq[String]) = {
 
     if (path.isEmpty) {
-      s"""|
+      s"""
         |version := "${p.mavenDependency.versionId}"
         |
         |name := "${p.mavenDependency.artifactId}"
         |
         |organization := "${p.mavenDependency.groupId}"
         |
-        |libraryDependencies in Global ++= Seq($dependencies
-        |)
+        |libraryDependencies in Global ++= Seq($dependencies)
         |
         |${settings.mkString("", "\n\n", "")}
-        """.stripMargin
+""".stripMargin
     } else {
       val s = settings.mkString(".settings(", ").settings(", ")")
-      s"""
-      |
-      |lazy val `$projectName` = ProjectName("$projectName","$path").settings(
-      |  libraryDependencies ++= Seq($dependencies
-      |    ),
+      s"""lazy val `$projectName` = ProjectName("$projectName","$path").settings(
+      |  libraryDependencies ++= Seq($dependencies),
       |    name := "${p.mavenDependency.artifactId}",
       |    version := "${p.mavenDependency.versionId}",
       |    organization := "${p.mavenDependency.groupId}"
       |)$s.dependsOn($dependsOnString)
       |
-    """.stripMargin
+""".stripMargin
     }
   }
 
+
+  private def doubleQuote(str: Any) = "\"" + str + "\""
 }
