@@ -5,22 +5,10 @@ import com.typesafe.scalalogging.slf4j.LazyLogging
 import scala.collection.JavaConversions._
 import org.maven.Plugin
 
-object SbtContent {
-  def toPath(path: File, rootDir: File) = {
-    val dir = path.getAbsolutePath
-    val root = rootDir.getAbsolutePath
-    val diff = dir.substring(root.length)
-    if (diff.startsWith(File.separator)) {
-      diff.substring(1)
-    } else {
-      diff
-    }
-  }
-}
 
 case class SbtContent(private val projects: Seq[Project], private val hierarchy: Map[MavenDependency, ProjectInformation], private val rootDir: File) extends LazyLogging {
 
-  import SbtContent._
+  import Converters._
 
   def write(buildSbtWriter: Writer, pluginsSbtWriter: Writer) {
     buildSbtWriter.write(
@@ -72,8 +60,8 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
     plugins.foldLeft((Seq[String](), "", Seq[Dependency]())) { (tuple, p) =>
       val (accSett, accPlug, accPluginDependencies) = tuple
       val (pluginEnum, plugin) = p
-      val settings = s"${pluginEnum.getSbtSetting}" +: accSett
-      val customPluginSettings = pluginEnum.getFunction()(plugin)
+      val settings =  accSett :+ s"${pluginEnum.getSbtSetting}"
+      val customPluginSettings = pluginEnum.getFunction()(rootDir,plugin)
       val plugins = accPlug + s"""
          |${pluginEnum.getPlugin}
          |

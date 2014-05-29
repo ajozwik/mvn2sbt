@@ -4,34 +4,67 @@ import org.maven.{Configuration4, Plugin}
 import scala.xml.{NodeSeq, Node}
 import scalaxb.DataRecord
 
+import java.io.File
 
 object Converters {
-  type Converter = Plugin => Seq[String]
 
-  def cxfConverter: Converter = plugin => {
+  def toPath(path: File, rootDir: File):String = {
+    val dir = path.getCanonicalPath
+    val root = rootDir.getCanonicalPath
+    val diff = dir.substring(root.length)
+    if (diff.startsWith(File.separator)) {
+      diff.substring(1)
+    } else {
+      diff
+    }
+  }
+
+  def toPath(path: String, rootDir: File):String = toPath(new File(path),rootDir)
+
+  type Converter = (File,Plugin) => Seq[String]
+
+  val cxfConverter: Converter = (rootDir,plugin) => CxfConverter(rootDir).convert(plugin)
+
+  val thriftConverter: Converter = (rootDir,plugin) => Nil
+
+  val groovyConverter: Converter = (rootDir,plugin) => Nil
+}
+
+
+case class CxfConverter(rootDir:File) extends PomToSbtPluginConverter {
+  import Converters.toPath
+  def convert(plugin:Plugin):Seq[String] = {
     val execution = plugin.executions.get.execution
     val configuration4 = execution.map { ex =>
-      ex.configuration.get
+      ex.configuration
     }
-    val confHead = configuration4.head
+    configuration4 match {
+      case (Some(confHead:Configuration4) :: tail) =>
+        val defaultOptSeq = extractMap(confHead, "defaultOptions").getOrElse("",Seq[String]())
 
-    val defaultOptions: Map[String, Seq[String]] = extractElement(confHead, "defaultOptions") match {
-      case Some(node) => extractWsdlOption(node.value.asInstanceOf[Node])
-      case _ => Map.empty
+        val wsdlOptionSeq = extractMap(confHead, "wsdlOptions","wsdlOption")
+
+        val wsdls = wsdlOptionSeq.map {
+          case (wsdl, seq) =>
+            val diff = toPath(wsdl,rootDir)
+            val s = defaultOptSeq ++ seq
+            s"""cxf.Wsdl(file("$diff"), Seq(${
+              s.mkString("\"", "\",\"", "\"")
+            }), "${wsdl.hashCode}")"""
+        }
+
+        Seq( s"""cxf.wsdls :=Seq(${
+          wsdls.mkString(",\n\t")
+        })""")
+      case _ => Nil
     }
+  }
 
-    val wsdlOptionSeq: Map[String, Seq[String]] = extractElement(confHead, "wsdlOptions") match {
-      case Some(wsdlOptions) => extractWsdlOption(wsdlOptions.value.asInstanceOf[Node])
-      case _ => Map.empty
-    }
-
-    val wsdls = wsdlOptionSeq.map {
-      case (wsdl, seq) =>
-        val s = defaultOptions.getOrElse(wsdl, Nil) ++ seq
-        s"""cxf.Wsdl("$wsdl", Seq(${s.mkString("\"", "\",\"", "\"")}), None)"""
-    }
-
-    Seq( s"""cxf.wsdls :=Seq(${wsdls.mkString(",\n\t")})""")
+  def extractMap(confHead: Configuration4, name: String,elements:String*): Map[String, Seq[String]] = extractElement(confHead, name) match {
+    case Some(node) =>
+      val cast = node.value.asInstanceOf[Node]
+      extractWsdlOption(cast,elements:_*)
+    case _ => Map.empty
   }
 
   def extractElement(confHead: Configuration4, name: String): Option[DataRecord[Any]] = {
@@ -40,13 +73,13 @@ object Converters {
     }
   }
 
-  private def extractNode(elem: Node, first: String, names: String*): NodeSeq = {
+  private def extractNode(elem: Node, first: String, names: String*): NodeSeq =
     names.foldLeft(elem \ first)((acc, name) => acc \ name)
-  }
 
 
-  private def extractWsdlOption(elem: Node) = {
-    val wsdlOption = extractNode(elem, "wsdlOption")
+
+  private def extractWsdlOption(elem: Node,elements:String*) = {
+    val wsdlOption = elements.foldLeft(elem.asInstanceOf[NodeSeq])((acc,name)=>acc \ name)
     wsdlOptionFromNode(wsdlOption)
   }
 
@@ -63,9 +96,12 @@ object Converters {
   private def buildExtraArgs(node: Node) = extractNode(node, "extraargs", "extraarg").map(_.text)
 
   private def buildBindings(node: Node) =
-    extractNode(node, "bindingFiles", "bindingFile").map(_.text)
+    extractNode(node, "bindingFiles", "bindingFile").flatMap(x=> Seq("-db",toPath(x.text,rootDir)))
 
-  def thriftConverter: Converter = plugin => Nil
+}
 
-  def groovyConverter: Converter = plugin => Nil
+
+sealed trait PomToSbtPluginConverter {
+  def convert(plugin:Plugin): Seq[String]
+
 }

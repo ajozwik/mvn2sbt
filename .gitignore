@@ -18,3 +18,4 @@ logs/
 .classpath
 .project
 *.class
+effective-pom.xml

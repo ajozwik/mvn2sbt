@@ -4,6 +4,16 @@ import java.nio.file.Paths
 import java.io.File
 import Mvn2Sbt._
 
+class CxfSpec extends AbstractProjectSpec("cxf")
+
+class Slf4jPomSpec extends AbstractProjectSpec("slf4j")
+
+class ThriftSpec extends AbstractProjectSpec("thrift")
+
+
+class LogbackPomSpec extends AbstractProjectSpec("logback")
+
+
 abstract class AbstractProjectSpec(project:String,inputFile:String = INPUT_TXT)  extends AbstractSpec {
 
 

@@ -9,6 +9,7 @@ import org.maven.Plugin
 
 object Mvn2Sbt extends StrictLogging {
   final val BUILD_SBT = "build.sbt"
+  final val PROJECT = "project"
   final val PLUGINS_SBT = "plugins.sbt"
   final val INPUT_TXT = "input.txt"
 
@@ -17,11 +18,6 @@ object Mvn2Sbt extends StrictLogging {
     iteratorToProjects(it)
   }
 
-  def fromMavenCommand(rootDir: File) = {
-    import sys.process._
-    val stream = Process(Seq("mvn", "dependency:tree"), rootDir).lineStream
-    iteratorToProjects(stream)
-  }
 
   private def iteratorToProjects(iterator: TraversableOnce[String]) = StreamProjectExtractor(iterator).projects
 
@@ -36,7 +32,9 @@ object Mvn2Sbt extends StrictLogging {
   def createSbtFile(projectsWithoutPath: Seq[Project], hierarchy: Map[MavenDependency, ProjectInformation], rootDir: File, outputDir: File) = {
     outputDir.mkdirs()
     val buildSbt = new File(outputDir, BUILD_SBT)
-    val pluginsSbt = new File(outputDir, PLUGINS_SBT)
+    val projectDir = new File(outputDir,PROJECT)
+    projectDir.mkdirs()
+    val pluginsSbt = new File(projectDir, PLUGINS_SBT)
     writeToFiles(buildSbt, pluginsSbt, SbtContent(projectsWithoutPath, hierarchy, rootDir).write)
   }
 
