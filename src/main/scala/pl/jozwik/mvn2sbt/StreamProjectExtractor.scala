@@ -54,16 +54,24 @@ case class StreamProjectExtractor(private val iterator: TraversableOnce[String])
 
   import StreamProjectExtractor._
 
-  val (projects, _) = cutInfo.foldLeft((Seq[Project](), false)) { (acc: (Seq[Project], Boolean), line: String) =>
-    val (projects, started) = acc
+  val projects = {
+    val (p, _) = cutInfo.foldLeft((Seq[Project](), false)) {
+      (acc: (Seq[Project], Boolean), line: String) =>
+        val (accProjects, started) = acc
+        handleLine(accProjects, line, started)
+    }
+    p.reverse
+  }
+
+  private def handleLine(accProjects: Seq[Project], line: String, started: Boolean): (Seq[Project], Boolean) = {
     if (line.startsWith(PROJECT_START)) {
-      (projects, true)
+      (accProjects, true)
     } else if (line.startsWith(START_DEPENDENCY)) {
-      addDependency(line, projects)
+      addDependency(line, accProjects)
     } else if (started) {
-      addProject(line, projects)
+      addProject(line, accProjects)
     } else {
-      (projects, false)
+      (accProjects, false)
     }
   }
 

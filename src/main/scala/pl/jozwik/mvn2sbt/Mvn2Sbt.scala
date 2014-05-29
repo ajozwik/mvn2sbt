@@ -31,7 +31,7 @@ object Mvn2Sbt extends StrictLogging {
   def createSbtFile(projectsWithoutPath: Seq[Project], hierarchy: Map[MavenDependency, ProjectInformation], rootDir: File, outputDir: File) = {
     outputDir.mkdirs()
     val buildSbt = new File(outputDir, BUILD_SBT)
-    val projectDir = new File(outputDir,PROJECT)
+    val projectDir = new File(outputDir, PROJECT)
     projectDir.mkdirs()
     val pluginsSbt = new File(projectDir, PLUGINS_SBT)
     writeToFiles(buildSbt, pluginsSbt, SbtContent(projectsWithoutPath, hierarchy, rootDir).write)
@@ -40,7 +40,7 @@ object Mvn2Sbt extends StrictLogging {
 
   def run(rootDir: File, outputDir: File) {
     val hierarchy = scanHierarchy(rootDir)
-    val projectsWithoutPath = projectsFromFile(new File(rootDir,INPUT_TXT))
+    val projectsWithoutPath = projectsFromFile(new File(rootDir, INPUT_TXT))
 
 
     createSbtFile(projectsWithoutPath, hierarchy, rootDir, outputDir)
@@ -51,19 +51,20 @@ object Mvn2Sbt extends StrictLogging {
 
 
   private def writeToFiles(buildSbt: File, pluginsSbt: File, f: (Writer, Writer) => Unit) = {
-    Some((new PrintWriter(buildSbt), new PrintWriter(pluginsSbt))).foreach { case (bpw, ppw) =>
-      try {
-        f(bpw, ppw)
-      } finally {
-        IOUtils.closeQuietly(bpw)
-        IOUtils.closeQuietly(ppw)
-      }
+    Some((new PrintWriter(buildSbt), new PrintWriter(pluginsSbt))).foreach {
+      case (bpw, ppw) =>
+        try {
+          f(bpw, ppw)
+        } finally {
+          IOUtils.closeQuietly(bpw)
+          IOUtils.closeQuietly(ppw)
+        }
     }
   }
 
   def main(args: Array[String]) {
 
-    def toAbsolutePath(f:File) = f.getAbsolutePath
+    def toAbsolutePath(f: File) = f.getAbsolutePath
 
     if (args.length == 2) {
       val rootDir = new File(args(0))
@@ -71,7 +72,7 @@ object Mvn2Sbt extends StrictLogging {
       println(s"Start with ${toAbsolutePath(rootDir)}, output to ${toAbsolutePath(outputPath)}")
       if (rootDir.isDirectory) {
         run(rootDir, outputPath)
-        println(s"""Go to $outputPath and copy $BUILD_SBT to $rootDir and $PLUGINS_SBT to ${new File(rootDir,"project")}""")
+        println( s"""Go to $outputPath and copy $BUILD_SBT to $rootDir and $PLUGINS_SBT to ${new File(rootDir, "project")}""")
         sys.exit()
       }
     }
