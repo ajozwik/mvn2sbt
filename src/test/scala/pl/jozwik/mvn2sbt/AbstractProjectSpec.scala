@@ -4,6 +4,8 @@ import java.nio.file.Paths
 import java.io.File
 import Mvn2Sbt._
 
+class MultiSpec extends AbstractProjectSpec("multi")
+
 class CxfSpec extends AbstractProjectSpec("cxf")
 
 class Slf4jPomSpec extends AbstractProjectSpec("slf4j")

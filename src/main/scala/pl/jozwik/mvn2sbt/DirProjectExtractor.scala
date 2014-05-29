@@ -19,7 +19,7 @@ case class DirProjectExtractor(rootDir: File) extends LazyLogging {
     dir.listFiles().find(f => f.getName == POM_XML) match {
       case Some(pomXml) =>
         handlePomFile(pomXml,parent)
-      case None => sys.error(s"$POM_XML file missing in ${dir.getAbsolutePath}, run scala Eff.sc <rootDir> first")
+      case None => sys.error(s"""$POM_XML file missing in ${dir.getAbsolutePath}, run "scala Eff.sc ${dir.getAbsolutePath}" first""")
     }
 
   private def handlePomFile(pomXml:File, parent: Option[MavenDependency]) = {

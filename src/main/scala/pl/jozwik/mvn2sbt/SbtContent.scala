@@ -41,7 +41,7 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
 
 
 
-    (createBuildSbt(p, projectName, path, dependencies, dependsOnString, settings), plugins)
+    (createBuildSbt(p, projectName, path, dependencies, dependsOnString, settings), plugins.mkString("","\n\n",if(plugins.isEmpty)"" else "\n\n"))
   }
 
 
@@ -56,18 +56,13 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
     contains || parentMatch
   }
 
-  private def toPlugins(plugins: Seq[(PluginEnum, Plugin)]): (Seq[String], String, Seq[Dependency]) = {
-    plugins.foldLeft((Seq[String](), "", Seq[Dependency]())) { (tuple, p) =>
+  private def toPlugins(plugins: Seq[(PluginEnum, Plugin)]): (Seq[String], Set[String], Seq[Dependency]) = {
+    plugins.foldLeft((Seq[String](), Set.empty[String], Seq[Dependency]())) { (tuple, p) =>
       val (accSett, accPlug, accPluginDependencies) = tuple
       val (pluginEnum, plugin) = p
       val settings =  s"${pluginEnum.getSbtSetting}" +: accSett
       val customPluginSettings = pluginEnum.getFunction()(rootDir,plugin)
-      val plugins = accPlug + s"""
-         |${pluginEnum.getPlugin}
-         |
-         |${pluginEnum.getExtraRepository}
-         |
-       """.stripMargin
+      val plugins = accPlug + (pluginEnum.getPlugin, pluginEnum.getExtraRepository)
       (settings ++ customPluginSettings , plugins, pluginEnum.getDependencies ++ accPluginDependencies)
     }
   }
@@ -89,7 +84,6 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
       case Scope.test => """% "test -> test""""
       case _ => ""
     }
-//    val proj =hierarchy(d.mavenDependency)
     s"""`${d.mavenDependency.artifactId}`$test"""
   }.mkString(",")
 
