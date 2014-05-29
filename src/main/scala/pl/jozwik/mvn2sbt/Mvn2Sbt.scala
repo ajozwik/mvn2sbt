@@ -4,8 +4,6 @@ import java.io.{Writer, File, PrintWriter}
 import scala.io.Source
 import com.typesafe.scalalogging.slf4j.StrictLogging
 import java.nio.file.{Paths, Path}
-import org.apache.commons.io.IOUtils
-import org.maven.Plugin
 
 object Mvn2Sbt extends StrictLogging {
   final val BUILD_SBT = "build.sbt"

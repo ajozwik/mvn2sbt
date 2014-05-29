@@ -25,9 +25,13 @@ object Converters {
 
   val cxfConverter: Converter = (rootDir,plugin) => CxfConverter(rootDir).convert(plugin)
 
-  val thriftConverter: Converter = (rootDir,plugin) => Nil
+  val defaultConverter:Converter = (rootDir,plugin) => Nil
 
-  val groovyConverter: Converter = (rootDir,plugin) => Nil
+  val thriftConverter = defaultConverter
+
+  val groovyConverter = defaultConverter
+
+  val warConverter = defaultConverter
 }
 
 

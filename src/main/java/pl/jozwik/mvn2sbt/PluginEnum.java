@@ -2,7 +2,6 @@ package pl.jozwik.mvn2sbt;
 
 
 import org.maven.Plugin;
-import scala.Function1;
 import scala.Function2;
 import scala.collection.Seq;
 
@@ -18,17 +17,20 @@ public enum PluginEnum {
     THRIFT("maven-thrift-plugin", "com.github.bigtoast.sbtthrift.ThriftPlugin.thriftSettings",
             "addSbtPlugin(\"com.github.bigtoast\" % \"sbt-thrift\" % \"0.7\")", "resolvers += \"bigtoast-github\" at \"http://bigtoast.github.com/repo/\"",
             Arrays.asList(new Dependency(new MavenDependency("commons-lang", "commons-lang", "2.6"), Scope.compile)), Converters.thriftConverter()),
-    CXF("cxf-codegen-plugin", "seq(cxf.settings :_*)", "addSbtPlugin(\"com.ebiznext.sbt.plugins\" % \"sbt-cxf-wsdl2java\" % \"0.1.2\")",
+    CXF("cxf-codegen-plugin", "cxf.settings", "addSbtPlugin(\"com.ebiznext.sbt.plugins\" % \"sbt-cxf-wsdl2java\" % \"0.1.2\")",
             "resolvers += \"Sonatype Repository\" at \"https://oss.sonatype.org/content/groups/public\"",
-            Collections.<Dependency>emptyList(), Converters.cxfConverter());
-    private final String sbtSetting;
+            Collections.<Dependency>emptyList(), Converters.cxfConverter()),
+    WAR("maven-war-plugin", "webSettings", "addSbtPlugin(\"com.earldouglas\" % \"xsbt-web-plugin\" % \"0.9.0\")", "",
+            Collections.<Dependency>emptyList(), Converters.warConverter());
+
     private final String artifactId;
+    private final String sbtSetting;
     private final String plugin;
     private final String extraRepository;
     private final List<Dependency> dependencies;
-    private final  Function2<File,Plugin, Seq<String>> function;
+    private final Function2<File, Plugin, Seq<String>> function;
 
-    private PluginEnum(String artifactId, String sbtSetting, String plugin, String extraRepository, List<Dependency> dependencies, Function2<File,Plugin, Seq<String>> function) {
+    private PluginEnum(String artifactId, String sbtSetting, String plugin, String extraRepository, List<Dependency> dependencies, Function2<File, Plugin, Seq<String>> function) {
         this.artifactId = artifactId;
         this.sbtSetting = sbtSetting;
         this.plugin = plugin;
@@ -57,7 +59,7 @@ public enum PluginEnum {
         return dependencies;
     }
 
-    public  Function2<File,Plugin, Seq<String>> getFunction() {
+    public Function2<File, Plugin, Seq<String>> getFunction() {
         return function;
     }
 }
