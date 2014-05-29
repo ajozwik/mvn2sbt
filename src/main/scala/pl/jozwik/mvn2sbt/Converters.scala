@@ -33,6 +33,9 @@ object Converters {
 
 case class CxfConverter(rootDir:File) extends PomToSbtPluginConverter {
   import Converters.toPath
+
+  private val ignoredArgs = Set("-wsdlLocation","-autoNameResolution")
+
   def convert(plugin:Plugin):Seq[String] = {
     val execution = plugin.executions.get.execution
     val configuration4 = execution.map { ex =>
@@ -93,10 +96,10 @@ case class CxfConverter(rootDir:File) extends PomToSbtPluginConverter {
 
   private def buildPackage(node: Node) = extractNode(node, "packagenames", "packagename").flatMap(n => Seq("-p", n.text))
 
-  private def buildExtraArgs(node: Node) = extractNode(node, "extraargs", "extraarg").map(_.text)
+  private def buildExtraArgs(node: Node) = extractNode(node, "extraargs", "extraarg").map(_.text).filterNot(ignoredArgs.contains(_))
 
   private def buildBindings(node: Node) =
-    extractNode(node, "bindingFiles", "bindingFile").flatMap(x=> Seq("-db",toPath(x.text,rootDir)))
+    extractNode(node, "bindingFiles", "bindingFile").flatMap(x=> Seq("-b",toPath(x.text,rootDir)))
 
 }
 

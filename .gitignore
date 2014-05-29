@@ -19,3 +19,4 @@ logs/
 .project
 *.class
 effective-pom.xml
+input.txt

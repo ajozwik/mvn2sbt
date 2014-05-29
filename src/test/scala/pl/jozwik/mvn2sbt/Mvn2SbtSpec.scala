@@ -13,7 +13,6 @@ class Mvn2SbtSpec extends AbstractSpec {
       val t = ProjectType.jar.name()
       val projectLine = s"$g:$a:$t:$v"
       val parsed = parseProjectLine(projectLine)
-      logger.debug("{}", parsed)
       parsed should be(g, a, t, v)
     }
 

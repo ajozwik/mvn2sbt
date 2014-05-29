@@ -60,7 +60,7 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
     plugins.foldLeft((Seq[String](), "", Seq[Dependency]())) { (tuple, p) =>
       val (accSett, accPlug, accPluginDependencies) = tuple
       val (pluginEnum, plugin) = p
-      val settings =  accSett :+ s"${pluginEnum.getSbtSetting}"
+      val settings =  s"${pluginEnum.getSbtSetting}" +: accSett
       val customPluginSettings = pluginEnum.getFunction()(rootDir,plugin)
       val plugins = accPlug + s"""
          |${pluginEnum.getPlugin}
@@ -68,7 +68,7 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
          |${pluginEnum.getExtraRepository}
          |
        """.stripMargin
-      (customPluginSettings ++ settings, plugins, pluginEnum.getDependencies ++ accPluginDependencies)
+      (settings ++ customPluginSettings , plugins, pluginEnum.getDependencies ++ accPluginDependencies)
     }
   }
 
