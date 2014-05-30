@@ -36,7 +36,7 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
     }.mkString(
         """,
         """.stripMargin)
-    val stop = ")\n"
+    val stop = ")\n\n"
     Some(start + resolversString + stop)
   }
 
