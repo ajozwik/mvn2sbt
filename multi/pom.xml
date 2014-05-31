@@ -12,6 +12,7 @@
     <modules>
         <module>thrift1</module>
         <module>thrift2</module>
+        <module>cxf</module>
     </modules>
 
     <properties>

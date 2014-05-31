@@ -20,24 +20,28 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
       val (projectContent, pluginsSbt, resolvers) = handleProject(p)
       (accContent ++ pluginsSbt, accResolvers ++ resolvers, sb.append(projectContent))
     }
-    resolversToOption(resolvers).foreach(buildSbtWriter.append)
+    buildSbtWriter.append(resolversToOption(resolvers))
     buildSbtWriter.append(buildSbtProjects)
     pluginsSbtWriter.append(contentOfPluginSbt.mkString("\n\n"))
     (buildSbtWriter.toString(), pluginsSbtWriter.toString())
   }
 
-  private def resolversToOption(resolvers: Set[String]) = if (resolvers.isEmpty) {
-    None
-  } else {
-    val start = "resolvers++=Seq("
-    val resolversString = resolvers.map { x =>
-      val name = doubleQuote(x)
-      s"$name at $name"
-    }.mkString(
-        """,
-        """.stripMargin)
+  private def resolversToOption(resolvers: Set[String]) = {
+    val start = "resolvers in Global ++= Seq(Resolver.mavenLocal"
     val stop = ")\n\n"
-    Some(start + resolversString + stop)
+    val opt = if (resolvers.isEmpty) {
+      None
+    } else {
+      val resolversString = resolvers.map { x =>
+        val name = doubleQuote(x)
+        s"$name at $name"
+      }.mkString(",",
+          """,
+          """.stripMargin,"")
+
+      Some(resolversString)
+    }
+    start + opt.getOrElse("") + stop
   }
 
   private def handleProject(p: Project): (String, Set[String], Set[String]) = {
@@ -47,7 +51,7 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
 
     val (dependsOn, libraries) = splitToDependsOnLibraries(p, information)
 
-    val (settings, plugins, pluginDependencies) = handlePlugins(information.plugins)
+    val (settings, plugins, pluginDependencies) = handlePlugins(information.projectPath, information.plugins)
 
     val dependencies = dependenciesToString(pluginDependencies ++ libraries)
 
@@ -70,11 +74,12 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
     contains || parentMatch
   }
 
-  private def handlePlugins(plugins: Seq[(PluginEnum, Plugin)]): (Seq[String], Set[String], Seq[Dependency]) = {
+  private def handlePlugins(file: File, plugins: Seq[(PluginEnum, Plugin)]): (Seq[String], Set[String], Seq[Dependency]) = {
     plugins.foldLeft((Seq[String](), Set.empty[String], Seq[Dependency]())) { (tuple, p) =>
       val (accSett, accPlug, accPluginDependencies) = tuple
       val (pluginEnum, plugin) = p
-      val settings = pluginEnum.getSbtSetting +: accSett
+      val endSettings: String = addSeqToArray(file.equals(rootDir))
+      val settings = (pluginEnum.getSbtSetting + endSettings) +: accSett
       val customPluginSettings = pluginEnum.getFunction()(rootDir, plugin)
       val plugins = accPlug +(pluginEnum.getPlugin, pluginEnum.getExtraRepository)
       (settings ++ customPluginSettings, plugins, pluginEnum.getDependencies ++ accPluginDependencies)
@@ -82,13 +87,20 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
   }
 
 
-  def dependenciesToString(libraries: Seq[Dependency]) = libraries.map { d =>
+  private def addSeqToArray(equal: Boolean) = if (equal) {
+    ""
+  } else {
+    " :_* "
+  }
+
+  def dependenciesToString(libraries: Seq[Dependency]) = libraries.flatMap { d =>
     val md = d.mavenDependency
-    val scope = d.scope match {
-      case Scope.compile => ""
-      case x => s" % ${doubleQuote(x)}"
+    val lib = s"${doubleQuote(md.groupId)} % ${doubleQuote(md.artifactId)} % ${doubleQuote(md.versionId)}"
+    d.scope match {
+      case Scope.system => None
+      case Scope.compile => Some(lib)
+      case x => Some(s"$lib % ${doubleQuote(x)}")
     }
-    s"""${doubleQuote(md.groupId)} % "${md.artifactId}" % "${md.versionId}"$scope"""
 
   }.mkString("", ",\n   ", "")
 
@@ -116,13 +128,13 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
         |${settings.mkString("", "\n\n", "")}
 """.stripMargin
     } else {
-      val s = settings.mkString(".settings(", ").settings(", ")")
+      val settingString = settings.mkString(".settings(", ").settings(", ")")
       s"""lazy val `$projectName` = ProjectName("$projectName","$path").settings(
       |  libraryDependencies ++= Seq($dependencies),
       |    name := "${p.mavenDependency.artifactId}",
       |    version := "${p.mavenDependency.versionId}",
       |    organization := "${p.mavenDependency.groupId}"
-      |)$s.dependsOn($dependsOnString)
+      |)$settingString.dependsOn($dependsOnString)
       |
 """.stripMargin
     }

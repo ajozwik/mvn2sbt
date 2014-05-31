@@ -15,10 +15,15 @@ Quick start:
 
 Supported plugins:
 
+Without parameters ( default configuration)
+
  * gmaven-plugin
  * maven-thrift-plugin
- * cxf-codegen-plugin
-
+ * war plugin
+ 
+With basic configuration
+ 
+ * cxf-codegen-plugin - with some options
 
 
 Project is still in phase alfa - source will be rebuilt in spare time.
