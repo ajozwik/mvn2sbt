@@ -29,7 +29,7 @@ args.foreach { root =>
 
   val rootDir = new File(root)
 
-  val inputTxt = new File(rootDir, "input.txt")
+  val inputTxt = new File(rootDir, "dependencyTree.txt")
 
   println(s"Create $inputTxt.")
 

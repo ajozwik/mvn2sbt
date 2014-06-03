@@ -10,18 +10,18 @@ import pl.jozwik.gen.Entity;
 
 public class SerializationUtils {
 
-	
-	private  final TSerializer serializer = new TSerializer(new TCompactProtocol.Factory());
-	private final TDeserializer deserializer = new TDeserializer(new TCompactProtocol.Factory());
 
-	public byte[] serialize(Entity entity) throws TException {
-		return serializer.serialize(entity);
-	}
+    private final TSerializer serializer = new TSerializer(new TCompactProtocol.Factory());
+    private final TDeserializer deserializer = new TDeserializer(new TCompactProtocol.Factory());
 
-	public Entity deserialize(byte[] bytes) throws TException {
+    public byte[] serialize(Entity entity) throws TException {
+        return serializer.serialize(entity);
+    }
+
+    public Entity deserialize(byte[] bytes) throws TException {
         Entity entity = new Entity();
-		deserializer.deserialize(entity, bytes);
-		return entity;
-	}
+        deserializer.deserialize(entity, bytes);
+        return entity;
+    }
 
 }

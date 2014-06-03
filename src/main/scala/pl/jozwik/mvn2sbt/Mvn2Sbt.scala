@@ -10,7 +10,7 @@ object Mvn2Sbt extends StrictLogging {
   final val BUILD_SBT = "build.sbt"
   final val PROJECT = "project"
   final val PLUGINS_SBT = "plugins.sbt"
-  final val INPUT_TXT = "input.txt"
+  final val DEPENDENCY_TREE_TXT = "dependencyTree.txt"
 
   def projectsFromFile(inputFile: File) = {
     val it = fileToIterator(inputFile)
@@ -42,7 +42,7 @@ object Mvn2Sbt extends StrictLogging {
 
   def run(rootDir: File, outputDir: File) {
     val hierarchy = scanHierarchy(rootDir)
-    val projectsWithoutPath = projectsFromFile(new File(rootDir, INPUT_TXT))
+    val projectsWithoutPath = projectsFromFile(new File(rootDir, DEPENDENCY_TREE_TXT))
 
 
     createSbtFile(projectsWithoutPath, hierarchy, rootDir, outputDir)

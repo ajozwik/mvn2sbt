@@ -16,7 +16,7 @@ class ThriftSpec extends AbstractProjectSpec("thrift")
 class LogbackPomSpec extends AbstractProjectSpec("logback")
 
 
-abstract class AbstractProjectSpec(project:String,inputFile:String = INPUT_TXT)  extends AbstractSpec {
+abstract class AbstractProjectSpec(project:String,inputFile:String = DEPENDENCY_TREE_TXT)  extends AbstractSpec {
 
 
   getClass.getSimpleName should {
