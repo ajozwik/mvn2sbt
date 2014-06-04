@@ -34,3 +34,14 @@ sourceGenerators in Compile <+= scalaxb in Compile
 
 packageName in scalaxb in Compile := "org.maven"
 
+val readPluginSbt = taskKey[String]("Read plugins.sbt file.")
+
+readPluginSbt := {
+	val lineIterator = scala.io.Source.fromFile(new java.io.File("project","plugins.sbt")).getLines
+        val linesWithValIterator = lineIterator.filter(line => line.contains("scalaxbVersion"))
+        val versionString =  linesWithValIterator.mkString("\n").split("=")(1).trim
+        val version = versionString.split("\n")(0) // only val declaration
+	println(version)
+	version
+}
+
