@@ -71,13 +71,18 @@
         </plugins>
     </build>
 
+
     <dependencies>
         <dependency>
-            <groupId>org.apache.thrift</groupId>
-            <artifactId>libthrift</artifactId>
-            <version>0.9.1</version>
+            <artifactId>cxf2</artifactId>
+            <groupId>pl.jozwik</groupId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
+            <artifactId>thrift11</artifactId>
+            <groupId>pl.jozwik</groupId>
+            <version>1.0.0</version>
         </dependency>
     </dependencies>
-
 
 </project>

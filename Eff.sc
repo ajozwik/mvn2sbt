@@ -9,12 +9,14 @@ if (args.length == 0) {
   println( s"""You are called "scala Eff.scala ${args.mkString(" ")}" """)
 }
 
-val r = """<module>(.*)</module>""".r
+val parseModuleName = """<module>(.*)</module>""".r
 def callEffectivePom(dir: File) {
-  Process(Seq("mvn","-N", "help:effective-pom", "-Doutput=effective-pom.xml"), dir).!
+  val effectivePom = "effective-pom.xml"
+  val result = Process(Seq("mvn","-N", "help:effective-pom", s"-Doutput=$effectivePom"), dir).!
+  wrongResult(result,new File(dir,effectivePom))
   val pom = Source.fromFile(new File(dir, "pom.xml")).mkString
-  (r findAllIn pom).map {
-    case r(inside) => inside
+  (parseModuleName findAllIn pom).map {
+    case parseModuleName(inside) => inside
   }.foreach {
     f =>
       val child = new File(dir, f)
@@ -29,14 +31,24 @@ args.foreach { root =>
 
   val rootDir = new File(root)
 
-  val inputTxt = new File(rootDir, "dependencyTree.txt")
+  val dependencyTree = new File(rootDir, "dependencyTree.txt")
 
-  println(s"Create $inputTxt.")
+  println(s"Creating $dependencyTree.")
 
-  (Process(Seq("mvn", "dependency:tree"), rootDir) #> inputTxt).!
+  val result = (Process(Seq("mvn", "dependency:tree"), rootDir) #> dependencyTree).!
 
-  println(s"$inputTxt created")
+  wrongResult(result,dependencyTree)
+
+  println(s"$dependencyTree created")
 
   callEffectivePom(rootDir)
 
+}
+
+
+def wrongResult(result:Int,output:File){
+  if(result!=0){
+    println(s"See $output for errors")
+    sys.exit(result)
+  }
 }
