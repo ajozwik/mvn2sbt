@@ -22,7 +22,7 @@ abstract class AbstractProjectSpec(project:String,inputFile:String = DEPENDENCY_
   getClass.getSimpleName should {
 
     s"Create sbt file for $project with file" in {
-      val rootDir = Paths.get(project).toFile
+      val rootDir = Paths.get("exampleProjects",project).toFile
       val hierarchy = scanHierarchy(rootDir)
       hierarchy should not be Map.empty
       val projects = projectsFromFile(new File(rootDir,inputFile))
