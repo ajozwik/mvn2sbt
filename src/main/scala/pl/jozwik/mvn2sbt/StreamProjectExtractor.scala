@@ -15,17 +15,17 @@ object StreamProjectExtractor extends StrictLogging {
   def parseDependencyLine(line: String) = {
     val text = line.split("\\s+")(1)
     val array = text.split(":")
-    val (g, a, v, s) = if (array.length == 5) {
-      (0, 1, 3, 4)
+    val (g, a, v, s,tests) = if (array.length == 5) {
+      (0, 1, 3, 4,false)
     } else {
-      (0, 1, 4, 5)
+      (0, 1, 4, 5,true)
     }
-    toOrderedTuple((g, a, v, s), array)
+    toOrderedTuple((g, a, v, s,tests), array)
   }
 
-  private def toOrderedTuple(order: (Int, Int, Int, Int), array: Array[String]) = {
-    val (a, b, c, d) = order
-    (array(a), array(b), array(c), array(d))
+  private def toOrderedTuple(order: (Int, Int, Int, Int, Boolean), array: Array[String]) = {
+    val (a, b, c, d,tests) = order
+    (array(a), array(b), array(c), array(d),tests)
   }
 
 
@@ -36,14 +36,14 @@ object StreamProjectExtractor extends StrictLogging {
   }
 
   private def addDependency(line: String, projects: Seq[Project]): (Seq[Project], Boolean) = {
-    val (groupId, artifactId, versionId, scope) = parseDependencyLine(line)
+    val (groupId, artifactId, versionId, scope,tests) = parseDependencyLine(line)
     val sc = Try(Scope.valueOf(scope)) match {
       case Success(el) => el
       case Failure(exp) =>
         logger.error(line)
         throw exp
     }
-    val dependency = Dependency(MavenDependency(groupId, artifactId, versionId), sc)
+    val dependency = Dependency(MavenDependency(groupId, artifactId, versionId), sc,tests)
     val project = projects.head
     val projectWithNewDependency = project.copy(dependencies = dependency +: project.dependencies)
     (projectWithNewDependency +: projects.tail, false)

@@ -99,6 +99,7 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
     d.scope match {
       case Scope.system => None
       case Scope.compile => Some(lib)
+      case x@Scope.test if d.classifierTests => Some(s"""$lib % ${doubleQuote(x)} classifier ${doubleQuote("tests")}""")
       case x => Some(s"$lib % ${doubleQuote(x)}")
     }
 

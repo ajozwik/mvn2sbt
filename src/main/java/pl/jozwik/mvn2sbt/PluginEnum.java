@@ -16,13 +16,13 @@ public enum PluginEnum {
             "resolvers += \"Biblio\" at \"http://mirrors.ibiblio.org/maven2\"", Collections.<Dependency>emptyList(), Converters.groovyConverter()),
     THRIFT("maven-thrift-plugin", "com.github.bigtoast.sbtthrift.ThriftPlugin.thriftSettings",
             "addSbtPlugin(\"com.github.bigtoast\" % \"sbt-thrift\" % \"0.7\")", "resolvers += \"bigtoast-github\" at \"http://bigtoast.github.com/repo/\"",
-            Arrays.asList(new Dependency(new MavenDependency("commons-lang", "commons-lang", "2.6"), Scope.compile)), Converters.thriftConverter()),
+            Arrays.asList(new Dependency(new MavenDependency("commons-lang", "commons-lang", "2.6"), Scope.compile,false)), Converters.thriftConverter()),
     CXF("cxf-codegen-plugin", "cxf.settings", "addSbtPlugin(\"com.ebiznext.sbt.plugins\" % \"sbt-cxf-wsdl2java\" % \"0.1.2\")",
             "resolvers += \"Sonatype Repository\" at \"https://oss.sonatype.org/content/groups/public\"",
             Collections.<Dependency>emptyList(), Converters.cxfConverter()),
     WAR("maven-war-plugin", "webSettings", "addSbtPlugin(\"com.earldouglas\" % \"xsbt-web-plugin\" % \"0.9.0\")", "",
-            Arrays.asList(new Dependency(new MavenDependency("org.eclipse.jetty", "jetty-webapp", "9.1.0.v20131115"), Scope.container),
-                    new Dependency(new MavenDependency("org.eclipse.jetty", "jetty-plus" , "9.1.0.v20131115"), Scope.container)), Converters.warConverter());
+            Arrays.asList(new Dependency(new MavenDependency("org.eclipse.jetty", "jetty-webapp", "9.1.0.v20131115"), Scope.container,false),
+                    new Dependency(new MavenDependency("org.eclipse.jetty", "jetty-plus" , "9.1.0.v20131115"), Scope.container,false)), Converters.warConverter());
 
     private final String artifactId;
     private final String sbtSetting;

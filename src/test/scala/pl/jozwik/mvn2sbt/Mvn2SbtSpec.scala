@@ -21,7 +21,7 @@ class Mvn2SbtSpec extends AbstractSpec {
     }
 
     "Parse dependency line with test-jar" in {
-      testLine("org.apache.httpcomponents", "httpclient", "4.2.3", "compile", (g, a, v, s) => s"+- $g:$a:test-jar:tests:$v:$s")
+      testLine("org.apache.httpcomponents", "httpclient", "4.2.3", "test", (g, a, v, s) => s"+- $g:$a:test-jar:tests:$v:$s")
     }
 
 
