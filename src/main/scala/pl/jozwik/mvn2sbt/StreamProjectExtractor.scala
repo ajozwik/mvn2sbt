@@ -9,7 +9,7 @@ object StreamProjectExtractor extends StrictLogging {
   final val START_DEPENDENCY = "+- "
 
   def parseProjectLine(line: String) = {
-    toOrderedTuple((0, 1, 2, 3), line.split(":"))
+    toOrderedTuple((0, 1, 2, 3,false), line.split(":"))
   }
 
   def parseDependencyLine(line: String) = {
@@ -30,7 +30,7 @@ object StreamProjectExtractor extends StrictLogging {
 
 
   private def addProject(line: String, projects: Seq[Project]): (Seq[Project], Boolean) = {
-    val (groupId, artifactId, projectType, versionId) = parseProjectLine(line)
+    val (groupId, artifactId, projectType, versionId,_) = parseProjectLine(line)
     val project = Project(MavenDependency(groupId, artifactId, versionId), ProjectType.valueOf(projectType))
     (project +: projects, false)
   }

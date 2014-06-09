@@ -13,7 +13,7 @@ class Mvn2SbtSpec extends AbstractSpec {
       val t = ProjectType.jar.name()
       val projectLine = s"$g:$a:$t:$v"
       val parsed = parseProjectLine(projectLine)
-      parsed should be(g, a, t, v)
+      parsed should be(g, a, t, v,false)
     }
 
     "Parse dependency line without test-jar" in {
@@ -30,7 +30,7 @@ class Mvn2SbtSpec extends AbstractSpec {
   private def testLine(g: String, a: String, v: String, s: String, f: (String, String, String, String) => String) = {
     val line = f(g, a, v, s)
     val res = parseDependencyLine(line)
-    val (groupId, artifactId, versionId, scope) = res
+    val (groupId, artifactId, versionId, scope,_) = res
     (groupId, artifactId, versionId, scope) should be(g, a, v, s)
   }
 
