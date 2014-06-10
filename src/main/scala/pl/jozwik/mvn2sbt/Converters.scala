@@ -58,7 +58,7 @@ case class CxfConverter(rootDir: File) extends PomToSbtPluginConverter {
             val s = defaultOptSeq ++ seq
             s"""cxf.Wsdl(file("$diff"), Seq(${
               s.mkString("\"", "\",\"", "\"")
-            }), "${wsdl.hashCode}")"""
+            }), "$diff")"""
         }
 
         Seq( s"""cxf.wsdls :=Seq(${
