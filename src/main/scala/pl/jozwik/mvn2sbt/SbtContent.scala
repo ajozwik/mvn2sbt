@@ -12,10 +12,22 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
 
   import pl.jozwik.mvn2sbt.PluginConverter._
 
-  private def optimizeProject(map: Map[String, SbtProjectContent], content: SbtProjectContent): SbtProjectContent = {
+  private def optimizeDependsOn(set: Set[Dependency], map: Map[MavenDependency, SbtProjectContent]): Set[Dependency] = {
+    val toRemove = set.flatMap {
+      dep =>
+        val setWithoutDep = set - dep
+        map(dep.mavenDependency).dependsOn.find(d => setWithoutDep.contains(d))
+    }
+    if (toRemove.isEmpty) {
+      set
+    } else {
+      optimizeDependsOn(set.diff(toRemove), map)
+    }
+  }
+
+  private def optimizeProject(map: Map[MavenDependency, SbtProjectContent], content: SbtProjectContent): SbtProjectContent = {
     val parentDependencies = content.dependsOn.flatMap { dep =>
-      val projectName = dep.mavenDependency.artifactId
-      map(projectName).libraries
+      map(dep.mavenDependency).libraries
     }
     val parentDependenciesSet = parentDependencies.toSet
     val optimizedLibraries = content.libraries.flatMap { dep =>
@@ -25,10 +37,13 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
         Some(dep)
       }
     }
-    content.copy(libraries = optimizedLibraries)
+    val optSbtProjectDescription = content.copy(libraries = optimizedLibraries)
+    val optimizedDependsOn = optimizeDependsOn(content.dependsOn, map)
+
+    optSbtProjectDescription.copy(dependsOn = optimizedDependsOn)
   }
 
-  private def optimizeProjects(map: Map[String, SbtProjectContent]): Map[String, SbtProjectContent] = {
+  private def optimizeProjects(map: Map[MavenDependency, SbtProjectContent]): Map[MavenDependency, SbtProjectContent] = {
     val optimizedMap = map.map {
       case (name, content) =>
         val optimized = optimizeProject(map, content)
@@ -52,10 +67,10 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
     val pluginsSbtWriter = new StringBuilder
 
     buildSbtWriter.append("def ProjectName(name: String,path:String): Project =  Project(name, file(path))\n\n")
-    val (contentOfPluginSbt, resolvers, buildSbtProjects) = projects.foldLeft((Set[String](), Set[String](), Map.empty[String, SbtProjectContent])) { (acc, p) =>
+    val (contentOfPluginSbt, resolvers, buildSbtProjects) = projects.foldLeft((Set[String](), Set[String](), Map.empty[MavenDependency, SbtProjectContent])) { (acc, p) =>
       val (accContent, accResolvers, stbProjectContent) = acc
       val (projectContent, pluginsSbt, resolvers) = handleProject(p)
-      (accContent ++ pluginsSbt, accResolvers ++ resolvers, stbProjectContent + (p.projectDependency.artifactId -> projectContent))
+      (accContent ++ pluginsSbt, accResolvers ++ resolvers, stbProjectContent + (p.projectDependency -> projectContent))
     }
 
 
@@ -67,7 +82,7 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
     (buildSbtWriter.toString(), pluginsSbtWriter.toString())
   }
 
-  private def writeProjects(sb: StringBuilder, projectsMap: Map[String, SbtProjectContent]) {
+  private def writeProjects(sb: StringBuilder, projectsMap: Map[MavenDependency, SbtProjectContent]) {
     projectsMap.foreach { case (name, content) => sb.append(createBuildSbt(content))}
   }
 
