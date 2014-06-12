@@ -5,7 +5,7 @@ import java.io.File
 import com.typesafe.scalalogging.slf4j.StrictLogging
 
 
-object DependencyConverter extends StrictLogging {
+object DependencyToPluginConverter extends StrictLogging {
 
   val TESTNG_XML: String = "src/test/resources/testng.xml"
 
@@ -17,7 +17,7 @@ object DependencyConverter extends StrictLogging {
     }
 
 
-  def convert(rootPath: File, path: File, dependencies: Seq[Dependency]) = dependencies.foldLeft((Set[String](), Set[String]())) { (tuple, dependency) =>
+  def convert(rootPath: File, path: File, dependencies: Set[Dependency]) = dependencies.foldLeft((Set[String](), Set[String]())) { (tuple, dependency) =>
     dependency.mavenDependency match {
       case MavenDependency("org.testng", _, _) =>
         val endSettings = addSeqToArray(path.equals(rootPath))

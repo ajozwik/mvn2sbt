@@ -34,7 +34,7 @@ object Mvn2Sbt extends StrictLogging {
     val projectDir = new File(outputDir, PROJECT)
     projectDir.mkdirs()
     val pluginsSbt = new File(projectDir, PLUGINS_SBT)
-    val (buildSbtContent, pluginSbtContent) = SbtContent(projectsWithoutPath, hierarchy, rootDir).write
+    val (buildSbtContent, pluginSbtContent) = SbtContent(projectsWithoutPath, hierarchy, rootDir).buildSbtContentPluginContentAsString
     writeToFile(buildSbt, buildSbtContent)
     writeToFile(pluginsSbt, pluginSbtContent)
   }

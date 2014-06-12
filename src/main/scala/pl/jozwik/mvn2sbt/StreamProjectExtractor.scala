@@ -45,7 +45,7 @@ object StreamProjectExtractor extends StrictLogging {
     }
     val dependency = Dependency(MavenDependency(groupId, artifactId, versionId), sc,tests)
     val project = projects.head
-    val projectWithNewDependency = project.copy(dependencies = dependency +: project.dependencies)
+    val projectWithNewDependency = project.copy(dependencies = project.dependencies + dependency )
     (projectWithNewDependency +: projects.tail, false)
   }
 }
