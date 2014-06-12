@@ -16,7 +16,8 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
     val toRemove = set.flatMap {
       dep =>
         val setWithoutDep = set - dep
-        map(dep.mavenDependency).dependsOn.find(d => setWithoutDep.contains(d))
+        map(dep.mavenDependency).dependsOn.find(d =>
+          setWithoutDep.contains(d))
     }
     if (toRemove.isEmpty) {
       set
@@ -26,36 +27,37 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
   }
 
   private def optimizeProject(map: Map[MavenDependency, SbtProjectContent], content: SbtProjectContent): SbtProjectContent = {
+    val optimizedLibraries = optimizeLibraries(map,content)
+    val optimizedDependsOn = optimizeDependsOn(content.dependsOn, map)
+    content.copy(libraries = optimizedLibraries,dependsOn = optimizedDependsOn)
+  }
+
+  private def optimizeLibraries(map: Map[MavenDependency, SbtProjectContent],content: SbtProjectContent): Set[Dependency] = {
     val parentDependencies = content.dependsOn.flatMap { dep =>
       map(dep.mavenDependency).libraries
     }
     val parentDependenciesSet = parentDependencies.toSet
     val optimizedLibraries = content.libraries.flatMap { dep =>
-      if (parentDependenciesSet.contains(dep)) {
+      if (parentDependenciesSet.contains(dep) && dep.scope == Scope.compile && content.libraries.find(p => p.mavenDependency == dep.mavenDependency && p.scope != Scope.compile).isEmpty) {
         None
       } else {
         Some(dep)
       }
     }
-    val optSbtProjectDescription = content.copy(libraries = optimizedLibraries)
-    val optimizedDependsOn = optimizeDependsOn(content.dependsOn, map)
-
-    optSbtProjectDescription.copy(dependsOn = optimizedDependsOn)
+    optimizedLibraries
   }
 
-  private def optimizeProjects(map: Map[MavenDependency, SbtProjectContent]): Map[MavenDependency, SbtProjectContent] = {
-    val optimizedMap = map.map {
+  private def optimizeProjects(depMap: Map[MavenDependency, SbtProjectContent]): Map[MavenDependency, SbtProjectContent] = {
+    val optimizedMap = depMap.map {
       case (name, content) =>
-        val optimized = optimizeProject(map, content)
+        val optimized = optimizeProject(depMap, content)
         if (optimized != content) {
-          logger.debug("{}", content.project.projectDependency.artifactId)
-          logger.debug("DIFF={}", content.project.dependencies.diff(optimized.project.dependencies))
           (name, optimized)
         } else {
           (name, content)
         }
     }
-    if (optimizedMap == map) {
+    if (optimizedMap == depMap) {
       optimizedMap
     } else {
       optimizeProjects(optimizedMap)
