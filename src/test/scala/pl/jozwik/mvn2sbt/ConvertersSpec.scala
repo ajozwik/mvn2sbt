@@ -9,7 +9,7 @@ class ConvertersSpec extends AbstractSpec{
         val rootDir = new File(".")
         val subPath = "aaaaa"
         val subFile= new File(rootDir,subPath)
-        val diff = Converters.toPath(subFile,rootDir)
+        val diff = PluginConverter.toPath(subFile,rootDir)
         diff should be(subPath)
       }
   }

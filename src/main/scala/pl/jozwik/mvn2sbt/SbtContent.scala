@@ -1,14 +1,14 @@
 package pl.jozwik.mvn2sbt
 
 import java.io.File
+
 import com.typesafe.scalalogging.slf4j.LazyLogging
-import scala.collection.JavaConversions._
 import org.maven.Plugin
 
 
 case class SbtContent(private val projects: Seq[Project], private val hierarchy: Map[MavenDependency, ProjectInformation], private val rootDir: File) extends LazyLogging {
 
-  import Converters._
+  import pl.jozwik.mvn2sbt.PluginConverter._
 
   def write: (String, String) = {
     val buildSbtWriter = new StringBuilder
@@ -37,12 +37,18 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
         s"$name at $name"
       }.mkString(",",
           """,
-          """.stripMargin,"")
+          """.stripMargin, "")
 
       Some(resolversString)
     }
     start + opt.getOrElse("") + stop
   }
+
+  private def pluginsDependsOnDependencies(file: File, seq: Seq[Dependency]) = {
+    DependencyConverter.convert(rootDir, file, seq)
+
+  }
+
 
   private def handleProject(p: Project): (String, Set[String], Set[String]) = {
     val projectName = p.mavenDependency.artifactId
@@ -57,9 +63,9 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
 
     val dependsOnString = dependsOnToString(dependsOn, information)
 
+    val (pluginsDependsOnDependenciesSettings, pluginsDependsOnDependenciesSet) = pluginsDependsOnDependencies(information.projectPath, libraries)
 
-
-    (createBuildSbt(p, projectName, path, dependencies, dependsOnString, settings), plugins, information.resolvers)
+    (createBuildSbt(p, projectName, path, dependencies, dependsOnString, pluginsDependsOnDependenciesSettings ++ settings), pluginsDependsOnDependenciesSet ++ plugins, information.resolvers)
   }
 
 
@@ -74,24 +80,20 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
     contains || parentMatch
   }
 
-  private def handlePlugins(file: File, plugins: Seq[(PluginEnum, Plugin)]): (Seq[String], Set[String], Seq[Dependency]) = {
-    plugins.foldLeft((Seq[String](), Set.empty[String], Seq[Dependency]())) { (tuple, p) =>
+  private def handlePlugins(file: File, plugins: Seq[(PluginDescription, Plugin)]): (Set[String], Set[String], Seq[Dependency]) = {
+    plugins.foldLeft((Set[String](), Set.empty[String], Seq[Dependency]())) { (tuple, p) =>
       val (accSett, accPlug, accPluginDependencies) = tuple
-      val (pluginEnum, plugin) = p
-      val endSettings: String = addSeqToArray(file.equals(rootDir))
-      val settings = (pluginEnum.getSbtSetting + endSettings) +: accSett
-      val customPluginSettings = pluginEnum.getFunction()(rootDir, plugin)
-      val plugins = accPlug +(pluginEnum.getPlugin, pluginEnum.getExtraRepository)
-      (settings ++ customPluginSettings, plugins, pluginEnum.getDependencies ++ accPluginDependencies)
+      val (pluginDescription, plugin) = p
+      val endSettings = DependencyConverter.addSeqToArray(file.equals(rootDir))
+      val settings = accSett + (pluginDescription.sbtSetting + endSettings)
+      val customPluginSettings = pluginDescription.pomConfigurationToSbtConfiguration(rootDir, plugin)
+      val plugins = accPlug +(pluginDescription.plugin, pluginDescription.extraRepository)
+      (settings ++ customPluginSettings, plugins, pluginDescription.dependencies ++ accPluginDependencies)
     }
   }
 
 
-  private def addSeqToArray(equal: Boolean) = if (equal) {
-    ""
-  } else {
-    " :_* "
-  }
+
 
   def dependenciesToString(libraries: Seq[Dependency]) = libraries.flatMap { d =>
     val md = d.mavenDependency
@@ -99,7 +101,7 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
     d.scope match {
       case Scope.system => None
       case Scope.compile => Some(lib)
-      case x@Scope.test if d.classifierTests => Some(s"""$lib % ${doubleQuote(x)} classifier ${doubleQuote("tests")}""")
+      case x@Scope.test if d.classifierTests => Some( s"""$lib % ${doubleQuote(x)} classifier ${doubleQuote("tests")}""")
       case x => Some(s"$lib % ${doubleQuote(x)}")
     }
 
@@ -114,7 +116,7 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
     s"""`${d.mavenDependency.artifactId}`$test"""
   }.mkString(",")
 
-  private def createBuildSbt(p: Project, projectName: String, path: String, dependencies: String, dependsOnString: String, settings: Seq[String]) = {
+  private def createBuildSbt(p: Project, projectName: String, path: String, dependencies: String, dependsOnString: String, settings: Set[String]) = {
 
     if (path.isEmpty) {
       s"""

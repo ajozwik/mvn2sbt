@@ -6,7 +6,7 @@ import scalaxb.DataRecord
 
 import java.io.File
 
-object Converters {
+object PluginConverter {
 
   def toPath(path: File, rootDir: File): String = {
     val dir = path.getCanonicalPath
@@ -21,11 +21,11 @@ object Converters {
 
   def toPath(path: String, rootDir: File): String = toPath(new File(path), rootDir)
 
-  type Converter = (File, Plugin) => Seq[String]
+  type PluginConverter = (File, Plugin) => Set[String]
 
-  val cxfConverter: Converter = (rootDir, plugin) => CxfConverter(rootDir).convert(plugin)
+  val cxfConverter: PluginConverter = (rootDir, plugin) => CxfPluginConverter(rootDir).convert(plugin)
 
-  val defaultConverter: Converter = (rootDir, plugin) => Nil
+  val defaultConverter: PluginConverter = (rootDir, plugin) => Set()
 
   val thriftConverter = defaultConverter
 
@@ -35,13 +35,13 @@ object Converters {
 }
 
 
-case class CxfConverter(rootDir: File) extends PomToSbtPluginConverter {
+case class CxfPluginConverter(rootDir: File) extends PomToSbtPluginConverter {
 
-  import Converters.toPath
+  import PluginConverter.toPath
 
   private val ignoredArgs = Set("-wsdlLocation", "-autoNameResolution")
 
-  def convert(plugin: Plugin): Seq[String] = {
+  def convert(plugin: Plugin): Set[String] = {
     val execution = plugin.executions.get.execution
     val configuration4 = execution.map { ex =>
       ex.configuration
@@ -61,10 +61,10 @@ case class CxfConverter(rootDir: File) extends PomToSbtPluginConverter {
             }), "$diff")"""
         }
 
-        Seq( s"""cxf.wsdls :=Seq(${
+        Set( s"""cxf.wsdls :=Seq(${
           wsdls.mkString(",\n\t")
         })""")
-      case _ => Nil
+      case _ => Set()
     }
   }
 
@@ -109,6 +109,6 @@ case class CxfConverter(rootDir: File) extends PomToSbtPluginConverter {
 
 
 sealed trait PomToSbtPluginConverter {
-  def convert(plugin: Plugin): Seq[String]
+  def convert(plugin: Plugin): Set[String]
 
 }
