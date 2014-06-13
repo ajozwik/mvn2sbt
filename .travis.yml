@@ -2,10 +2,10 @@ language: scala
 scala:
   - 2.11.1
 script:
-  - sbt "run Eff exampleProjects/cxf"
-  - sbt "run Eff exampleProjects/slf4j"
-  - sbt "run Eff exampleProjects/multi"
-  - sbt "run Eff exampleProjects/logback"
-  - sbt "run Eff exampleProjects/thrift"
+  - sbt "runMain Eff exampleProjects/cxf"
+  - sbt "runMain Eff exampleProjects/slf4j"
+  - sbt "runMain Eff exampleProjects/multi"
+  - sbt "runMain Eff exampleProjects/logback"
+  - sbt "runMain Eff exampleProjects/thrift"
 jdk:
   - oraclejdk8
