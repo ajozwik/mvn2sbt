@@ -1,6 +1,5 @@
 #### Convert maven project (pom.xml files) to sbt project (build.sbt with plugins).
 
-
 Logback and slf4j are used as reference projects.
 
 Quick start:
@@ -27,3 +26,8 @@ With basic configuration
 
 
 Project is still in phase alfa - source will be rebuilt in spare time.
+
+
+<a href="https://travis-ci.org/travis-ci/travis-web">
+<img alt="Build Status" src="https://travis-ci.org/ajozwik/mvn2sbt.svg?branch=master">
+</a>
