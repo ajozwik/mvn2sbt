@@ -18,6 +18,3 @@ logs/
 .classpath
 .project
 *.class
-effective-pom.xml
-input.txt
-dependencyTree.txt
