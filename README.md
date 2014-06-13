@@ -6,7 +6,7 @@ Quick start:
 
 1. Clone project
 1. Run  `sbt pack`
-1. First run scala Eff.sc <mavenProject>. It will create input.txt and effective-pom.xml files.
+1. First run `scala Eff.sc <mavenProject>`. It will create dependencyTree.txt and effective-pom.xml files.
 1. Run target/pack/bin/mvn2sbt <mavenProject> <outputDir>
 1. Copy <outputDir>/build.sbt to <mavenProject>/build.sbt
 1. Copy <outputDir>/plugins.sbt to <mavenProject>/project/plugins.sbt
