@@ -1,1 +1,11 @@
 language: scala
+scala:
+  - 2.11.1
+script:
+  - scala Eff.sc exampleProjects/cxf
+  - scala Eff.sc exampleProjects/logback
+  - scala Eff.sc exampleProjects/multi
+  - scala Eff.sc exampleProjects/slf4j
+  - scala Eff.sc exampleProjects/thrift
+jdk:
+  - oraclejdk8
