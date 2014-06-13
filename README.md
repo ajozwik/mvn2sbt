@@ -28,5 +28,5 @@ With basic configuration
 Project is still in phase alfa - source will be rebuilt in spare time.
 
 
-![Build Status](https://travis-ci.org/ajozwik/mvn2sbt.svg?branch=master)
+[![Build Status](https://travis-ci.org/ajozwik/mvn2sbt.svg?branch=master "Build Status")](https://travis-ci.org/ajozwik/mvn2sbt)
 
