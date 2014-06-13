@@ -27,12 +27,12 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
   }
 
   private def optimizeProject(map: Map[MavenDependency, SbtProjectContent], content: SbtProjectContent): SbtProjectContent = {
-    val optimizedLibraries = optimizeLibraries(map,content)
+    val optimizedLibraries = optimizeLibraries(map, content)
     val optimizedDependsOn = optimizeDependsOn(content.dependsOn, map)
-    content.copy(libraries = optimizedLibraries,dependsOn = optimizedDependsOn)
+    content.copy(libraries = optimizedLibraries, dependsOn = optimizedDependsOn)
   }
 
-  private def optimizeLibraries(map: Map[MavenDependency, SbtProjectContent],content: SbtProjectContent): Set[Dependency] = {
+  private def optimizeLibraries(map: Map[MavenDependency, SbtProjectContent], content: SbtProjectContent): Set[Dependency] = {
     val parentDependencies = content.dependsOn.flatMap { dep =>
       map(dep.mavenDependency).libraries
     }
@@ -85,7 +85,10 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
   }
 
   private def writeProjects(sb: StringBuilder, projectsMap: Map[MavenDependency, SbtProjectContent]) {
-    projectsMap.foreach { case (name, content) => sb.append(createBuildSbt(content))}
+    val sorted = projectsMap.toSeq.sortBy((a) => a._1.artifactId)
+    sorted.foreach {
+      case (name, content) => sb.append(createBuildSbt(content))
+    }
   }
 
   private def resolversToOption(resolvers: Set[String]) = {
@@ -148,7 +151,7 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
   }
 
 
-  def dependenciesToString(libraries: Set[Dependency]) = libraries.flatMap { d =>
+  def dependenciesToString(libraries: TraversableOnce[Dependency]) = libraries.flatMap { d =>
     val md = d.mavenDependency
     val lib = s"${doubleQuote(md.groupId)} % ${doubleQuote(md.artifactId)} % ${doubleQuote(md.versionId)}"
     d.scope match {
@@ -161,7 +164,7 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
   }.mkString("", ",\n   ", "")
 
 
-  private def dependsOnToString(dependsOn: Set[Dependency], information: ProjectInformation) = dependsOn.map { d =>
+  private def dependsOnToString(dependsOn: TraversableOnce[Dependency], information: ProjectInformation) = dependsOn.map { d =>
     val test = d.scope match {
       case Scope.test => s"% ${doubleQuote("test -> test")}"
       case _ => ""
@@ -169,14 +172,18 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
     s"""`${d.mavenDependency.artifactId}`$test"""
   }.mkString(",")
 
+  def sort(set: Set[Dependency]): TraversableOnce[Dependency] = {
+    set.toIndexedSeq.sorted(Ordering.by[Dependency,(String,String)](x => (x.mavenDependency.groupId,x.mavenDependency.artifactId)))
+  }
+
   private def createBuildSbt(sbtProjectContent: SbtProjectContent) = {
     val SbtProjectContent(project, path, libraries, dependsOn, information, settings) = sbtProjectContent
 
     val projectName = project.projectDependency.artifactId
 
-    val dependencies = dependenciesToString(libraries)
+    val dependencies = dependenciesToString(sort(libraries))
 
-    val dependsOnString = dependsOnToString(dependsOn, information)
+    val dependsOnString = dependsOnToString(sort(dependsOn), information)
 
     if (path.isEmpty) {
       s"""
