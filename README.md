@@ -28,6 +28,5 @@ With basic configuration
 Project is still in phase alfa - source will be rebuilt in spare time.
 
 
-<a href="https://travis-ci.org/travis-ci/travis-web">
-<img alt="Build Status" src="https://travis-ci.org/ajozwik/mvn2sbt.svg?branch=master">
-</a>
+![Build Status](https://travis-ci.org/ajozwik/mvn2sbt.svg?branch=master)
+
