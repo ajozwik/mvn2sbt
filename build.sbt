@@ -38,7 +38,7 @@ lazy val `genscalaxb` = ProjectName("genscalaxb","genscalaxb").settings(scalaxbS
 
 lazy val `converter` = ProjectName("converter","converter").settings(
   instrumentSettings :_*
-).dependsOn(`genscalaxb`)
+).settings(CoverallsPlugin.coverallsSettings :_* ).dependsOn(`genscalaxb`)
 
 
 
