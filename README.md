@@ -1,4 +1,6 @@
-#### Convert maven project (pom.xml files) to sbt project (build.sbt with plugins).
+Mvn2Sbt [![Build Status](https://travis-ci.org/ajozwik/mvn2sbt.svg?branch=master "Build Status")](https://travis-ci.org/ajozwik/mvn2sbt)
+=========
+**Convert maven project (pom.xml files) to sbt project (build.sbt with plugins).**
 
 Logback and slf4j are used as reference projects.
 
@@ -28,5 +30,4 @@ With basic configuration
 Project is still in phase alfa - source will be rebuilt in spare time.
 
 
-[![Build Status](https://travis-ci.org/ajozwik/mvn2sbt.svg?branch=master "Build Status")](https://travis-ci.org/ajozwik/mvn2sbt)
 
