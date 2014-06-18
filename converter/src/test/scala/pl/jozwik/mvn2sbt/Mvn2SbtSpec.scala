@@ -39,6 +39,12 @@ class Mvn2SbtSpec extends AbstractSpec {
       }
     }
 
+    "Wrong pom file" in {
+      intercept[RuntimeException] {
+        Mvn2Sbt.scanHierarchy(new File(TestConstants.EXAMPLES_PROJECTS,"brokenPom"))
+      }
+    }
+
   }
 
   private def testLine(g: String, a: String, v: String, s: String, f: (String, String, String, String) => String) = {

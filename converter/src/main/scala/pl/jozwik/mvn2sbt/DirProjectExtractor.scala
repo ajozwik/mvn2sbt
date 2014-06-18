@@ -6,7 +6,17 @@ import org.maven.{Parent, Model}
 import scala.util.{Try, Success, Failure}
 
 object DirProjectExtractor {
-  final val POM_XML = "effective-pom.xml"
+  final val EFFECTIVE_POM_XML = "effective-pom.xml"
+
+  private[mvn2sbt] def valueFromOptions(option: Option[String], default: Option[String]) =
+    (option, default) match {
+      case (Some(value), _) =>
+        value
+      case (_, Some(defaultValue)) =>
+        defaultValue
+      case _ =>
+        throw new IllegalArgumentException("Both None")
+    }
 }
 
 case class DirProjectExtractor(rootDir: File) extends LazyLogging {
@@ -15,12 +25,15 @@ case class DirProjectExtractor(rootDir: File) extends LazyLogging {
 
   val projectsMap = toProjectMap(rootDir, None)
 
-  private def toProjectMap(dir: File, parent: Option[MavenDependency]) =
-    dir.listFiles().find(f => f.getName == POM_XML) match {
+  private def toProjectMap(dir: File, parent: Option[MavenDependency]) = {
+    val pomOption = dir.listFiles.find(f => f.getName == EFFECTIVE_POM_XML)
+    pomOption match {
       case Some(pomXml) =>
         handlePomFile(pomXml, parent)
-      case None => throw new IllegalStateException(s"""$POM_XML file missing in ${dir.getAbsolutePath}, run "scala Eff.sc ${dir.getAbsolutePath}" first""")
+      case None =>
+        throw new IllegalStateException( s"""$EFFECTIVE_POM_XML file missing in ${dir.getAbsolutePath}, run "scala Eff.sc ${dir.getAbsolutePath}" first""")
     }
+  }
 
   private def handlePomFile(pomXml: File, parent: Option[MavenDependency]) = {
     val xmlFromFile = Try(xml.XML.loadFile(pomXml)) match {
@@ -58,13 +71,5 @@ case class DirProjectExtractor(rootDir: File) extends LazyLogging {
     }
   }
 
-  private def valueFromOptions(option: Option[String], default: Option[String]) =
-    (option, default) match {
-      case (Some(value), _) =>
-        value
-      case (_, Some(defaultValue)) =>
-        defaultValue
-      case _ =>
-        sys.error("Wrong configuration")
-    }
+
 }

@@ -4,6 +4,11 @@ import java.nio.file.Paths
 import java.io.File
 import Mvn2Sbt._
 
+
+object TestConstants{
+  final val EXAMPLES_PROJECTS = "exampleProjects"
+}
+
 class MultiSpec extends AbstractProjectSpec("multi")
 
 class CxfSpec extends AbstractProjectSpec("cxf")
@@ -22,7 +27,7 @@ abstract class AbstractProjectSpec(project:String,inputFile:String = DEPENDENCY_
   getClass.getSimpleName should {
 
     s"Create sbt file for $project with file" in {
-      val rootDir = Paths.get("exampleProjects",project).toFile
+      val rootDir = Paths.get(TestConstants.EXAMPLES_PROJECTS,project).toFile
       val output = new File("target",project)
       Mvn2Sbt.main(Array(rootDir.getAbsolutePath,output.getAbsolutePath))
       new File(output,BUILD_SBT).exists() should be(true)
