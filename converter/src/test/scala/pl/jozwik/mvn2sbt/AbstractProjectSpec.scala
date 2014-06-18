@@ -23,10 +23,9 @@ abstract class AbstractProjectSpec(project:String,inputFile:String = DEPENDENCY_
 
     s"Create sbt file for $project with file" in {
       val rootDir = Paths.get("exampleProjects",project).toFile
-      val hierarchy = scanHierarchy(rootDir)
-      hierarchy should not be Map.empty
-      val projects = projectsFromFile(new File(rootDir,inputFile))
-      createSbtFile(projects,hierarchy,rootDir,new File("target",project))
+      val output = new File("target",project)
+      Mvn2Sbt.main(Array(rootDir.getAbsolutePath,output.getAbsolutePath))
+      new File(output,BUILD_SBT).exists() should be(true)
 
     }
 

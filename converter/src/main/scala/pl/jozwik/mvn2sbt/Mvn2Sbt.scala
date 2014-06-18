@@ -43,8 +43,6 @@ object Mvn2Sbt extends StrictLogging {
   def run(rootDir: File, outputDir: File) {
     val hierarchy = scanHierarchy(rootDir)
     val projectsWithoutPath = projectsFromFile(new File(rootDir, DEPENDENCY_TREE_TXT))
-
-
     createSbtFile(projectsWithoutPath, hierarchy, rootDir, outputDir)
   }
 
@@ -78,7 +76,6 @@ object Mvn2Sbt extends StrictLogging {
     if (rootDir.isDirectory) {
       run(rootDir, outputPath)
       println( s"""Go to $outputPath and copy $BUILD_SBT to $rootDir and $PLUGINS_SBT to ${new File(rootDir, "project")}""")
-      sys.exit()
     }
 
   }

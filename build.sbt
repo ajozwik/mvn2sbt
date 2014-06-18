@@ -10,7 +10,7 @@ name := "mvn2sbt"
 
 organization in Global := "pl.jozwik"
 
-version in Global := "0.3.0"
+version in Global := "0.3.1"
 
 scalaVersion in Global := "2.11.1"
 
@@ -39,11 +39,6 @@ lazy val `genscalaxb` = ProjectName("genscalaxb","genscalaxb").settings(scalaxbS
 lazy val `converter` = ProjectName("converter","converter").settings(
   instrumentSettings :_*
 ).settings(CoverallsPlugin.coverallsSettings :_* ).dependsOn(`genscalaxb`)
-
-
-
-
-
 
 
 
