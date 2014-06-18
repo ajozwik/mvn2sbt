@@ -37,7 +37,7 @@ class Mvn2SbtSpec extends AbstractSpec {
       intercept[IllegalStateException] {
         val target = new File("target")
         target.mkdirs()
-        Mvn2Sbt.scanHierarchy(target))
+        Mvn2Sbt.scanHierarchy(target)
       }
     }
 
