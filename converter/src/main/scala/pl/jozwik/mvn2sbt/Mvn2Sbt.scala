@@ -68,7 +68,7 @@ object Mvn2Sbt extends StrictLogging {
     } else if (args.length == 2) {
       args(1)
     } else {
-      sys.error("Use <rootDirWithMavenProject> [<outputDir>]")
+      throw new IllegalArgumentException("Use <rootDirWithMavenProject> [<outputDir>]")
     }
     val rootDir = new File(args(0))
     val outputPath = new File(out)

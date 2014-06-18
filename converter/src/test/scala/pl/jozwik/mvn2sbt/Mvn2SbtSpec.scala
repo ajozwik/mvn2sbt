@@ -1,5 +1,7 @@
 package pl.jozwik.mvn2sbt
 
+import java.io.File
+
 class Mvn2SbtSpec extends AbstractSpec {
 
   import StreamProjectExtractor._
@@ -13,7 +15,7 @@ class Mvn2SbtSpec extends AbstractSpec {
       val t = ProjectType.jar.name()
       val projectLine = s"$g:$a:$t:$v"
       val parsed = parseProjectLine(projectLine)
-      parsed should be(g, a, t, v,false)
+      parsed should be(g, a, t, v, false)
     }
 
     "Parse dependency line without test-jar" in {
@@ -25,12 +27,24 @@ class Mvn2SbtSpec extends AbstractSpec {
     }
 
 
+    "Expects parameters" in {
+      intercept[IllegalArgumentException] {
+        Mvn2Sbt.main(Array())
+      }
+    }
+
+    "Wrong maven project root directory" in {
+      intercept[IllegalStateException] {
+        Mvn2Sbt.scanHierarchy(new File("target"))
+      }
+    }
+
   }
 
   private def testLine(g: String, a: String, v: String, s: String, f: (String, String, String, String) => String) = {
     val line = f(g, a, v, s)
     val res = parseDependencyLine(line)
-    val (groupId, artifactId, versionId, scope,_) = res
+    val (groupId, artifactId, versionId, scope, _) = res
     (groupId, artifactId, versionId, scope) should be(g, a, v, s)
   }
 
