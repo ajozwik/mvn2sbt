@@ -12,7 +12,7 @@ object Mvn2Sbt extends StrictLogging {
   final val PLUGINS_SBT = "plugins.sbt"
   final val DEPENDENCY_TREE_TXT = "dependencyTree.txt"
 
-  def projectsFromFile(inputFile: File) = {
+  private def projectsFromFile(inputFile: File) = {
     val it = fileToIterator(inputFile)
     iteratorToProjects(it)
   }
@@ -28,7 +28,7 @@ object Mvn2Sbt extends StrictLogging {
   def scanHierarchy(rootDir: File) = DirProjectExtractor(rootDir).projectsMap
 
 
-  def createSbtFile(projectsWithoutPath: Seq[Project], hierarchy: Map[MavenDependency, ProjectInformation], rootDir: File, outputDir: File) = {
+  private def createSbtFile(projectsWithoutPath: Seq[Project], hierarchy: Map[MavenDependency, ProjectInformation], rootDir: File, outputDir: File) = {
     outputDir.mkdirs()
     val buildSbt = new File(outputDir, BUILD_SBT)
     val projectDir = new File(outputDir, PROJECT)
@@ -40,14 +40,11 @@ object Mvn2Sbt extends StrictLogging {
   }
 
 
-  def run(rootDir: File, outputDir: File) {
+  private def handleRootDir(rootDir: File, outputDir: File) {
     val hierarchy = scanHierarchy(rootDir)
     val projectsWithoutPath = projectsFromFile(new File(rootDir, DEPENDENCY_TREE_TXT))
     createSbtFile(projectsWithoutPath, hierarchy, rootDir, outputDir)
   }
-
-
-  def sbtFile(rootDir: Path) = Paths.get(rootDir.toFile.getAbsolutePath, BUILD_SBT)
 
 
   private def writeToFile(file: File, content: String) = Some(new PrintWriter(file)).foreach {
@@ -74,7 +71,7 @@ object Mvn2Sbt extends StrictLogging {
     val outputPath = new File(out)
     println(s"Start with ${toAbsolutePath(rootDir)}, output to ${toAbsolutePath(outputPath)}")
     if (rootDir.isDirectory) {
-      run(rootDir, outputPath)
+      handleRootDir(rootDir, outputPath)
       println( s"""Go to $outputPath and copy $BUILD_SBT to $rootDir and $PLUGINS_SBT to ${new File(rootDir, "project")}""")
     }
 

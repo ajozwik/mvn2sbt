@@ -39,9 +39,15 @@ class Mvn2SbtSpec extends AbstractSpec {
       }
     }
 
+//    "Wrong pom file" in {
+//      intercept[RuntimeException] {
+//        Mvn2Sbt.scanHierarchy(new File(TestConstants.EXAMPLES_PROJECTS,"brokenPom"))
+//      }
+//    }
+
     "Wrong pom file" in {
       intercept[RuntimeException] {
-        Mvn2Sbt.scanHierarchy(new File(TestConstants.EXAMPLES_PROJECTS,"brokenPom"))
+        Mvn2Sbt.main(Array(new File(TestConstants.EXAMPLES_PROJECTS,"brokenPom").getAbsolutePath))
       }
     }
 
