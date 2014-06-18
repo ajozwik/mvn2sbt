@@ -35,14 +35,16 @@ class Mvn2SbtSpec extends AbstractSpec {
 
     "Wrong maven project root directory" in {
       intercept[IllegalStateException] {
-        Mvn2Sbt.scanHierarchy(new File("target"))
+        val target = new File("target")
+        target.mkdirs()
+        Mvn2Sbt.scanHierarchy(target))
       }
     }
 
 
     "Wrong pom file" in {
       intercept[RuntimeException] {
-        Mvn2Sbt.main(Array(new File(TestConstants.EXAMPLES_PROJECTS,"brokenPom").getAbsolutePath))
+        Mvn2Sbt.main(Array(new File(TestConstants.EXAMPLES_PROJECTS, "brokenPom").getAbsolutePath))
       }
     }
 
