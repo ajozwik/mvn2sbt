@@ -43,7 +43,7 @@ class Mvn2SbtSpec extends AbstractSpec {
 
 
     "Wrong pom file" in {
-      intercept[RuntimeException] {
+      intercept[Exception] {
         Mvn2Sbt.main(Array(new File(TestConstants.EXAMPLES_PROJECTS, "brokenPom").getAbsolutePath))
       }
     }

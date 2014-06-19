@@ -1,6 +1,14 @@
 package pl.jozwik.mvn2sbt
 
+import java.io.File
+
+import org.maven.Model
+
+import scalaxb.DataRecord
+
 class DirProjectExtractorSpec extends AbstractSpec{
+
+
 
   "DirProjectExtractor " should {
       "Get first option " in {
@@ -21,6 +29,13 @@ class DirProjectExtractorSpec extends AbstractSpec{
         DirProjectExtractor.valueFromOptions(None,None)
       }
     }
+
+//    "Empty pom file" in {
+//      val model  = Model(Map("groupId"->DataRecord(None,Some("groupId"),"tt")))
+//      model.groupId
+//
+//      DirProjectExtractor.createProjectMap(new File("."),model,None)
+//    }
 
   }
 
