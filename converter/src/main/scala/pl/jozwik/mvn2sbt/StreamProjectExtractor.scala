@@ -35,7 +35,7 @@ object StreamProjectExtractor extends StrictLogging {
     (project +: projects, false)
   }
 
-  private def addDependency(line: String, projects: Seq[Project]): (Seq[Project], Boolean) = {
+  private[mvn2sbt] def addDependency(line: String, projects: Seq[Project]): (Seq[Project], Boolean) = {
     val (groupId, artifactId, versionId, scope,tests) = parseDependencyLine(line)
     val sc = Try(Scope.valueOf(scope)) match {
       case Success(el) => el
