@@ -7,10 +7,32 @@ import org.maven.Plugin
 
 case class SbtProjectContent(project: Project, path: String, libraries: Set[Dependency], dependsOn: Set[Dependency], information: ProjectInformation, settings: Set[String])
 
+object SbtContent{
+  private[mvn2sbt] def resolversToOption(resolvers: Set[String]) = {
+    val start = "resolvers in Global ++= Seq(Resolver.mavenLocal"
+    val stop = ")\n\n"
+    val opt = if (resolvers.isEmpty) {
+      None
+    } else {
+      val resolversString = resolvers.map { x =>
+        val name = doubleQuote(x)
+        s"$name at $name"
+      }.mkString(",",
+          """,
+          """.stripMargin, "")
+
+      Some(resolversString)
+    }
+    start + opt.getOrElse("") + stop
+  }
+
+  private def doubleQuote(str: Any) = "\"" + str + "\""
+}
 
 case class SbtContent(private val projects: Seq[Project], private val hierarchy: Map[MavenDependency, ProjectInformation], private val rootDir: File) extends LazyLogging {
 
-  import pl.jozwik.mvn2sbt.PluginConverter._
+  import PluginConverter._
+  import SbtContent._
 
   private def optimizeDependsOn(set: Set[Dependency], map: Map[MavenDependency, SbtProjectContent]): Set[Dependency] = {
     val toRemove = set.flatMap {
@@ -25,6 +47,8 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
       optimizeDependsOn(set.diff(toRemove), map)
     }
   }
+
+
 
   private def optimizeProject(map: Map[MavenDependency, SbtProjectContent], content: SbtProjectContent): SbtProjectContent = {
     val optimizedLibraries = optimizeLibraries(map, content)
@@ -91,23 +115,6 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
     }
   }
 
-  private def resolversToOption(resolvers: Set[String]) = {
-    val start = "resolvers in Global ++= Seq(Resolver.mavenLocal"
-    val stop = ")\n\n"
-    val opt = if (resolvers.isEmpty) {
-      None
-    } else {
-      val resolversString = resolvers.map { x =>
-        val name = doubleQuote(x)
-        s"$name at $name"
-      }.mkString(",",
-          """,
-          """.stripMargin, "")
-
-      Some(resolversString)
-    }
-    start + opt.getOrElse("") + stop
-  }
 
 
   private def handleProject(p: Project): (SbtProjectContent, Set[String], Set[String]) = {
@@ -211,5 +218,5 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
   }
 
 
-  private def doubleQuote(str: Any) = "\"" + str + "\""
+
 }

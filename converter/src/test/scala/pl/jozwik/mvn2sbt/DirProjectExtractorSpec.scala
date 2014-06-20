@@ -30,12 +30,12 @@ class DirProjectExtractorSpec extends AbstractSpec{
       }
     }
 
-//    "Empty pom file" in {
-//      val model  = Model(Map("groupId"->DataRecord(None,Some("groupId"),"tt")))
-//      model.groupId
-//
-//      DirProjectExtractor.createProjectMap(new File("."),model,None)
-//    }
+    "Empty pom file" in {
+
+      DirProjectExtractor(new File(TestConstants.EXAMPLES_PROJECTS,"emptyPom")).projectsMap.forall{
+        case (k,v) => v.resolvers.isEmpty
+      } should be(true)
+    }
 
   }
 
