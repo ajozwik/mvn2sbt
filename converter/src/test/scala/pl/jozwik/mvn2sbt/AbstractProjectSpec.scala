@@ -13,6 +13,8 @@ class MultiSpec extends AbstractProjectSpec("multi")
 
 class CxfSpec extends AbstractProjectSpec("cxf")
 
+class CxfEmptySpec extends AbstractProjectSpec("cxf_empty")
+
 class Slf4jPomSpec extends AbstractProjectSpec("slf4j")
 
 class ThriftSpec extends AbstractProjectSpec("thrift")

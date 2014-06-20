@@ -64,7 +64,8 @@ case class CxfPluginConverter(rootDir: File) extends PomToSbtPluginConverter {
         Set( s"""cxf.wsdls :=Seq(${
           wsdls.mkString(",\n\t")
         })""")
-      case _ => Set()
+      case _ =>
+        Set()
     }
   }
 
