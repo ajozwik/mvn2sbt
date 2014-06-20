@@ -24,11 +24,6 @@
                         <phase>generate-sources</phase>
                         <configuration>
                             <sourceRoot>${sourceRoot}</sourceRoot>
-                            <defaultOptions>
-                                <bindingFiles>
-                                    <bindingFile>${wsdl.dir}/binding.xml</bindingFile>
-                                </bindingFiles>
-                            </defaultOptions>
                             <wsdlOptions>
                                 <wsdlOption>
                                     <wsdl>${wsdl.dir}/Subs.wsdl</wsdl>
