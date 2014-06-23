@@ -7,7 +7,7 @@ Logback and slf4j are used as reference projects.
 Quick start:
 
 1. Clone project
-1. Run target/pack/bin/mvn2sbt <mavenProject> <outputDir>
+1. Run converter/target/pack/bin/mvn2sbt <mavenProject> <outputDir>
 1. Copy <outputDir>/build.sbt to <mavenProject>/build.sbt
 1. Copy <outputDir>/plugins.sbt to <mavenProject>/project/plugins.sbt
 1. Go to <mavenProject> and run `sbt compile` for test

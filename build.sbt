@@ -1,9 +1,5 @@
 import ScalaxbKeys._
 
-packSettings
-
-packMain := Map("mvn2sbt" -> "pl.jozwik.mvn2sbt.Mvn2Sbt")
-
 incOptions := incOptions.value.withNameHashing(true)
 
 name := "mvn2sbt"
@@ -21,7 +17,7 @@ scalacOptions in Test ++= Seq("-Yrangepos")
 libraryDependencies in Global ++= Seq(
   "com.typesafe.scala-logging" %% "scala-logging-slf4j" % "2.1.2",
   "org.scalacheck" %% "scalacheck" % "1.11.4" % "test",
-  "org.scalatest" %% "scalatest" % "2.1.7" % "test",
+  "org.scalatest" %% "scalatest" % "2.2.0" % "test",
   "ch.qos.logback" % "logback-classic" % "1.1.2",
   "org.scala-lang.modules" %% "scala-xml" % "1.0.2",
   "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.1",
@@ -30,18 +26,20 @@ libraryDependencies in Global ++= Seq(
 
 
 
-lazy val `genscalaxb` = ProjectName("genscalaxb","genscalaxb").settings(scalaxbSettings :_* ).settings(
+lazy val `genscalaxb` = ProjectName("genscalaxb", "genscalaxb").settings(scalaxbSettings: _*).settings(
   packageName in scalaxb in Compile := "org.maven",
   sourceGenerators in Compile <+= scalaxb in Compile
 )
 
 
-lazy val `converter` = ProjectName("converter","converter").settings(
-  instrumentSettings :_*
-).settings(CoverallsPlugin.coverallsSettings :_* ).dependsOn(`genscalaxb`)
+lazy val `converter` = ProjectName("converter", "converter").settings(
+  instrumentSettings: _*
+).settings(CoverallsPlugin.coverallsSettings: _*).settings(packSettings: _*).settings(
+    packMain := Map("mvn2sbt" -> "pl.jozwik.mvn2sbt.Mvn2Sbt")
+  ).dependsOn(`genscalaxb`)
 
 
 
-def ProjectName(name: String,path:String): Project =  Project(name, file(path))
+def ProjectName(name: String, path: String): Project = Project(name, file(path))
 
 
