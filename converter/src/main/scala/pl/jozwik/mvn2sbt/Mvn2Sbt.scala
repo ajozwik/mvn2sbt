@@ -2,8 +2,7 @@ package pl.jozwik.mvn2sbt
 
 import java.io.{File, PrintWriter}
 import scala.io.Source
-import com.typesafe.scalalogging.slf4j.StrictLogging
-import java.nio.file.{Paths, Path}
+import com.typesafe.scalalogging.StrictLogging
 import org.apache.commons.io.IOUtils
 
 object Mvn2Sbt extends StrictLogging {

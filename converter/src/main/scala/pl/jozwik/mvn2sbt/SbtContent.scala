@@ -2,7 +2,7 @@ package pl.jozwik.mvn2sbt
 
 import java.io.File
 
-import com.typesafe.scalalogging.slf4j.LazyLogging
+import com.typesafe.scalalogging.LazyLogging
 import org.maven.Plugin
 
 case class SbtProjectContent(project: Project, path: String, libraries: Set[Dependency], dependsOn: Set[Dependency], information: ProjectInformation, settings: Set[String])

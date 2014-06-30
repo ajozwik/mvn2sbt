@@ -1,6 +1,6 @@
 package pl.jozwik.mvn2sbt
 
-import com.typesafe.scalalogging.slf4j.StrictLogging
+import com.typesafe.scalalogging.StrictLogging
 import scala.util.{Failure, Success, Try}
 
 object StreamProjectExtractor extends StrictLogging {

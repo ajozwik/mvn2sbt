@@ -1,6 +1,6 @@
 package pl.jozwik.mvn2sbt
 
-import com.typesafe.scalalogging.slf4j.LazyLogging
+import com.typesafe.scalalogging.LazyLogging
 import java.io.File
 import org.maven.{Parent, Model}
 import scala.util.{Try, Success, Failure}
