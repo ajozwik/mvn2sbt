@@ -6,7 +6,7 @@ import org.apache.thrift.TSerializer;
 import org.apache.thrift.protocol.TCompactProtocol;
 
 import pl.jozwik.gen.Entity;
-
+import pl.jozwik.xsdgenxjb.IntervalType;
 
 public class SerializationUtils {
 
@@ -19,6 +19,7 @@ public class SerializationUtils {
 	}
 
 	public Entity deserialize(byte[] bytes) throws TException {
+        new IntervalType();
         Entity entity = new Entity();
 		deserializer.deserialize(entity, bytes);
 		return entity;

@@ -35,6 +35,13 @@ object PluginDescription {
     List(new Dependency(new MavenDependency("org.eclipse.jetty", "jetty-webapp", "9.1.0.v20131115"), Scope.container, false),
       new Dependency(new MavenDependency("org.eclipse.jetty", "jetty-plus", "9.1.0.v20131115"), Scope.container, false)),
     PluginConverter.warConverter
+  ),"jaxb2-maven-plugin" -> PluginDescription(
+    "jaxb2-maven-plugin",
+    "com.github.retronym.sbtxjc.SbtXjcPlugin.xjcSettings",
+    "addSbtPlugin(\"org.scala-sbt.plugins\" % \"sbt-xjc\" % \"0.5\")",
+    "resolvers += Resolver.url(\"scalasbt\" , url(\"http://scalasbt.artifactoryonline.com/scalasbt/repo\"))(Resolver.ivyStylePatterns)",
+    Nil,
+    PluginConverter.jaxbConverter
   ))
 
 }

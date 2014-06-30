@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified"
+           attributeFormDefault="unqualified">
+
+    <xs:complexType name="IntervalType">
+        <xs:sequence>
+            <xs:element name="begin" type="xs:long" nillable="true"/>
+            <xs:element name="end" type="xs:long" nillable="true"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="ConsumptionType">
+        <xs:sequence>
+            <xs:element name="id" type="xs:int"/>
+            <xs:element name="timestamp" type="xs:long"/>
+            <xs:element name="count" type="xs:int"/>
+            <xs:element name="value" type="xs:long"/>
+        </xs:sequence>
+    </xs:complexType>
+
+
+    <xs:simpleType name="AggregationLevel">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="HOURLY"/>
+            <xs:enumeration value="DAILY"/>
+            <xs:enumeration value="WEEKLY"/>
+            <xs:enumeration value="MONTHLY"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+
+</xs:schema>
