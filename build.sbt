@@ -8,7 +8,7 @@ organization in Global := "pl.jozwik"
 
 version in Global := "0.3.1"
 
-scalaVersion in Global := "2.11.1"
+scalaVersion in Global := "2.11.2"
 
 scalacOptions ++= Seq("-deprecation", "-unchecked", "-feature")
 
@@ -16,11 +16,11 @@ scalacOptions in Test ++= Seq("-Yrangepos")
 
 libraryDependencies in Global ++= Seq(
   "com.typesafe.scala-logging" %% "scala-logging" % "3.0.0",
-  "org.scalacheck" %% "scalacheck" % "1.11.4" % "test",
+  "org.scalacheck" %% "scalacheck" % "1.11.5" % "test",
   "org.scalatest" %% "scalatest" % "2.2.0" % "test",
   "ch.qos.logback" % "logback-classic" % "1.1.2",
   "org.scala-lang.modules" %% "scala-xml" % "1.0.2",
-  "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.1",
+  "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.2",
   "commons-io" % "commons-io" % "2.4"
 )
 
