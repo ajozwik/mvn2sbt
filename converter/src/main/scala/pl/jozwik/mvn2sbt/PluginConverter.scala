@@ -5,6 +5,7 @@ import scala.xml.{NodeSeq, Node}
 import scalaxb.DataRecord
 
 import java.io.File
+import PluginConverter._
 
 object PluginConverter {
 
@@ -34,12 +35,21 @@ object PluginConverter {
   val warConverter = defaultConverter
 
   val jaxbConverter: PluginConverter = (rootDir, plugin) => JaxbPluginConverter(rootDir).convert(plugin)
+
+  def extractElement(confHead: Configuration4, name: String): Option[DataRecord[Any]] = {
+    confHead.any.find { r =>
+      r.key == Some(name)
+    }
+  }
 }
 
 case class JaxbPluginConverter(rootDir: File) extends PomToSbtPluginConverter {
+
   def convert(plugin: Plugin): Set[String] = extractConfiguration(plugin) match {
     case (Some(confHead: Configuration4) :: tail) =>
-      Set("sources in (xjc, Compile)  <+= sourceDirectory / \"main\" / \"xsd\"","xjcCommandLine := Seq(\"-p\",\"pl.ds.xsdgenerated\",\"-b\",\"domain/stubs/src/main/xjb\"))")
+      val node = extractElement(confHead, "packageName")
+      val packageName = node.get.value.asInstanceOf[Node].text
+      Set( """sources in (Compile, xjc) <<= sourceDirectory map (_ / "main" / "xsd" ** "*.xsd" get) """, s"""xjcCommandLine := Seq("-p","$packageName","-b",sourceDirectory.value.getAbsolutePath +"/main/xjb")""")
     case _ =>
       Set()
   }
@@ -81,11 +91,6 @@ case class CxfPluginConverter(rootDir: File) extends PomToSbtPluginConverter {
     case _ => Map.empty
   }
 
-  def extractElement(confHead: Configuration4, name: String): Option[DataRecord[Any]] = {
-    confHead.any.find { r =>
-      r.key == Some(name)
-    }
-  }
 
   private def extractNode(elem: Node, first: String, names: String*): NodeSeq =
     names.foldLeft(elem \ first)((acc, name) => acc \ name)

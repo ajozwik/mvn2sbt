@@ -205,7 +205,7 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
         |${settings.mkString("", "\n\n", "")}
 """.stripMargin
     } else {
-      val settingString = settings.mkString(".settings(", ").settings(", ")")
+      val settingString = settings.mkString(".settings(", ").\nsettings(", ")")
       s"""lazy val `$projectName` = ProjectName("$projectName","$path").settings(
       |  libraryDependencies ++= Seq($dependencies),
       |    name := "${project.projectDependency.artifactId}",
