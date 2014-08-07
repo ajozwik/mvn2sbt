@@ -26,7 +26,7 @@ object PluginConverter {
 
   val cxfConverter: PluginConverter = (rootDir, plugin) => CxfPluginConverter(rootDir).convert(plugin)
 
-  val defaultConverter: PluginConverter = (rootDir, plugin) => Set()
+  val defaultConverter = (rootDir: File, plugin: Plugin) => Set.empty[String]
 
   val thriftConverter = defaultConverter
 
@@ -63,13 +63,11 @@ object PluginConverter {
 
 case class JaxbPluginConverter(rootDir: File) extends PomToSbtPluginConverter {
 
-  def convert(plugin: Plugin): Set[String] = extractConfiguration(plugin) match {
-    case (Some(confHead: Configuration4) :: tail) =>
-      val node = extractElement(confHead, "packageName")
-      val packageName = node.get.value.asInstanceOf[Node].text
-      Set( """sources in (Compile, xjc) <<= sourceDirectory map (_ / "main" / "xsd" ** "*.xsd" get) """, s"""xjcCommandLine := Seq("-p","$packageName","-b",sourceDirectory.value.getAbsolutePath +"/main/xjb")""")
-    case _ =>
-      Set()
+  def configurationToSet(confHead: Configuration4): Set[String] = {
+    val node = extractElement(confHead, "packageName")
+    val packageName = node.get.value.asInstanceOf[Node].text
+    Set( """sources in (Compile, xjc) <<= sourceDirectory map (_ / "main" / "xsd" ** "*.xsd" get) """,
+      s"""xjcCommandLine := Seq("-p","$packageName","-b",sourceDirectory.value.getAbsolutePath +"/main/xjb")""")
   }
 }
 
@@ -79,30 +77,27 @@ case class CxfPluginConverter(rootDir: File) extends PomToSbtPluginConverter {
 
   private val ignoredArgs = Set("-wsdlLocation", "-autoNameResolution")
 
-  def convert(plugin: Plugin): Set[String] = extractConfiguration(plugin) match {
-    case (Some(confHead: Configuration4) :: tail) =>
-      val defaultOptSeq = extractMap(confHead, "wsdl",buildCxfSeq, "defaultOptions").getOrElse("", Seq[String]())
+  def configurationToSet(confHead: Configuration4): Set[String] = {
+    val defaultOptSeq = extractMap(confHead, "wsdl", buildCxfSeq, "defaultOptions").getOrElse("", Seq[String]())
 
-      val wsdlOptionSeq = extractMap(confHead, "wsdl",buildCxfSeq, "wsdlOptions", "wsdlOption")
+    val wsdlOptionSeq = extractMap(confHead, "wsdl", buildCxfSeq, "wsdlOptions", "wsdlOption")
 
-      val wsdls = wsdlOptionSeq.map {
-        case (wsdl, seq) =>
-          val diff = toPath(wsdl, rootDir)
-          val s = defaultOptSeq ++ seq
-          s"""cxf.Wsdl(file("$diff"), Seq(${
-            s.mkString("\"", "\",\"", "\"")
-          }), "$diff")"""
-      }
+    val wsdls = wsdlOptionSeq.map {
+      case (wsdl, seq) =>
+        val diff = toPath(wsdl, rootDir)
+        val s = defaultOptSeq ++ seq
+        s"""cxf.Wsdl(file("$diff"), Seq(${
+          s.mkString("\"", "\",\"", "\"")
+        }), "$diff")"""
+    }
 
-      Set( s"""cxf.wsdls :=Seq(${wsdls.mkString(",\n\t")})""")
-    case _ =>
-      Set.empty
+    Set( s"""cxf.wsdls :=Seq(${wsdls.mkString(",\n\t")})""")
   }
 
+
   def extractMap(confHead: Configuration4, key: String, buildSeq: (Node) => Seq[String], name: String, elements: String*): Map[String, Seq[String]] = extractElement(confHead, name) match {
-    case Some(node) =>
-      val cast = node.value.asInstanceOf[Node]
-      toKeySeqMap(cast, key, buildSeq, elements: _*)
+    case Some(node:Node) =>
+      toKeySeqMap(node, key, buildSeq, elements: _*)
     case _ => Map.empty
   }
 
@@ -119,7 +114,13 @@ case class CxfPluginConverter(rootDir: File) extends PomToSbtPluginConverter {
 
 
 sealed trait PomToSbtPluginConverter {
-  def convert(plugin: Plugin): Set[String]
+  final def convert(plugin: Plugin): Set[String] = extractConfiguration(plugin) match {
+    case (Some(confHead: Configuration4) :: tail) =>
+      configurationToSet(confHead)
+    case _ => Set.empty
+  }
+
+  protected def configurationToSet(confHead: Configuration4): Set[String]
 
   private[mvn2sbt] def extractConfiguration(plugin: Plugin) = {
     val execution = plugin.executions.get.execution

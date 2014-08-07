@@ -17,7 +17,7 @@ scalacOptions in Test ++= Seq("-Yrangepos")
 libraryDependencies in Global ++= Seq(
   "com.typesafe.scala-logging" %% "scala-logging" % "3.0.0",
   "org.scalacheck" %% "scalacheck" % "1.11.5" % "test",
-  "org.scalatest" %% "scalatest" % "2.2.0" % "test",
+  "org.scalatest" %% "scalatest" % "2.2.1" % "test",
   "ch.qos.logback" % "logback-classic" % "1.1.2",
   "org.scala-lang.modules" %% "scala-xml" % "1.0.2",
   "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.2",
