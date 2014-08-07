@@ -202,7 +202,7 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
         |
         |libraryDependencies in Global ++= Seq($dependencies)
         |
-        |${settings.mkString("", "\n\n", "")}
+        |${settings.mkString("", "\n\n", "\n")}
 """.stripMargin
     } else {
       val settingString = settings.mkString(".settings(", ").\nsettings(", ")")
