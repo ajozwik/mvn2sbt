@@ -38,9 +38,27 @@ object PluginConverter {
 
   def extractElement(confHead: Configuration4, name: String): Option[DataRecord[Any]] = {
     confHead.any.find { r =>
-      r.key == Some(name)
+      r.key match {
+        case Some(n) => n == name
+        case _ => false
+      }
     }
   }
+
+  def extractNode(elem: Node, first: String, names: String*): NodeSeq =
+    names.foldLeft(elem \ first)((acc, name) => acc \ name)
+
+  def toKeySeqMap(elem: Node, key: String, buildSeq: (Node) => Seq[String], elements: String*): Map[String, Seq[String]] = {
+    val nodeSeq = elements.foldLeft(elem.asInstanceOf[NodeSeq])((acc, name) => acc \ name)
+    toKeySeqMap(nodeSeq, key, buildSeq)
+  }
+
+  private def toKeySeqMap(nodeSeq: NodeSeq, key: String, buildSeq: (Node) => Seq[String]): Map[String, Seq[String]] =
+    nodeSeq.foldLeft(Map.empty[String, Seq[String]]) {
+      (acc, node) =>
+        acc + (extractNode(node, key).text -> buildSeq(node))
+    }
+
 }
 
 case class JaxbPluginConverter(rootDir: File) extends PomToSbtPluginConverter {
@@ -63,9 +81,9 @@ case class CxfPluginConverter(rootDir: File) extends PomToSbtPluginConverter {
 
   def convert(plugin: Plugin): Set[String] = extractConfiguration(plugin) match {
     case (Some(confHead: Configuration4) :: tail) =>
-      val defaultOptSeq = extractMap(confHead, "defaultOptions").getOrElse("", Seq[String]())
+      val defaultOptSeq = extractMap(confHead, "wsdl",buildCxfSeq, "defaultOptions").getOrElse("", Seq[String]())
 
-      val wsdlOptionSeq = extractMap(confHead, "wsdlOptions", "wsdlOption")
+      val wsdlOptionSeq = extractMap(confHead, "wsdl",buildCxfSeq, "wsdlOptions", "wsdlOption")
 
       val wsdls = wsdlOptionSeq.map {
         case (wsdl, seq) =>
@@ -76,44 +94,26 @@ case class CxfPluginConverter(rootDir: File) extends PomToSbtPluginConverter {
           }), "$diff")"""
       }
 
-      Set( s"""cxf.wsdls :=Seq(${
-        wsdls.mkString(",\n\t")
-      })""")
+      Set( s"""cxf.wsdls :=Seq(${wsdls.mkString(",\n\t")})""")
     case _ =>
-      Set()
+      Set.empty
   }
 
-  def extractMap(confHead: Configuration4, name: String, elements: String*): Map[String, Seq[String]] = extractElement(confHead, name) match {
+  def extractMap(confHead: Configuration4, key: String, buildSeq: (Node) => Seq[String], name: String, elements: String*): Map[String, Seq[String]] = extractElement(confHead, name) match {
     case Some(node) =>
       val cast = node.value.asInstanceOf[Node]
-      extractWsdlOption(cast, elements: _*)
+      toKeySeqMap(cast, key, buildSeq, elements: _*)
     case _ => Map.empty
   }
 
 
-  private def extractNode(elem: Node, first: String, names: String*): NodeSeq =
-    names.foldLeft(elem \ first)((acc, name) => acc \ name)
-
-
-  private def extractWsdlOption(elem: Node, elements: String*) = {
-    val wsdlOption = elements.foldLeft(elem.asInstanceOf[NodeSeq])((acc, name) => acc \ name)
-    wsdlOptionFromNode(wsdlOption)
+  def buildCxfSeq(node: Node): Seq[String] = {
+    val packages = extractNode(node, "packagenames", "packagename").flatMap(n => Seq("-p", n.text))
+    val extraArgs = extractNode(node, "extraargs", "extraarg").map(_.text).filterNot(ignoredArgs.contains)
+    val bindings = extractNode(node, "bindingFiles", "bindingFile").flatMap(x => Seq("-b", toPath(x.text, rootDir)))
+    packages ++ extraArgs ++ bindings
   }
 
-  private def wsdlOptionFromNode(wsdlOption: NodeSeq): Map[String, Seq[String]] =
-    wsdlOption.map(w => (extractNode(w, "wsdl").text, buildSeq(w))).toMap
-
-
-  private def buildSeq(node: Node) =
-    buildPackage(node) ++ buildExtraArgs(node) ++ buildBindings(node)
-
-
-  private def buildPackage(node: Node) = extractNode(node, "packagenames", "packagename").flatMap(n => Seq("-p", n.text))
-
-  private def buildExtraArgs(node: Node) = extractNode(node, "extraargs", "extraarg").map(_.text).filterNot(ignoredArgs.contains)
-
-  private def buildBindings(node: Node) =
-    extractNode(node, "bindingFiles", "bindingFile").flatMap(x => Seq("-b", toPath(x.text, rootDir)))
 
 }
 

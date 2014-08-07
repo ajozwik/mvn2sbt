@@ -4,7 +4,7 @@ import java.io.File
 
 
 if (args.length == 0) {
-  println( """Call sbt "runMain Eff <rootDir1> <rootDir2>" """)
+  println( """Call "scala Eff <rootDir1> [<rootDir2>]" """)
   sys.exit(-1)
 } else {
   println( s"""You are called "scala Eff ${args.mkString(" ")}" """)

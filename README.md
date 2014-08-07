@@ -7,7 +7,8 @@ Logback and slf4j are used as reference projects.
 Quick start:
 
 1. Clone project
-1. Run converter/target/pack/bin/mvn2sbt <mavenProject> <outputDir>
+1. Run scala Eff mavenProject, where rootDir - directory with your maven project
+1. Run converter/target/pack/bin/mvn2sbt <mavenProject> [outputDir]
 1. Copy <outputDir>/build.sbt to <mavenProject>/build.sbt
 1. Copy <outputDir>/plugins.sbt to <mavenProject>/project/plugins.sbt
 1. Go to <mavenProject> and run `sbt compile` for test
@@ -18,13 +19,10 @@ Without parameters ( default configuration)
 
  * gmaven-plugin
  * maven-thrift-plugin
- * war plugin
+ * maven-war-plugin
+ * cxf-codegen-plugin
+ * testng plugin (as dependency)
  
-With basic configuration
- 
- * cxf-codegen-plugin - with some options
-
-
 Project is still in phase alfa - source will be rebuilt in spare time.
 
 
