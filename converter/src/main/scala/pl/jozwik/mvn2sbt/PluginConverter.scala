@@ -58,7 +58,6 @@ case class JaxbPluginConverter(rootDir: File) extends PomToSbtPluginConverter {
 
 case class CxfPluginConverter(rootDir: File) extends PomToSbtPluginConverter {
 
-  import PluginConverter.toPath
 
   private val ignoredArgs = Set("-wsdlLocation", "-autoNameResolution")
 
