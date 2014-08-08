@@ -45,11 +45,13 @@ object PluginConverter {
     }
   }
 
-  def extractNode(elem: Node, first: String, names: String*): NodeSeq =
-    names.foldLeft(elem \ first)((acc, name) => acc \ name)
+  def extractNode(elem: Node, first: String, names: String*): NodeSeq = {
+    val child = elem \ first
+    names.foldLeft(child)((acc, name) => acc \ name)
+  }
 
-  def toKeySeqMap(elem: Node, key: String, buildSeq: (Node) => Seq[String], elements: String*): Map[String, Seq[String]] = {
-    val nodeSeq = elements.foldLeft(elem.asInstanceOf[NodeSeq])((acc, name) => acc \ name)
+  def toKeySeqMap(elem: NodeSeq, key: String, buildSeq: (Node) => Seq[String], elements: String*): Map[String, Seq[String]] = {
+    val nodeSeq = elements.foldLeft(elem)((acc, name) => acc \ name)
     toKeySeqMap(nodeSeq, key, buildSeq)
   }
 
@@ -95,10 +97,15 @@ case class CxfPluginConverter(rootDir: File) extends PomToSbtPluginConverter {
   }
 
 
-  def extractMap(confHead: Configuration4, key: String, buildSeq: (Node) => Seq[String], name: String, elements: String*): Map[String, Seq[String]] = extractElement(confHead, name) match {
-    case Some(node:Node) =>
-      toKeySeqMap(node, key, buildSeq, elements: _*)
-    case _ => Map.empty
+  def extractMap(confHead: Configuration4, key: String, buildSeq: (Node) => Seq[String], name: String, elements: String*): Map[String, Seq[String]] = {
+    val element = extractElement(confHead, name)
+    element match {
+      case Some(node) =>
+        val nodeSeq = node.value.asInstanceOf[NodeSeq]
+        toKeySeqMap(nodeSeq, key, buildSeq, elements: _*)
+      case _ =>
+        Map.empty
+    }
   }
 
 
