@@ -5,7 +5,6 @@ import scala.xml.{NodeSeq, Node}
 import scalaxb.DataRecord
 
 import java.io.File
-import PluginConverter._
 
 object PluginConverter {
 
@@ -24,17 +23,8 @@ object PluginConverter {
 
   type PluginConverter = (File, Plugin) => Set[String]
 
-  val cxfConverter: PluginConverter = (rootDir, plugin) => CxfPluginConverter(rootDir).convert(plugin)
-
   val defaultConverter = (rootDir: File, plugin: Plugin) => Set.empty[String]
 
-  val thriftConverter = defaultConverter
-
-  val groovyConverter = defaultConverter
-
-  val warConverter = defaultConverter
-
-  val jaxbConverter: PluginConverter = (rootDir, plugin) => JaxbPluginConverter(rootDir).convert(plugin)
 
   def extractElement(confHead: Configuration4, name: String): Option[DataRecord[Any]] = {
     confHead.any.find { r =>
@@ -63,64 +53,8 @@ object PluginConverter {
 
 }
 
-case class JaxbPluginConverter(rootDir: File) extends PomToSbtPluginConverter {
 
-  def configurationToSet(confHead: Configuration4): Set[String] = {
-    val node = extractElement(confHead, "packageName")
-    val packageName = node.get.value.asInstanceOf[Node].text
-    Set( """sources in (Compile, xjc) <<= sourceDirectory map (_ / "main" / "xsd" ** "*.xsd" get) """,
-      s"""xjcCommandLine := Seq("-p","$packageName","-b",sourceDirectory.value.getAbsolutePath +"/main/xjb")""")
-  }
-}
-
-
-case class CxfPluginConverter(rootDir: File) extends PomToSbtPluginConverter {
-
-
-  private val ignoredArgs = Set("-wsdlLocation", "-autoNameResolution")
-
-  def configurationToSet(confHead: Configuration4): Set[String] = {
-    val defaultOptSeq = extractMap(confHead, "wsdl", buildCxfSeq, "defaultOptions").getOrElse("", Seq[String]())
-
-    val wsdlOptionSeq = extractMap(confHead, "wsdl", buildCxfSeq, "wsdlOptions", "wsdlOption")
-
-    val wsdls = wsdlOptionSeq.map {
-      case (wsdl, seq) =>
-        val diff = toPath(wsdl, rootDir)
-        val s = defaultOptSeq ++ seq
-        s"""cxf.Wsdl(file("$diff"), Seq(${
-          s.mkString("\"", "\",\"", "\"")
-        }), "$diff")"""
-    }
-
-    Set( s"""cxf.wsdls :=Seq(${wsdls.mkString(",\n\t")})""")
-  }
-
-
-  def extractMap(confHead: Configuration4, key: String, buildSeq: (Node) => Seq[String], name: String, elements: String*): Map[String, Seq[String]] = {
-    val element = extractElement(confHead, name)
-    element match {
-      case Some(node) =>
-        val nodeSeq = node.value.asInstanceOf[NodeSeq]
-        toKeySeqMap(nodeSeq, key, buildSeq, elements: _*)
-      case _ =>
-        Map.empty
-    }
-  }
-
-
-  def buildCxfSeq(node: Node): Seq[String] = {
-    val packages = extractNode(node, "packagenames", "packagename").flatMap(n => Seq("-p", n.text))
-    val extraArgs = extractNode(node, "extraargs", "extraarg").map(_.text).filterNot(ignoredArgs.contains)
-    val bindings = extractNode(node, "bindingFiles", "bindingFile").flatMap(x => Seq("-b", toPath(x.text, rootDir)))
-    packages ++ extraArgs ++ bindings
-  }
-
-
-}
-
-
-sealed trait PomToSbtPluginConverter {
+trait PomToSbtPluginConverter {
   final def convert(plugin: Plugin): Set[String] = extractConfiguration(plugin) match {
     case (Some(confHead: Configuration4) :: tail) =>
       configurationToSet(confHead)
