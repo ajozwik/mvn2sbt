@@ -91,9 +91,10 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
   def buildSbtContentPluginContentAsString: (String, String) = {
     val buildSbtWriter = new StringBuilder
     val pluginsSbtWriter = new StringBuilder
-
-    buildSbtWriter.append("def ProjectName(name: String,path:String): Project =  Project(name, file(path))\n\n")
-    val (contentOfPluginSbt, resolvers, buildSbtProjects) = projects.foldLeft((Set[String](), Set[String](), Map.empty[MavenDependency, SbtProjectContent])) { (acc, p) =>
+    buildSbtWriter.append("""scalaVersion in Global := "2.11.2"""").append("\n\n")
+    buildSbtWriter.append("def ProjectName(name: String,path:String): Project =  Project(name, file(path))").append("\n\n")
+    val (contentOfPluginSbt, resolvers, buildSbtProjects) = projects.foldLeft((Set.empty[String], Set.empty[String], Map.empty[MavenDependency, SbtProjectContent])) {
+      (acc, p) =>
       val (accContent, accResolvers, stbProjectContent) = acc
       val (projectContent, pluginsSbt, resolvers) = handleProject(p)
       (accContent ++ pluginsSbt, accResolvers ++ resolvers, stbProjectContent + (p.projectDependency -> projectContent))

@@ -10,19 +10,19 @@ import pl.jozwik.mvn2sbt.PluginConverter._
 import scala.util.{Failure, Success, Try}
 
 object MavenSbtPluginMapper extends StrictLogging {
-  private final val EMPTY_SEQ = Seq[(PluginDescription, Plugin)]()
-  private val artifactIdToPluginDescriptionMap: Map[String, PluginDescription] = loadConverters()
+  private final val EMPTY_SEQ = Seq.empty[(PluginDescription, Plugin)]
   final val DEFAULT_CONVERTERS_PATH = "/converters.xml"
   final val CONVERTERS_PATH = "converters.path"
-
-  private[mvn2sbt] def loadConverters() = {
+  private[mvn2sbt] lazy val artifactIdToPluginDescriptionMap: Map[String, PluginDescription] = {
     val path = System.getProperty(CONVERTERS_PATH, DEFAULT_CONVERTERS_PATH)
     val stream = getClass.getResourceAsStream(path)
     import org.maven._
     val converters = Try(xml.XML.load(stream)) match {
       case Success(s) => scalaxb.fromXML[pl.jozwik.gen.Converters](s)
-      case Failure(th) => throw th
+      case Failure(th) => logger.error(s"$path not found")
+        throw th
     }
+    stream.close()
     converters.converter.foldLeft(Map.empty[String, PluginDescription]) {
       (acc, converter) =>
         val pluginDescription = toPluginDescription(converter)
