@@ -10,7 +10,7 @@
                 <version>0.1.2</version>
             </dependency>
         </pluginsSbtPluginConfiguration>
-        <extraRepository>"Sonatype Repository" at"https://oss.sonatype.org/content/groups/public"</extraRepository>
+        <extraRepository>"Sonatype Repository" at "https://oss.sonatype.org/content/groups/public"</extraRepository>
         <dependencies/>
         <converter>pl.jozwik.mvn2sbt.pom2sbt.CxfPluginConverter</converter>
     </converter>
@@ -93,5 +93,4 @@
         </dependencies>
         <converter/>
     </converter>
-
 </converters>

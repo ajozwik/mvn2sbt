@@ -42,7 +42,7 @@ object MavenSbtPluginMapper extends StrictLogging {
   }
 
   private def toAddSbtString(dependencies: Dependencies): String = {
-    dependencies.dependency.map(d => s"""addSbtPlugin("${d.groupId}"%"${d.artifactId}"%"${d.version})""").mkString("\n\n")
+    dependencies.dependency.map(d => s"""addSbtPlugin("${d.groupId}" % "${d.artifactId}" % "${d.version}") """).mkString("\n\n")
   }
 
   private def toDependencySeq(dependencies: Option[Dependencies]) =
