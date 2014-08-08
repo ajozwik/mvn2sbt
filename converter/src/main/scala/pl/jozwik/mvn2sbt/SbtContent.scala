@@ -152,7 +152,7 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
       val endSettings = DependencyToPluginConverter.addSeqToArray(file.equals(rootDir))
       val settings = accSett + (pluginDescription.sbtSetting + endSettings)
       val customPluginSettings = pluginDescription.pomConfigurationToSbtConfiguration(rootDir, plugin)
-      val plugins = accPlug +(pluginDescription.plugin, pluginDescription.extraRepository)
+      val plugins = accPlug +(pluginDescription.pluginsSbtPluginConfiguation, pluginDescription.extraRepository)
       (settings ++ customPluginSettings, plugins, accPluginDependencies ++ pluginDescription.dependencies)
     }
   }

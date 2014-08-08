@@ -3,31 +3,21 @@ package pl.jozwik.mvn2sbt.pom2sbt
 import java.io.File
 
 import org.maven.Configuration4
-import pl.jozwik.mvn2sbt.PluginConverter.PluginConverter
-import pl.jozwik.mvn2sbt.{Dependency, PomToSbtPluginConverter}
+import pl.jozwik.mvn2sbt.PomToSbtPluginConverter
 
 import scala.xml.{Node, NodeSeq}
 
-object CxfCodegenPluginDescription extends Pom2Sbt {
-  val artifactId = "cxf-codegen-plugin"
-  val plugin = "cxf.settings"
-  val extraRepository = """addSbtPlugin("com.ebiznext.sbt.plugins" % "sbt-cxf-wsdl2java" % "0.1.2")"""
-  val sbtSetting: String = """resolvers += "Sonatype Repository" at "https://oss.sonatype.org/content/groups/public" """
-  val dependencies: Seq[Dependency] = Nil
-  val converter: PluginConverter = (rootDir, plugin) => CxfPluginConverter(rootDir).convert(plugin)
-}
 
-
-case class CxfPluginConverter(rootDir: File) extends PomToSbtPluginConverter {
+class CxfPluginConverter extends PomToSbtPluginConverter {
 
   import pl.jozwik.mvn2sbt.PluginConverter._
 
   private val ignoredArgs = Set("-wsdlLocation", "-autoNameResolution")
 
-  def configurationToSet(confHead: Configuration4): Set[String] = {
-    val defaultOptSeq = extractMap(confHead, "wsdl", buildCxfSeq, "defaultOptions").getOrElse("", Seq[String]())
+  def configurationToSet(confHead: Configuration4,rootDir:File): Set[String] = {
+    val defaultOptSeq = extractMap(confHead, "wsdl", buildCxfSeq(rootDir), "defaultOptions").getOrElse("", Seq[String]())
 
-    val wsdlOptionSeq = extractMap(confHead, "wsdl", buildCxfSeq, "wsdlOptions", "wsdlOption")
+    val wsdlOptionSeq = extractMap(confHead, "wsdl", buildCxfSeq(rootDir), "wsdlOptions", "wsdlOption")
 
     val wsdls = wsdlOptionSeq.map {
       case (wsdl, seq) =>
@@ -51,7 +41,7 @@ case class CxfPluginConverter(rootDir: File) extends PomToSbtPluginConverter {
     }
   }
 
-  def buildCxfSeq(node: Node): Seq[String] = {
+  def buildCxfSeq(rootDir:File)(node: Node): Seq[String] = {
     val packages = extractNode(node, "packagenames", "packagename").flatMap(n => Seq("-p", n.text))
     val extraArgs = extractNode(node, "extraargs", "extraarg").map(_.text).filterNot(ignoredArgs.contains)
     val bindings = extractNode(node, "bindingFiles", "bindingFile").flatMap(x => Seq("-b", toPath(x.text, rootDir)))

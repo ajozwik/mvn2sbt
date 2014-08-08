@@ -27,7 +27,8 @@ libraryDependencies in Global ++= Seq(
 
 
 lazy val `genscalaxb` = ProjectName("genscalaxb", "genscalaxb").settings(scalaxbSettings: _*).settings(
-  packageName in scalaxb in Compile := "org.maven",
+  packageNames in scalaxb in Compile := Map(new URI("https://github.com/ajozwik/mvn2sbt") -> "pl.jozwik.gen",
+    new URI("http://maven.apache.org/POM/4.0.0") -> "org.maven"),
   sourceGenerators in Compile <+= scalaxb in Compile
 )
 

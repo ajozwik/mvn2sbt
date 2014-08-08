@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified"
+           targetNamespace="https://github.com/ajozwik/mvn2sbt"
+           xmlns="https://github.com/ajozwik/mvn2sbt" attributeFormDefault="unqualified">
+    <xs:element name="converters" type="Converters"/>
+    <xs:complexType name="Converters">
+        <xs:sequence>
+            <xs:element name="converter" type="Converter" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="Converter">
+        <xs:sequence>
+            <xs:element name="artifactId" type="xs:string"/>
+            <xs:element name="sbtSetting" type="xs:string"/>
+            <xs:element name="pluginsSbtPluginConfiguration" type="Dependencies" minOccurs="0"/>
+            <xs:element name="extraRepository" type="xs:string" minOccurs="0"/>
+            <xs:element name="dependencies" type="Dependencies" minOccurs="0"/>
+            <xs:element name="converter" type="xs:string" />
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="Dependencies">
+        <xs:sequence>
+            <xs:element name="dependency" type="Dependency" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="Dependency">
+        <xs:sequence>
+            <xs:element name="groupId" type="xs:string"/>
+            <xs:element name="artifactId" type="xs:string"/>
+            <xs:element name="version" type="xs:string"/>
+            <xs:element name="scope" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+</xs:schema>
