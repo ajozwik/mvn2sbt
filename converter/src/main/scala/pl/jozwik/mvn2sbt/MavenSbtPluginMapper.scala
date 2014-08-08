@@ -17,12 +17,12 @@ object MavenSbtPluginMapper extends StrictLogging {
     val path = System.getProperty(CONVERTERS_PATH, DEFAULT_CONVERTERS_PATH)
     val stream = getClass.getResourceAsStream(path)
     import org.maven._
-    val converters = Try(xml.XML.load(stream)) match {
-      case Success(s) => scalaxb.fromXML[pl.jozwik.gen.Converters](s)
-      case Failure(th) => logger.error(s"$path not found")
-        throw th
+    val elem = try {
+      xml.XML.load(stream)
+    } finally {
+      stream.close()
     }
-    stream.close()
+    val converters = scalaxb.fromXML[pl.jozwik.gen.Converters](elem)
     converters.converter.foldLeft(Map.empty[String, PluginDescription]) {
       (acc, converter) =>
         val pluginDescription = toPluginDescription(converter)
