@@ -1,10 +1,10 @@
 package pl.jozwik.mvn2sbt
 
-import java.io.{FileOutputStream, File}
+import java.io.{File, FileOutputStream}
 
 class Mvn2SbtSpec extends AbstractSpec {
 
-  import StreamProjectExtractor._
+  import pl.jozwik.mvn2sbt.StreamProjectExtractor._
 
   "Mvn2Sbt " should {
 
@@ -20,6 +20,10 @@ class Mvn2SbtSpec extends AbstractSpec {
 
     "Parse dependency line without test-jar" in {
       testLine("org.apache.httpcomponents", "httpclient", "4.2.3", "compile", (g, a, v, s) => s"+- $g:$a:jar:$v:$s")
+    }
+
+    """Parse dependency line without test-jar \-""" in {
+      testLine("org.testng", "testng", "6.8.8", "test", (g, a, v, s) => s"""\\- $g:$a:jar:$v:$s""")
     }
 
     "Parse dependency line with test-jar" in {

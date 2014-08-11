@@ -3,11 +3,9 @@ package pl.jozwik.mvn2sbt
 import java.io.File
 
 import com.typesafe.scalalogging.StrictLogging
-import org.maven.{Build, Plugin, Model}
-import pl.jozwik.gen.{Dependencies, Converter}
+import org.maven.{Build, Model, Plugin}
+import pl.jozwik.gen.{Converter, Dependencies}
 import pl.jozwik.mvn2sbt.PluginConverter._
-
-import scala.util.{Failure, Success, Try}
 
 object MavenSbtPluginMapper extends StrictLogging {
   private final val EMPTY_SEQ = Seq.empty[(PluginDescription, Plugin)]
@@ -32,7 +30,7 @@ object MavenSbtPluginMapper extends StrictLogging {
 
   private def toPluginDescription(converter: Converter) = {
     val artifactId = converter.artifactId
-    val sbtSetting = converter.sbtSetting
+    val sbtSetting = converter.sbtSetting.getOrElse("")
     val pluginsSbtPluginConfiguration = converter.pluginsSbtPluginConfiguration.fold("")(d => toAddSbtString(d))
     val extraRepository = converter.extraRepository.fold("")(repo => s"resolvers += $repo")
     val dependencies = toDependencySeq(converter.dependencies)
@@ -74,7 +72,7 @@ object MavenSbtPluginMapper extends StrictLogging {
 
 case class MavenSbtPluginMapper(model: Model) {
 
-  import MavenSbtPluginMapper._
+  import pl.jozwik.mvn2sbt.MavenSbtPluginMapper._
 
   val plugins: Seq[(PluginDescription, Plugin)] =
     model.build.fold(EMPTY_SEQ)(buildToPlugins)

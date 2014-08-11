@@ -1,12 +1,13 @@
 package pl.jozwik.mvn2sbt
 
 import com.typesafe.scalalogging.StrictLogging
+
 import scala.util.{Failure, Success, Try}
 
 object StreamProjectExtractor extends StrictLogging {
   final val PROJECT_START: String = "--- maven-dependency-plugin:"
   final val INFO = "[INFO] "
-  final val START_DEPENDENCY = "+- "
+  final val START_DEPENDENCY = Seq("+- ","\\- ")
 
   def parseProjectLine(line: String) = {
     toOrderedTuple((0, 1, 2, 3,false), line.split(":"))
@@ -52,7 +53,7 @@ object StreamProjectExtractor extends StrictLogging {
 
 case class StreamProjectExtractor(private val iterator: TraversableOnce[String]) {
 
-  import StreamProjectExtractor._
+  import pl.jozwik.mvn2sbt.StreamProjectExtractor._
 
   val projects = {
     val (p, _) = cutInfo.foldLeft((Seq[Project](), false)) {
@@ -66,7 +67,7 @@ case class StreamProjectExtractor(private val iterator: TraversableOnce[String])
   private def handleLine(accProjects: Seq[Project], line: String, started: Boolean): (Seq[Project], Boolean) = {
     if (line.startsWith(PROJECT_START)) {
       (accProjects, true)
-    } else if (line.startsWith(START_DEPENDENCY)) {
+    } else if (START_DEPENDENCY.exists(start => line.startsWith(start))) {
       addDependency(line, accProjects)
     } else if (started) {
       addProject(line, accProjects)

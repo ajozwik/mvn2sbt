@@ -1,6 +1,7 @@
 package pl.jozwik.mvn2sbt
 
 import java.io.File
+
 import org.maven.Plugin
 
 case class MavenDependency(groupId: String, artifactId: String, versionId: String)

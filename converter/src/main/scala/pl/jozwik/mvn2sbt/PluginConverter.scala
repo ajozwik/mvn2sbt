@@ -1,10 +1,11 @@
 package pl.jozwik.mvn2sbt
 
-import org.maven.{Configuration4, Plugin}
-import scala.xml.{NodeSeq, Node}
-import scalaxb.DataRecord
-
 import java.io.File
+
+import org.maven.{Configuration4, Plugin}
+
+import scala.xml.{Node, NodeSeq}
+import scalaxb.DataRecord
 
 object PluginConverter {
 
@@ -29,8 +30,10 @@ object PluginConverter {
   def extractElement(confHead: Configuration4, name: String): Option[DataRecord[Any]] = {
     confHead.any.find { r =>
       r.key match {
-        case Some(n) => n == name
-        case _ => false
+        case Some(n) =>
+          n == name
+        case _ =>
+          false
       }
     }
   }
@@ -55,13 +58,13 @@ object PluginConverter {
 
 
 trait PomToSbtPluginConverter {
-  final def convert(plugin: Plugin,rootDir:File): Set[String] = extractConfiguration(plugin) match {
+  final def convert(plugin: Plugin, rootDir: File): Set[String] = extractConfiguration(plugin) match {
     case (Some(confHead: Configuration4) :: tail) =>
-      configurationToSet(confHead,rootDir)
+      configurationToSet(confHead, rootDir)
     case _ => Set.empty
   }
 
-  protected def configurationToSet(confHead: Configuration4,rootDir:File): Set[String]
+  protected def configurationToSet(confHead: Configuration4, rootDir: File): Set[String]
 
   private[mvn2sbt] def extractConfiguration(plugin: Plugin) = {
     val execution = plugin.executions.get.execution

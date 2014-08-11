@@ -1,9 +1,11 @@
 package pl.jozwik.mvn2sbt
 
-import com.typesafe.scalalogging.LazyLogging
 import java.io.File
-import org.maven.{Parent, Model}
-import scala.util.{Try, Success, Failure}
+
+import com.typesafe.scalalogging.LazyLogging
+import org.maven.{Model, Parent}
+
+import scala.util.{Failure, Success, Try}
 
 object DirProjectExtractor extends LazyLogging {
   final val EFFECTIVE_POM_XML = "effective-pom.xml"
@@ -70,7 +72,7 @@ object DirProjectExtractor extends LazyLogging {
 
 case class DirProjectExtractor(rootDir: File) {
 
-  import DirProjectExtractor._
+  import pl.jozwik.mvn2sbt.DirProjectExtractor._
 
   val projectsMap = toProjectMap(rootDir, None)
 

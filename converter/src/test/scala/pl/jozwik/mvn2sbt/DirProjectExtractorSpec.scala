@@ -2,10 +2,6 @@ package pl.jozwik.mvn2sbt
 
 import java.io.File
 
-import org.maven.Model
-
-import scalaxb.DataRecord
-
 class DirProjectExtractorSpec extends AbstractSpec{
 
 

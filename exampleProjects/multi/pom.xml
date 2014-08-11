@@ -13,15 +13,17 @@
         <module>thrift1</module>
         <module>thrift2</module>
         <module>cxf</module>
+        <module>scala</module>
     </modules>
 
     <properties>
         <maven.compiler.source>1.6</maven.compiler.source>
         <maven.compiler.target>1.6</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
         <junit.version>4.10</junit.version>
 
+        <scala-plugin.version>3.1.6</scala-plugin.version>
+        <scala.version>2.11.2</scala.version>
     </properties>
 
     <repositories>

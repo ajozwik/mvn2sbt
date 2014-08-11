@@ -2,6 +2,8 @@ package pl.jozwik.mvn2sbt
 
 import java.io.File
 
+import scalaxb.DataRecord
+
 class ConvertersSpec extends AbstractSpec{
 
   "Converters " should {
@@ -12,6 +14,14 @@ class ConvertersSpec extends AbstractSpec{
         val diff = PluginConverter.toPath(subFile,rootDir)
         diff should be(subPath)
       }
+
+    "Coverage " in {
+      import org.maven._
+      val name = "aaa"
+      val any = DataRecord[Exclusion](Exclusion())
+      val conf4 = Configuration4(any)
+      PluginConverter.extractElement(conf4,name) shouldBe(None)
+    }
   }
 
 }

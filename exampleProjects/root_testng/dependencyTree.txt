@@ -1,18 +1,18 @@
 [INFO] Scanning for projects...
 [INFO]                                                                         
 [INFO] ------------------------------------------------------------------------
-[INFO] Building Cxf bindings 1.0.0
+[INFO] Building Root testng 1.0.0
 [INFO] ------------------------------------------------------------------------
 [INFO] 
-[INFO] --- maven-dependency-plugin:2.8:tree (default-cli) @ cxf ---
-[INFO] pl.jozwik:cxf:jar:1.0.0
+[INFO] --- maven-dependency-plugin:2.8:tree (default-cli) @ testng ---
+[INFO] pl.jozwik:testng:jar:1.0.0
 [INFO] \- org.testng:testng:jar:6.8.8:test
 [INFO]    +- org.beanshell:bsh:jar:2.0b4:test
 [INFO]    \- com.beust:jcommander:jar:1.27:test
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
 [INFO] ------------------------------------------------------------------------
-[INFO] Total time: 0.959 s
-[INFO] Finished at: 2014-08-11T09:21:15+02:00
-[INFO] Final Memory: 11M/170M
+[INFO] Total time: 4.699 s
+[INFO] Finished at: 2014-08-11T10:17:53+02:00
+[INFO] Final Memory: 10M/171M
 [INFO] ------------------------------------------------------------------------

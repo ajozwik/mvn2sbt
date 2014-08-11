@@ -1,0 +1,9 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite name="SuiteMain" verbose="1">
+	<test name="RegressionMain">
+		<packages>
+			<package name="pl.jozwik.test.*" />
+		</packages>
+	</test>
+</suite>

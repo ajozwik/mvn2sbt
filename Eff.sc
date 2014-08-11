@@ -50,7 +50,10 @@ args.foreach { root =>
 
 def wrongResult(result: Int, output: File) {
   if (result != 0) {
-    println(s"See $output for errors")
+    println(s"See $output for errors, content below:\n\n\n\n")
+    println("==================ERROR MESSAGE==========")
+    scala.io.Source.fromFile(output).getLines().foreach(println)
+    println("==================ERROR MESSAGE==========")
     sys.exit(result)
   }
 }

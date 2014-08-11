@@ -6,8 +6,7 @@
 [INFO] Cxf bindings
 [INFO] Thrift interfaces 1
 [INFO] Thrift interfaces 2
-[INFO] 
-[INFO] Using the builder org.apache.maven.lifecycle.internal.builder.singlethreaded.SingleThreadedBuilder with a thread count of 1
+[INFO] Scala project
 [INFO]                                                                         
 [INFO] ------------------------------------------------------------------------
 [INFO] Building multi 1.1.2
@@ -87,17 +86,29 @@
 [INFO] |  \- org.hamcrest:hamcrest-core:jar:1.1:test
 [INFO] \- org.easytesting:fest-assert:jar:1.2:test
 [INFO]    \- org.easytesting:fest-util:jar:1.1:test
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building Scala project 1.0.0
+[INFO] ------------------------------------------------------------------------
+[INFO] 
+[INFO] --- maven-dependency-plugin:2.8:tree (default-cli) @ scala ---
+[INFO] pl.jozwik:scala:jar:1.0.0
+[INFO] +- junit:junit:jar:4.10:test
+[INFO] |  \- org.hamcrest:hamcrest-core:jar:1.1:test
+[INFO] \- org.easytesting:fest-assert:jar:1.2:test
+[INFO]    \- org.easytesting:fest-util:jar:1.1:test
 [INFO] ------------------------------------------------------------------------
 [INFO] Reactor Summary:
 [INFO] 
-[INFO] multi ............................................. SUCCESS [  1.161 s]
-[INFO] Cxf bindings ...................................... SUCCESS [  0.590 s]
-[INFO] Thrift interfaces 1 ............................... SUCCESS [  0.073 s]
-[INFO] Thrift interfaces 2 ............................... SUCCESS [  0.029 s]
+[INFO] multi .............................................. SUCCESS [  2.517 s]
+[INFO] Cxf bindings ....................................... SUCCESS [  0.845 s]
+[INFO] Thrift interfaces 1 ................................ SUCCESS [  0.132 s]
+[INFO] Thrift interfaces 2 ................................ SUCCESS [  0.027 s]
+[INFO] Scala project ...................................... SUCCESS [  0.082 s]
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
 [INFO] ------------------------------------------------------------------------
-[INFO] Total time: 2.332 s
-[INFO] Finished at: 2014-06-27T23:26:11+01:00
-[INFO] Final Memory: 11M/116M
+[INFO] Total time: 4.639 s
+[INFO] Finished at: 2014-08-11T09:11:07+02:00
+[INFO] Final Memory: 11M/177M
 [INFO] ------------------------------------------------------------------------

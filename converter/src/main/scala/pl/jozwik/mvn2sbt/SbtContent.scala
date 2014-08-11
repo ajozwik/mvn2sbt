@@ -31,8 +31,8 @@ object SbtContent{
 
 case class SbtContent(private val projects: Seq[Project], private val hierarchy: Map[MavenDependency, ProjectInformation], private val rootDir: File) extends LazyLogging {
 
-  import PluginConverter._
-  import SbtContent._
+  import pl.jozwik.mvn2sbt.PluginConverter._
+  import pl.jozwik.mvn2sbt.SbtContent._
 
   private def optimizeDependsOn(set: Set[Dependency], map: Map[MavenDependency, SbtProjectContent]): Set[Dependency] = {
     val toRemove = set.flatMap {
@@ -129,7 +129,7 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
 
 
     val (pluginsDependsOnDependenciesSettings, pluginsDependsOnDependenciesSet) =
-      DependencyToPluginConverter.convert(rootDir, information.projectPath, libraries)
+      DependencyToPluginConverter.addPluginForDependency(rootDir, information.projectPath, libraries)
 
     (SbtProjectContent(p, path, pluginDependencies ++ libraries, dependsOn, information, pluginsDependsOnDependenciesSettings ++ settings), pluginsDependsOnDependenciesSet ++ plugins, information.resolvers)
   }

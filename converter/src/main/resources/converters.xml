@@ -89,4 +89,8 @@
         </dependencies>
         <converter/>
     </converter>
+    <converter>
+        <artifactId>scala-maven-plugin</artifactId>
+        <converter/>
+    </converter>
 </converters>

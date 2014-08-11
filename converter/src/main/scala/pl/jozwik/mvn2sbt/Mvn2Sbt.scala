@@ -1,9 +1,11 @@
 package pl.jozwik.mvn2sbt
 
 import java.io.{File, PrintWriter}
-import scala.io.Source
+
 import com.typesafe.scalalogging.StrictLogging
 import org.apache.commons.io.IOUtils
+
+import scala.io.Source
 
 object Mvn2Sbt extends StrictLogging {
   final val BUILD_SBT = "build.sbt"
@@ -12,17 +14,17 @@ object Mvn2Sbt extends StrictLogging {
   final val DEPENDENCY_TREE_TXT = "dependencyTree.txt"
 
   private def projectsFromFile(inputFile: File) = {
-    val it = fileToIterator(inputFile)
-    iteratorToProjects(it)
+    val source = Source.fromFile(inputFile)
+    try {
+      iteratorToProjects(source.getLines())
+    } finally {
+      source.close()
+    }
   }
 
 
   private def iteratorToProjects(iterator: TraversableOnce[String]) = StreamProjectExtractor(iterator).projects
 
-
-  private def fileToIterator(location: File) = {
-    Source.fromFile(location).getLines()
-  }
 
   def scanHierarchy(rootDir: File) = DirProjectExtractor(rootDir).projectsMap
 
