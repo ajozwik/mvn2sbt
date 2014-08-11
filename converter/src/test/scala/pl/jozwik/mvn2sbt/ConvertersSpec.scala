@@ -4,23 +4,23 @@ import java.io.File
 
 import scalaxb.DataRecord
 
-class ConvertersSpec extends AbstractSpec{
+class ConvertersSpec extends AbstractSpec {
 
   "Converters " should {
-      "Extract supPath" in {
-        val rootDir = new File(".")
-        val subPath = "aaaaa"
-        val subFile= new File(rootDir,subPath)
-        val diff = PluginConverter.toPath(subFile,rootDir)
-        diff should be(subPath)
-      }
+    "Extract supPath" in {
+      val rootDir = new File(".")
+      val subPath = "aaaaa"
+      val subFile = new File(rootDir, subPath)
+      val diff = PluginConverter.toPath(subFile, rootDir)
+      diff should be(subPath)
+    }
 
     "Coverage " in {
       import org.maven._
       val name = "aaa"
       val any = DataRecord[Exclusion](Exclusion())
       val conf4 = Configuration4(any)
-      PluginConverter.extractElement(conf4,name) shouldBe(None)
+      PluginConverter.extractElement(conf4, name) shouldBe (None)
     }
   }
 

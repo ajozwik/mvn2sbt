@@ -12,7 +12,7 @@ class JaxbPluginConverter extends PomToSbtPluginConverter {
 
   import pl.jozwik.mvn2sbt.PluginConverter._
 
-  def configurationToSet(confHead: Configuration4,rootDir:File): Set[String] = {
+  def configurationToSet(confHead: Configuration4, rootDir: File): Set[String] = {
     val node = extractElement(confHead, "packageName")
     val packageName = node.get.value.asInstanceOf[Node].text
     Set( """sources in (Compile, xjc) <<= sourceDirectory map (_ / "main" / "xsd" ** "*.xsd" get) """,

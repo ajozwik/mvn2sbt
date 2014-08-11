@@ -16,9 +16,9 @@ class CxfSpec extends AbstractProjectSpec("cxf")
 
 class CxfEmptySpec extends AbstractProjectSpec("cxf_empty")
 
-class RootTestngSpec extends AbstractProjectSpec("root_testng"){
-  override protected def checkContent(content:String){
-      content should include("testng")
+class RootTestngSpec extends AbstractProjectSpec("root_testng") {
+  override protected def checkContent(content: String) {
+    content should include("testng")
   }
 }
 
@@ -43,7 +43,7 @@ abstract class AbstractProjectSpec(project: String) extends AbstractSpec {
     checkContent(content)
   }
 
-  protected def checkContent(content:String){
+  protected def checkContent(content: String) {
 
   }
 

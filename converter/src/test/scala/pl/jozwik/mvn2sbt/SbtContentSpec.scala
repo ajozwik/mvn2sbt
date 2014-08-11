@@ -5,7 +5,7 @@ class SbtContentSpec extends AbstractSpec {
 
   "SbtContentSpec " should {
     "Return None for empty list" in {
-      SbtContent.resolversToOption(Set()).indexOf(",") should be (-1)
+      SbtContent.resolversToOption(Set()).indexOf(",") should be(-1)
     }
   }
 

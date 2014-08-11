@@ -30,7 +30,7 @@ object MavenSbtPluginMapper extends StrictLogging {
 
   private def toPluginDescription(converter: Converter) = {
     val artifactId = converter.artifactId
-    val sbtSetting = converter.sbtSetting.getOrElse("")
+    val sbtSetting = converter.sbtSetting
     val pluginsSbtPluginConfiguration = converter.pluginsSbtPluginConfiguration.fold("")(d => toAddSbtString(d))
     val extraRepository = converter.extraRepository.fold("")(repo => s"resolvers += $repo")
     val dependencies = toDependencySeq(converter.dependencies)
@@ -52,12 +52,9 @@ object MavenSbtPluginMapper extends StrictLogging {
           Dependency(mavenDependency, scope)
       })
 
-  private def toScope(scope: Option[String]) = {
-    scope match {
-      case Some(s) => Scope.valueOf(s)
-      case _ => Scope.compile
-    }
-  }
+  private def toScope(scope: Option[String]) =
+    scope.fold(Scope.compile)(s => Scope.valueOf(s))
+
 
   private def toPluginConverter(converterClass: String) = {
     if (converterClass == null || converterClass.isEmpty) {

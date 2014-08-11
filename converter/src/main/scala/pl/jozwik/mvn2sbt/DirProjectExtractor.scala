@@ -26,9 +26,9 @@ object DirProjectExtractor extends LazyLogging {
     val dependency = MavenDependency(groupId, pomModel.artifactId.get, version)
     val pomParent = toPomParent(pomModel.parent)
     val plugins = MavenSbtPluginMapper(pomModel).plugins
-    val resolvers = pomModel.repositories.map(r => r.repository.flatMap(_.url)) match {
-      case Some(seq) => seq
-      case _ => Seq.empty[String]
+    val resolversOptions = pomModel.repositories.map(r => r.repository.flatMap(_.url))
+    val resolvers = resolversOptions.fold(Seq.empty[String]) {
+      seq => seq
     }
     val currMap = Map(dependency -> ProjectInformation(dir, pomParent, resolvers.toSet, plugins: _*))
     pomModel.modules match {
@@ -41,18 +41,15 @@ object DirProjectExtractor extends LazyLogging {
     }
   }
 
-  private def toPomParent(parent: Option[Parent]) = parent match {
-    case Some(p) => Some(MavenDependency(p.groupId.get, p.artifactId.get, p.version.get))
-    case _ => None
-  }
+  private def toPomParent(parent: Option[Parent]) = parent.map(
+    p => MavenDependency(p.groupId.get, p.artifactId.get, p.version.get)
+  )
 
   private def toProjectMap(dir: File, parent: Option[MavenDependency]) = {
     val pomOption = dir.listFiles.find(f => f.getName == EFFECTIVE_POM_XML)
-    pomOption match {
-      case Some(pomXml) =>
+    pomOption.fold(throw new IllegalStateException( s"""$EFFECTIVE_POM_XML file missing in ${dir.getAbsolutePath}, run "scala Eff.sc ${dir.getAbsolutePath}" first""")) {
+      (pomXml) =>
         handlePomFile(pomXml, parent)
-      case None =>
-        throw new IllegalStateException( s"""$EFFECTIVE_POM_XML file missing in ${dir.getAbsolutePath}, run "scala Eff.sc ${dir.getAbsolutePath}" first""")
     }
   }
 

@@ -139,10 +139,10 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
   private def splitToDependsOnLibraries(p: Project, information: ProjectInformation) = p.dependencies.partition { d =>
     val m = d.mavenDependency
     val contains = hierarchy.contains(m)
-    val parentMatch = hierarchy(p.projectDependency).parent match {
-      case Some(parent) =>
+    val parentOption = hierarchy(p.projectDependency).parent
+    val parentMatch = parentOption.fold(false) {
+      parent =>
         parent == m
-      case _ => false
     }
     contains || parentMatch
   }
@@ -152,9 +152,9 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
       val (accSett, accPlug, accPluginDependencies) = tuple
       val (pluginDescription, plugin) = p
       val endSettings = DependencyToPluginConverter.addSeqToArray(file.equals(rootDir))
-      val settings = accSett + (pluginDescription.sbtSetting + endSettings)
+      val settings = pluginDescription.sbtSetting.fold(accSett)(x => accSett + (x + endSettings))
       val customPluginSettings = pluginDescription.pomConfigurationToSbtConfiguration(rootDir, plugin)
-      val plugins = accPlug +(pluginDescription.pluginsSbtPluginConfiguation, pluginDescription.extraRepository)
+      val plugins = accPlug +(pluginDescription.pluginsSbtPluginConfiguration, pluginDescription.extraRepository)
       (settings ++ customPluginSettings, plugins, accPluginDependencies ++ pluginDescription.dependencies)
     }
   }
@@ -166,7 +166,7 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
     d.scope match {
       case Scope.system => None
       case Scope.compile => Some(lib)
-      case x@Scope.test if d.classifierTests => Some( s"""$lib % ${doubleQuote(x)} classifier ${doubleQuote("tests")}""")
+      case test@Scope.test if d.classifierTests => Some( s"""$lib % ${doubleQuote(test)} classifier ${doubleQuote("tests")}""")
       case x => Some(s"$lib % ${doubleQuote(x)}")
     }
 

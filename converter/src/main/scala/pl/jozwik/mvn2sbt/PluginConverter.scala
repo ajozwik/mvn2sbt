@@ -29,11 +29,9 @@ object PluginConverter {
 
   def extractElement(confHead: Configuration4, name: String): Option[DataRecord[Any]] = {
     confHead.any.find { r =>
-      r.key match {
-        case Some(n) =>
+      r.key.fold(false) {
+        n =>
           n == name
-        case _ =>
-          false
       }
     }
   }

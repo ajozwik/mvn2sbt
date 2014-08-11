@@ -7,46 +7,46 @@ import scala.util.{Failure, Success, Try}
 object StreamProjectExtractor extends StrictLogging {
   final val PROJECT_START: String = "--- maven-dependency-plugin:"
   final val INFO = "[INFO] "
-  final val START_DEPENDENCY = Seq("+- ","\\- ")
+  final val START_DEPENDENCY = Seq("+- ", "\\- ")
 
   def parseProjectLine(line: String) = {
-    toOrderedTuple((0, 1, 2, 3,false), line.split(":"))
+    toOrderedTuple((0, 1, 2, 3, false), line.split(":"))
   }
 
   def parseDependencyLine(line: String) = {
     val text = line.split("\\s+")(1)
     val array = text.split(":")
-    val (g, a, v, s,tests) = if (array.length == 5) {
-      (0, 1, 3, 4,false)
+    val (g, a, v, s, tests) = if (array.length == 5) {
+      (0, 1, 3, 4, false)
     } else {
-      (0, 1, 4, 5,true)
+      (0, 1, 4, 5, true)
     }
-    toOrderedTuple((g, a, v, s,tests), array)
+    toOrderedTuple((g, a, v, s, tests), array)
   }
 
   private def toOrderedTuple(order: (Int, Int, Int, Int, Boolean), array: Array[String]) = {
-    val (a, b, c, d,tests) = order
-    (array(a), array(b), array(c), array(d),tests)
+    val (a, b, c, d, tests) = order
+    (array(a), array(b), array(c), array(d), tests)
   }
 
 
   private def addProject(line: String, projects: Seq[Project]): (Seq[Project], Boolean) = {
-    val (groupId, artifactId, projectType, versionId,_) = parseProjectLine(line)
+    val (groupId, artifactId, projectType, versionId, _) = parseProjectLine(line)
     val project = Project(MavenDependency(groupId, artifactId, versionId), ProjectType.valueOf(projectType))
     (project +: projects, false)
   }
 
   private[mvn2sbt] def addDependency(line: String, projects: Seq[Project]): (Seq[Project], Boolean) = {
-    val (groupId, artifactId, versionId, scope,tests) = parseDependencyLine(line)
+    val (groupId, artifactId, versionId, scope, tests) = parseDependencyLine(line)
     val sc = Try(Scope.valueOf(scope)) match {
       case Success(el) => el
       case Failure(exp) =>
         logger.error(line)
         throw exp
     }
-    val dependency = Dependency(MavenDependency(groupId, artifactId, versionId), sc,tests)
+    val dependency = Dependency(MavenDependency(groupId, artifactId, versionId), sc, tests)
     val project = projects.head
-    val projectWithNewDependency = project.copy(dependencies = project.dependencies + dependency )
+    val projectWithNewDependency = project.copy(dependencies = project.dependencies + dependency)
     (projectWithNewDependency +: projects.tail, false)
   }
 }
