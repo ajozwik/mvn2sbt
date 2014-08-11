@@ -12,8 +12,8 @@ object TestConstants {
 
 class MultiSpec extends AbstractProjectSpec("multi")
 
-class CxfSpec extends AbstractProjectSpec("cxf"){
-  override protected def checkContent(content: String) {
+class CxfSpec extends AbstractProjectSpec("cxf") {
+  override protected def checkBuildSbtContent(content: String) {
     content should not include "-exsh"
     content should not include "-fe"
   }
@@ -22,8 +22,8 @@ class CxfSpec extends AbstractProjectSpec("cxf"){
 class CxfEmptySpec extends AbstractProjectSpec("cxf_empty")
 
 class RootTestngSpec extends AbstractProjectSpec("root_testng") {
-  override protected def checkContent(content: String) {
-    content should include ("testng")
+  override protected def checkBuildSbtContent(content: String) {
+    content should include("testng")
   }
 }
 
@@ -38,17 +38,17 @@ class LogbackPomSpec extends AbstractProjectSpec("logback")
 abstract class AbstractProjectSpec(project: String) extends AbstractSpec {
 
 
-  private def checkContent(buildSbt: File) {
-    val source = scala.io.Source.fromFile("file.txt")
+  private def checkBuildSbtContent(buildSbt: File) {
+    val source = scala.io.Source.fromFile(buildSbt)
     val content = try {
       source.mkString
     } finally {
       source.close()
     }
-    checkContent(content)
+    checkBuildSbtContent(content)
   }
 
-  protected def checkContent(content: String) {
+  protected def checkBuildSbtContent(content: String) {
 
   }
 
@@ -60,10 +60,8 @@ abstract class AbstractProjectSpec(project: String) extends AbstractSpec {
       val output = new File("target", project)
       Mvn2Sbt.main(Array(rootDir.getAbsolutePath, output.getAbsolutePath))
       val buildSbt = new File(output, BUILD_SBT)
-      val pluginsSbt = new File(output, PLUGINS_SBT)
-
       buildSbt.exists() should be(true)
-
+      checkBuildSbtContent(buildSbt)
     }
 
   }

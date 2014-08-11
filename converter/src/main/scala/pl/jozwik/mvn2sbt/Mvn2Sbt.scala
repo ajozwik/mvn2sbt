@@ -8,6 +8,9 @@ import org.apache.commons.io.IOUtils
 import scala.io.Source
 
 object Mvn2Sbt extends StrictLogging {
+  val SBT_VERSION = "sbt.version"
+  private final val BUILD_PROPERTIES= "build.properties"
+  private final val DEFAULT_SBT_VERSION = "0.13.5"
   final val BUILD_SBT = "build.sbt"
   final val PROJECT = "project"
   final val PLUGINS_SBT = "plugins.sbt"
@@ -34,10 +37,13 @@ object Mvn2Sbt extends StrictLogging {
     val buildSbt = new File(outputDir, BUILD_SBT)
     val projectDir = new File(outputDir, PROJECT)
     projectDir.mkdirs()
+    val buildProperties = new File(projectDir,BUILD_PROPERTIES)
     val pluginsSbt = new File(projectDir, PLUGINS_SBT)
     val (buildSbtContent, pluginSbtContent) = SbtContent(projectsWithoutPath, hierarchy, rootDir).buildSbtContentPluginContentAsString
     writeToFile(buildSbt, buildSbtContent)
     writeToFile(pluginsSbt, pluginSbtContent)
+    val sbtVersion = System.getProperty(SBT_VERSION,DEFAULT_SBT_VERSION)
+    writeToFile(buildProperties,s"sbt.version=$sbtVersion")
   }
 
 

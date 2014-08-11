@@ -27,7 +27,7 @@ object PluginConverter {
   val defaultConverter = (rootDir: File, plugin: Plugin) => Set.empty[String]
 
 
-  def extractElement(confHead: Configuration4, name: String): Option[DataRecord[Any]] = {
+  def findElement(confHead: Configuration4, name: String): Option[DataRecord[Any]] = {
     confHead.any.find { r =>
       r.key.fold(false) {
         n =>
@@ -36,7 +36,7 @@ object PluginConverter {
     }
   }
 
-  def extractNode(elem: Node, first: String, names: String*): NodeSeq = {
+  def findNode(elem: Node, first: String, names: String*): NodeSeq = {
     val child = elem \ first
     names.foldLeft(child)((acc, name) => acc \ name)
   }
@@ -49,14 +49,14 @@ object PluginConverter {
   private def toKeySeqMap(nodeSeq: NodeSeq, key: String, buildSeq: (Node) => Seq[String]): Map[String, Seq[String]] =
     nodeSeq.foldLeft(Map.empty[String, Seq[String]]) {
       (acc, node) =>
-        acc + (extractNode(node, key).text -> buildSeq(node))
+        acc + (findNode(node, key).text -> buildSeq(node))
     }
 
 }
 
 
 trait PomToSbtPluginConverter {
-  final def convert(plugin: Plugin, rootDir: File): Set[String] = extractConfiguration(plugin) match {
+  final def convert(plugin: Plugin, rootDir: File): Set[String] = findConfiguration(plugin) match {
     case (Some(confHead: Configuration4) :: tail) =>
       configurationToSet(confHead, rootDir)
     case _ => Set.empty
@@ -64,7 +64,7 @@ trait PomToSbtPluginConverter {
 
   protected def configurationToSet(confHead: Configuration4, rootDir: File): Set[String]
 
-  private[mvn2sbt] def extractConfiguration(plugin: Plugin) = {
+  private[mvn2sbt] def findConfiguration(plugin: Plugin) = {
     val execution = plugin.executions.get.execution
     execution.map { ex => ex.configuration}
   }
