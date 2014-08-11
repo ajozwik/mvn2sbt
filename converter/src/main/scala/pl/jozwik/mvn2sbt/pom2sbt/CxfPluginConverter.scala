@@ -12,7 +12,7 @@ class CxfPluginConverter extends PomToSbtPluginConverter {
 
   import pl.jozwik.mvn2sbt.PluginConverter._
 
-  private val ignoredArgs = Set("-wsdlLocation", "-autoNameResolution")
+  private val ignoredArgs = Set("-wsdlLocation", "-autoNameResolution", "-verbose")
 
   def configurationToSet(confHead: Configuration4, rootDir: File): Set[String] = {
     val cxfSeq: Node => Seq[String] = buildCxfSeq(rootDir)
@@ -44,7 +44,24 @@ class CxfPluginConverter extends PomToSbtPluginConverter {
     val packages = extractNode(node, "packagenames", "packagename").flatMap(n => Seq("-p", n.text))
     val extraArgs = extractNode(node, "extraargs", "extraarg").map(_.text).filterNot(ignoredArgs.contains)
     val bindings = extractNode(node, "bindingFiles", "bindingFile").flatMap(x => Seq("-b", toPath(x.text, rootDir)))
-    packages ++ extraArgs ++ bindings
+    val extra = remove(extraArgs, "-exsh", "-fe")
+    packages ++ extra ++ bindings
+  }
+
+  private def remove(seq: Seq[String], names: String*): Seq[String] = {
+    if (names.isEmpty) {
+      seq
+    } else {
+      val index = seq.indexOf(names.head)
+      val toRet = if (index == -1) {
+        seq
+      } else {
+        val (before, after) = seq.splitAt(index)
+        val (_, rest) = after.splitAt(2)
+        before ++ rest
+      }
+      remove(toRet, names.tail: _*)
+    }
   }
 
 

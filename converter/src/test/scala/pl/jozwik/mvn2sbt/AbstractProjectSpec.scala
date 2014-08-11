@@ -12,13 +12,18 @@ object TestConstants {
 
 class MultiSpec extends AbstractProjectSpec("multi")
 
-class CxfSpec extends AbstractProjectSpec("cxf")
+class CxfSpec extends AbstractProjectSpec("cxf"){
+  override protected def checkContent(content: String) {
+    content should not include "-exsh"
+    content should not include "-fe"
+  }
+}
 
 class CxfEmptySpec extends AbstractProjectSpec("cxf_empty")
 
 class RootTestngSpec extends AbstractProjectSpec("root_testng") {
   override protected def checkContent(content: String) {
-    content should include("testng")
+    content should include ("testng")
   }
 }
 
