@@ -7,7 +7,9 @@ import org.maven.Plugin
 
 case class SbtProjectContent(project: Project, path: String, libraries: Set[Dependency], dependsOn: Set[Dependency], information: ProjectInformation, settings: Set[String])
 
-object SbtContent{
+object SbtContent {
+  final val SCALA_VERSION_IN_GLOBAL = "scala.version"
+
   private[mvn2sbt] def resolversToOption(resolvers: Set[String]) = {
     val start = "resolvers in Global ++= Seq(Resolver.mavenLocal"
     val stop = ")\n\n"
@@ -47,7 +49,6 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
       optimizeDependsOn(set.diff(toRemove), map)
     }
   }
-
 
 
   private def optimizeProject(map: Map[MavenDependency, SbtProjectContent], content: SbtProjectContent): SbtProjectContent = {
@@ -91,13 +92,14 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
   def buildSbtContentPluginContentAsString: (String, String) = {
     val buildSbtWriter = new StringBuilder
     val pluginsSbtWriter = new StringBuilder
-    buildSbtWriter.append("""scalaVersion in Global := "2.11.2"""").append("\n\n")
+    val defaultScalaVersion = System.getProperty(SCALA_VERSION_IN_GLOBAL, "2.11.2")
+    buildSbtWriter.append( s"""scalaVersion in Global := "$defaultScalaVersion"""").append("\n\n")
     buildSbtWriter.append("def ProjectName(name: String,path:String): Project =  Project(name, file(path))").append("\n\n")
     val (contentOfPluginSbt, resolvers, buildSbtProjects) = projects.foldLeft((Set.empty[String], Set.empty[String], Map.empty[MavenDependency, SbtProjectContent])) {
       (acc, p) =>
-      val (accContent, accResolvers, stbProjectContent) = acc
-      val (projectContent, pluginsSbt, resolvers) = handleProject(p)
-      (accContent ++ pluginsSbt, accResolvers ++ resolvers, stbProjectContent + (p.projectDependency -> projectContent))
+        val (accContent, accResolvers, stbProjectContent) = acc
+        val (projectContent, pluginsSbt, resolvers) = handleProject(p)
+        (accContent ++ pluginsSbt, accResolvers ++ resolvers, stbProjectContent + (p.projectDependency -> projectContent))
     }
 
 
@@ -115,7 +117,6 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
       case (name, content) => sb.append(createBuildSbt(content))
     }
   }
-
 
 
   private def handleProject(p: Project): (SbtProjectContent, Set[String], Set[String]) = {
@@ -181,7 +182,7 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
   }.mkString(",")
 
   def sort(set: Set[Dependency]): TraversableOnce[Dependency] = {
-    set.toIndexedSeq.sorted(Ordering.by[Dependency,(String,String)](x => (x.mavenDependency.groupId,x.mavenDependency.artifactId)))
+    set.toIndexedSeq.sorted(Ordering.by[Dependency, (String, String)](x => (x.mavenDependency.groupId, x.mavenDependency.artifactId)))
   }
 
   private def createBuildSbt(sbtProjectContent: SbtProjectContent) = {
@@ -217,7 +218,6 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
 """.stripMargin
     }
   }
-
 
 
 }

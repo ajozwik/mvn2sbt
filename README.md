@@ -8,9 +8,9 @@ Quick start:
 
 1. Clone project
 1. Run scala Eff mavenProject, where rootDir - directory with your maven project
-1. Run converter/target/pack/bin/mvn2sbt <mavenProject> [outputDir]
-1. Copy <outputDir>/build.sbt to <mavenProject>/build.sbt
-1. Copy <outputDir>/plugins.sbt to <mavenProject>/project/plugins.sbt
+1. Run converter/target/pack/bin/mvn2sbt &lt;mavenProject&gt; [outputDir] [-Dscala.version=&lt;2.11.2&gt;]
+1. Optional (if outputDir specified): copy <outputDir>/build.sbt to &lt;mavenProject&gt;/build.sbt
+1. Optional (if outputDir specified): copy <outputDir>/plugins.sbt to &lt;mavenProject&gt;/project/plugins.sbt
 1. Go to <mavenProject> and run `sbt compile` for test
 
 Supported plugins:
