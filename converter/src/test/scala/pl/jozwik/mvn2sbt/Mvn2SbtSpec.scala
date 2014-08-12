@@ -56,8 +56,9 @@ class Mvn2SbtSpec extends AbstractSpec {
       val file = new File("__")
       new FileOutputStream(file).close()
       Mvn2Sbt.main(Array(file.getAbsolutePath))
-      file.exists() should be(true)
+      file should exist
       file.delete()
+      file shouldNot exist
     }
 
   }

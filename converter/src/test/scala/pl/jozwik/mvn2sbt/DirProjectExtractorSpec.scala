@@ -26,10 +26,9 @@ class DirProjectExtractorSpec extends AbstractSpec {
     }
 
     "Empty pom file" in {
-
       DirProjectExtractor(new File(TestConstants.EXAMPLES_PROJECTS, "emptyPom")).projectsMap.forall {
         case (k, v) => v.resolvers.isEmpty
-      } should be(true)
+      } should be (true)
     }
 
   }

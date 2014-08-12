@@ -2,8 +2,6 @@ package pl.jozwik.mvn2sbt
 
 import java.io.File
 
-import pl.jozwik.mvn2sbt.pom2sbt.CxfPluginConverter
-
 import scalaxb.DataRecord
 
 class ConvertersSpec extends AbstractSpec {
@@ -22,7 +20,7 @@ class ConvertersSpec extends AbstractSpec {
       val name = "aaa"
       val any = DataRecord[Exclusion](Exclusion())
       val conf4 = Configuration4(any)
-      PluginConverter.findElement(conf4, name) shouldBe (None)
+      PluginConverter.findElement(conf4, name) shouldBe None
     }
 
   }

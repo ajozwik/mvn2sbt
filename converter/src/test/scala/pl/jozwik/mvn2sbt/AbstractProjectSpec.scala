@@ -60,7 +60,7 @@ abstract class AbstractProjectSpec(project: String) extends AbstractSpec {
       val output = new File("target", project)
       Mvn2Sbt.main(Array(rootDir.getAbsolutePath, output.getAbsolutePath))
       val buildSbt = new File(output, BUILD_SBT)
-      buildSbt.exists() should be(true)
+      buildSbt should exist
       checkBuildSbtContent(buildSbt)
     }
 
