@@ -75,10 +75,12 @@ case class MavenSbtPluginMapper(model: Model) {
     model.build.fold(EMPTY_SEQ)(buildToPlugins)
 
 
-  private def buildToPlugins(build: Build) =
-    build.plugins.map(plugins => plugins.plugin).fold(EMPTY_SEQ) {
+  private def buildToPlugins(build: Build) = {
+    val pluginSeqOption = build.plugins.map(plugins => plugins.plugin)
+    pluginSeqOption.fold(EMPTY_SEQ) {
       pluginsSeq => pluginsSeq.flatMap(plugin => findPlugin(plugin).map(p => (p, plugin)))
     }
+  }
 
   private def findPlugin(plugin: Plugin): Option[PluginDescription] =
     artifactIdToPluginDescriptionMap.get(orEmpty(plugin.artifactId))
