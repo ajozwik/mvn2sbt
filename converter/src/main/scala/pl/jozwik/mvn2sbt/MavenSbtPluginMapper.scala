@@ -8,7 +8,7 @@ import pl.jozwik.gen.{Converter, Dependencies}
 import pl.jozwik.mvn2sbt.PluginConverter._
 
 object MavenSbtPluginMapper extends StrictLogging {
-  private final val EMPTY_SEQ = Seq.empty[(PluginDescription, Plugin)]
+  private [mvn2sbt]final val EMPTY_SEQ = Seq.empty[(PluginDescription, Plugin)]
   final val DEFAULT_CONVERTERS_PATH = "/converters.xml"
   final val CONVERTERS_PATH = "converters.path"
   private[mvn2sbt] lazy val artifactIdToPluginDescriptionMap: Map[String, PluginDescription] = {
@@ -65,17 +65,8 @@ object MavenSbtPluginMapper extends StrictLogging {
       (rootDir: File, plugin: Plugin) => converter.convert(plugin, rootDir)
     }
   }
-}
 
-case class MavenSbtPluginMapper(model: Model) {
-
-  import pl.jozwik.mvn2sbt.MavenSbtPluginMapper._
-
-  val plugins: Seq[(PluginDescription, Plugin)] =
-    model.build.fold(EMPTY_SEQ)(buildToPlugins)
-
-
-  private def buildToPlugins(build: Build) = {
+  private[mvn2sbt] def buildToPlugins(build: Build) = {
     val pluginSeqOption = build.plugins.map(plugins => plugins.plugin)
     pluginSeqOption.fold(EMPTY_SEQ) {
       pluginsSeq => pluginsSeq.flatMap(plugin => findPlugin(plugin).map(p => (p, plugin)))
@@ -87,4 +78,14 @@ case class MavenSbtPluginMapper(model: Model) {
 
 
   private def orEmpty(opt: Option[String]) = opt.getOrElse("")
+
+}
+
+case class MavenSbtPluginMapper(model: Model) {
+
+  import pl.jozwik.mvn2sbt.MavenSbtPluginMapper._
+
+  val plugins: Seq[(PluginDescription, Plugin)] =
+    model.build.fold(EMPTY_SEQ)(buildToPlugins)
+
 }
