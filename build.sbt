@@ -41,6 +41,6 @@ lazy val `converter` = ProjectName("converter", "converter").settings(
 
 
 
-def ProjectName(name: String, path: String): Project = Project(name, file(path))
+def ProjectName(name: String, path: String) = Project(name, file(path))
 
 

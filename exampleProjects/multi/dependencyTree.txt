@@ -6,6 +6,7 @@
 [INFO] Cxf bindings
 [INFO] Thrift interfaces 1
 [INFO] Thrift interfaces 2
+[INFO] For test
 [INFO] Scala project
 [INFO]                                                                         
 [INFO] ------------------------------------------------------------------------
@@ -14,8 +15,8 @@
 [INFO] 
 [INFO] --- maven-dependency-plugin:2.8:tree (default-cli) @ multi ---
 [INFO] pl.jozwik:multi:pom:1.1.2
-[INFO] +- junit:junit:jar:4.10:test
-[INFO] |  \- org.hamcrest:hamcrest-core:jar:1.1:test
+[INFO] +- junit:junit:jar:4.11:test
+[INFO] |  \- org.hamcrest:hamcrest-core:jar:1.3:test
 [INFO] \- org.easytesting:fest-assert:jar:1.2:test
 [INFO]    \- org.easytesting:fest-util:jar:1.1:test
 [INFO]                                                                         
@@ -34,8 +35,8 @@
 [INFO] +- ch.qos.logback:logback-classic:jar:1.1.2:compile
 [INFO] |  \- ch.qos.logback:logback-core:jar:1.1.2:compile
 [INFO] +- org.slf4j:slf4j-api:jar:1.7.7:provided
-[INFO] +- junit:junit:jar:4.10:test
-[INFO] |  \- org.hamcrest:hamcrest-core:jar:1.1:test
+[INFO] +- junit:junit:jar:4.11:test
+[INFO] |  \- org.hamcrest:hamcrest-core:jar:1.3:test
 [INFO] \- org.easytesting:fest-assert:jar:1.2:test
 [INFO]    \- org.easytesting:fest-util:jar:1.1:test
 [INFO]                                                                         
@@ -59,8 +60,8 @@
 [INFO] |  \- com.beust:jcommander:jar:1.27:test
 [INFO] +- ch.qos.logback:logback-classic:jar:1.1.2:compile
 [INFO] |  \- ch.qos.logback:logback-core:jar:1.1.2:compile
-[INFO] +- junit:junit:jar:4.10:test
-[INFO] |  \- org.hamcrest:hamcrest-core:jar:1.1:test
+[INFO] +- junit:junit:jar:4.11:test
+[INFO] |  \- org.hamcrest:hamcrest-core:jar:1.3:test
 [INFO] \- org.easytesting:fest-assert:jar:1.2:test
 [INFO]    \- org.easytesting:fest-util:jar:1.1:test
 [INFO]                                                                         
@@ -82,8 +83,29 @@
 [INFO] +- pl.jozwik:thrift11:jar:1.0.0:compile
 [INFO] |  \- commons-lang:commons-lang:jar:2.6:compile
 [INFO] +- org.slf4j:slf4j-api:jar:1.7.7:provided
-[INFO] +- junit:junit:jar:4.10:test
-[INFO] |  \- org.hamcrest:hamcrest-core:jar:1.1:test
+[INFO] +- junit:junit:jar:4.11:test
+[INFO] |  \- org.hamcrest:hamcrest-core:jar:1.3:test
+[INFO] \- org.easytesting:fest-assert:jar:1.2:test
+[INFO]    \- org.easytesting:fest-util:jar:1.1:test
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building For test 1.0.0
+[INFO] ------------------------------------------------------------------------
+[INFO] 
+[INFO] --- maven-dependency-plugin:2.8:tree (default-cli) @ test ---
+[INFO] pl.jozwik:test:jar:1.0.0
+[INFO] +- pl.jozwik:cxf2:jar:1.0.0:compile
+[INFO] |  +- org.apache.thrift:libthrift:jar:0.9.1:compile
+[INFO] |  |  +- org.slf4j:slf4j-api:jar:1.5.8:compile
+[INFO] |  |  +- org.apache.commons:commons-lang3:jar:3.1:compile
+[INFO] |  |  +- org.apache.httpcomponents:httpclient:jar:4.2.5:compile
+[INFO] |  |  |  +- commons-logging:commons-logging:jar:1.1.1:compile
+[INFO] |  |  |  \- commons-codec:commons-codec:jar:1.6:compile
+[INFO] |  |  \- org.apache.httpcomponents:httpcore:jar:4.2.4:compile
+[INFO] |  \- ch.qos.logback:logback-classic:jar:1.1.2:compile
+[INFO] |     \- ch.qos.logback:logback-core:jar:1.1.2:compile
+[INFO] +- junit:junit:jar:4.11:test
+[INFO] |  \- org.hamcrest:hamcrest-core:jar:1.3:test
 [INFO] \- org.easytesting:fest-assert:jar:1.2:test
 [INFO]    \- org.easytesting:fest-util:jar:1.1:test
 [INFO]                                                                         
@@ -93,22 +115,34 @@
 [INFO] 
 [INFO] --- maven-dependency-plugin:2.8:tree (default-cli) @ scala ---
 [INFO] pl.jozwik:scala:jar:1.0.0
-[INFO] +- junit:junit:jar:4.10:test
-[INFO] |  \- org.hamcrest:hamcrest-core:jar:1.1:test
+[INFO] +- pl.jozwik:cxf2:jar:1.0.0:compile
+[INFO] |  +- org.apache.thrift:libthrift:jar:0.9.1:compile
+[INFO] |  |  +- org.slf4j:slf4j-api:jar:1.5.8:compile
+[INFO] |  |  +- org.apache.commons:commons-lang3:jar:3.1:compile
+[INFO] |  |  +- org.apache.httpcomponents:httpclient:jar:4.2.5:compile
+[INFO] |  |  |  +- commons-logging:commons-logging:jar:1.1.1:compile
+[INFO] |  |  |  \- commons-codec:commons-codec:jar:1.6:compile
+[INFO] |  |  \- org.apache.httpcomponents:httpcore:jar:4.2.4:compile
+[INFO] |  \- ch.qos.logback:logback-classic:jar:1.1.2:compile
+[INFO] |     \- ch.qos.logback:logback-core:jar:1.1.2:compile
+[INFO] +- pl.jozwik:test:test-jar:tests:1.0.0:test
+[INFO] +- junit:junit:jar:4.11:test
+[INFO] |  \- org.hamcrest:hamcrest-core:jar:1.3:test
 [INFO] \- org.easytesting:fest-assert:jar:1.2:test
 [INFO]    \- org.easytesting:fest-util:jar:1.1:test
 [INFO] ------------------------------------------------------------------------
 [INFO] Reactor Summary:
 [INFO] 
-[INFO] multi .............................................. SUCCESS [  2.517 s]
-[INFO] Cxf bindings ....................................... SUCCESS [  0.845 s]
-[INFO] Thrift interfaces 1 ................................ SUCCESS [  0.132 s]
-[INFO] Thrift interfaces 2 ................................ SUCCESS [  0.027 s]
-[INFO] Scala project ...................................... SUCCESS [  0.082 s]
+[INFO] multi .............................................. SUCCESS [  0.830 s]
+[INFO] Cxf bindings ....................................... SUCCESS [  0.086 s]
+[INFO] Thrift interfaces 1 ................................ SUCCESS [  0.021 s]
+[INFO] Thrift interfaces 2 ................................ SUCCESS [  0.014 s]
+[INFO] For test ........................................... SUCCESS [  0.016 s]
+[INFO] Scala project ...................................... SUCCESS [  0.041 s]
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
 [INFO] ------------------------------------------------------------------------
-[INFO] Total time: 4.639 s
-[INFO] Finished at: 2014-08-11T09:11:07+02:00
-[INFO] Final Memory: 11M/177M
+[INFO] Total time: 1.452 s
+[INFO] Finished at: 2014-08-13T10:40:02+02:00
+[INFO] Final Memory: 11M/190M
 [INFO] ------------------------------------------------------------------------

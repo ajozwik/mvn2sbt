@@ -45,5 +45,18 @@
 
         </plugins>
     </build>
-
+    <dependencies>
+        <dependency>
+            <groupId>pl.jozwik</groupId>
+            <artifactId>cxf2</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>pl.jozwik</groupId>
+            <artifactId>test</artifactId>
+            <version>${project.version}</version><!--$NO-MVN-MAN-VER$ -->
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 </project>

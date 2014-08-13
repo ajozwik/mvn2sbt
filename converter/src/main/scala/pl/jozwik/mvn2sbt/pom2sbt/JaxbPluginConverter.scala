@@ -16,7 +16,7 @@ class JaxbPluginConverter extends PomToSbtPluginConverter {
     val node = findElement(confHead, "packageName")
     val packageName = node.map(v => v.value.asInstanceOf[Node].text)
     val packageParameters = packageName.fold(""){
-      pn => s""""-p","$pn,""""
+      pn => s""""-p","$pn","""
     }
     Set( """sources in (Compile, xjc) <<= sourceDirectory map (_ / "main" / "xsd" ** "*.xsd" get) """,
       s"""xjcCommandLine := Seq($packageParameters"-b",sourceDirectory.value.getAbsolutePath +"/main/xjb")""")

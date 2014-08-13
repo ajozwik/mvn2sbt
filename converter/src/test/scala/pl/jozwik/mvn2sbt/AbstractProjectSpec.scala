@@ -10,7 +10,12 @@ object TestConstants {
   final val EXAMPLES_PROJECTS = "exampleProjects"
 }
 
-class MultiSpec extends AbstractProjectSpec("multi")
+class MultiSpec extends AbstractProjectSpec("multi") {
+  override protected def checkBuildSbtContent(content: String) {
+    val project = "`cxf2`"
+    content should fullyMatch regex s"""(?s)(.*$project){4}.*"""
+  }
+}
 
 class CxfSpec extends AbstractProjectSpec("cxf") {
   override protected def checkBuildSbtContent(content: String) {

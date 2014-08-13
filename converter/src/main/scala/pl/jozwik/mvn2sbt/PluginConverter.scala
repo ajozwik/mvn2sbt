@@ -9,7 +9,7 @@ import scalaxb.DataRecord
 
 object PluginConverter {
 
-  def toPath(path: File, rootDir: File): String = {
+  def toRelativePath(path: File, rootDir: File): String = {
     val dir = path.getCanonicalPath
     val root = rootDir.getCanonicalPath
     val diff = dir.substring(root.length)
@@ -20,7 +20,7 @@ object PluginConverter {
     }
   }
 
-  def toPath(path: String, rootDir: File): String = toPath(new File(path), rootDir)
+  def toPath(path: String, rootDir: File): String = toRelativePath(new File(path), rootDir)
 
   type PluginConverter = (File, Plugin) => Set[String]
 

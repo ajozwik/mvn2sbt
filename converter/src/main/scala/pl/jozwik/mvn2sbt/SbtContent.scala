@@ -10,25 +10,28 @@ case class SbtProjectContent(project: Project, path: String, libraries: Set[Depe
 object SbtContent {
   final val SCALA_VERSION_IN_GLOBAL = "scala.version"
 
+  final val PROHIBITED_CHARS = "."
+
   private[mvn2sbt] def resolversToOption(resolvers: Set[String]) = {
-    val start = "resolvers in Global ++= Seq(Resolver.mavenLocal"
-    val stop = ")\n\n"
+
     val opt = if (resolvers.isEmpty) {
       None
     } else {
       val resolversString = resolvers.map { x =>
-        val name = doubleQuote(x)
-        s"$name at $name"
+        s""" "$x" at "$x" """
       }.mkString(",",
           """,
           """.stripMargin, "")
 
       Some(resolversString)
     }
-    start + opt.getOrElse("") + stop
+    s"""resolvers in Global ++= Seq(Resolver.mavenLocal${opt.getOrElse("")}""" + ")\n\n"
   }
 
-  private def doubleQuote(str: Any) = "\"" + str + "\""
+  private[mvn2sbt] def changeNotSupportedSymbols(text: String) = {
+    text.replaceAll(s"[$PROHIBITED_CHARS]", "_")
+  }
+
 }
 
 case class SbtContent(private val projects: Seq[Project], private val hierarchy: Map[MavenDependency, ProjectInformation], private val rootDir: File) extends LazyLogging {
@@ -36,24 +39,29 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
   import pl.jozwik.mvn2sbt.PluginConverter._
   import pl.jozwik.mvn2sbt.SbtContent._
 
-  private def optimizeDependsOn(set: Set[Dependency], map: Map[MavenDependency, SbtProjectContent]): Set[Dependency] = {
-    val toRemove = set.flatMap {
-      dep =>
-        val setWithoutDep = set - dep
-        map(dep.mavenDependency).dependsOn.find(d =>
-          setWithoutDep.contains(d))
+  private def optimizeDependsOn(dependsOn: Set[Dependency], sbtProjectsMap: Map[MavenDependency, SbtProjectContent]): Set[Dependency] = {
+    val toRemove = dependsOn.flatMap {
+      dependOn =>
+        val setWithoutDep = dependsOn - dependOn
+        dependOn.scope match {
+          case Scope.test if dependOn.classifierTests => None
+          case _ =>
+            val project = sbtProjectsMap(dependOn.mavenDependency)
+            project.dependsOn.find(d => setWithoutDep.contains(d))
+        }
     }
     if (toRemove.isEmpty) {
-      set
+      dependsOn
     } else {
-      optimizeDependsOn(set.diff(toRemove), map)
+      optimizeDependsOn(dependsOn.diff(toRemove), sbtProjectsMap)
     }
   }
 
 
-  private def optimizeProject(map: Map[MavenDependency, SbtProjectContent], content: SbtProjectContent): SbtProjectContent = {
-    val optimizedLibraries = optimizeLibraries(map, content)
-    val optimizedDependsOn = optimizeDependsOn(content.dependsOn, map)
+  private def optimizeProject(sbtProjectsMap: Map[MavenDependency, SbtProjectContent], content: SbtProjectContent): SbtProjectContent = {
+
+    val optimizedLibraries = optimizeLibraries(sbtProjectsMap, content)
+    val optimizedDependsOn = optimizeDependsOn(content.dependsOn, sbtProjectsMap)
     content.copy(libraries = optimizedLibraries, dependsOn = optimizedDependsOn)
   }
 
@@ -72,17 +80,17 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
     optimizedLibraries
   }
 
-  private def optimizeProjects(depMap: Map[MavenDependency, SbtProjectContent]): Map[MavenDependency, SbtProjectContent] = {
-    val optimizedMap = depMap.map {
+  private def optimizeProjects(sbtProjectsMap: Map[MavenDependency, SbtProjectContent]): Map[MavenDependency, SbtProjectContent] = {
+    val optimizedMap = sbtProjectsMap.map {
       case (name, content) =>
-        val optimized = optimizeProject(depMap, content)
+        val optimized = optimizeProject(sbtProjectsMap, content)
         if (optimized != content) {
           (name, optimized)
         } else {
           (name, content)
         }
     }
-    if (optimizedMap == depMap) {
+    if (optimizedMap == sbtProjectsMap) {
       optimizedMap
     } else {
       optimizeProjects(optimizedMap)
@@ -93,7 +101,7 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
     val buildSbtWriter = new StringBuilder
     val pluginsSbtWriter = new StringBuilder
     val defaultScalaVersion = System.getProperty(SCALA_VERSION_IN_GLOBAL, "2.11.2")
-    buildSbtWriter.append( s"""scalaVersion in Global := "$defaultScalaVersion"""").append("\n\n")
+    buildSbtWriter.append( s"""scalaVersion in Global := "$defaultScalaVersion" """).append("\n\n")
     buildSbtWriter.append("def ProjectName(name: String,path:String): Project =  Project(name, file(path))").append("\n\n")
     val (contentOfPluginSbt, resolvers, buildSbtProjects) = projects.foldLeft((Set.empty[String], Set.empty[String], Map.empty[MavenDependency, SbtProjectContent])) {
       (acc, p) =>
@@ -122,7 +130,7 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
   private def handleProject(p: Project): (SbtProjectContent, Set[String], Set[String]) = {
 
     val information = hierarchy(p.projectDependency)
-    val path = toPath(information.projectPath, rootDir)
+    val relativePath = toRelativePath(information.projectPath, rootDir)
 
     val (dependsOn, libraries) = splitToDependsOnLibraries(p, information)
 
@@ -132,19 +140,20 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
     val (pluginsDependsOnDependenciesSettings, pluginsDependsOnDependenciesSet) =
       DependencyToPluginConverter.addPluginForDependency(rootDir, information.projectPath, libraries)
 
-    (SbtProjectContent(p, path, pluginDependencies ++ libraries, dependsOn, information, pluginsDependsOnDependenciesSettings ++ settings), pluginsDependsOnDependenciesSet ++ plugins, information.resolvers)
+    (SbtProjectContent(p, relativePath, pluginDependencies ++ libraries, dependsOn, information, pluginsDependsOnDependenciesSettings ++ settings), pluginsDependsOnDependenciesSet ++ plugins, information.resolvers)
   }
 
 
-  private def splitToDependsOnLibraries(p: Project, information: ProjectInformation) = p.dependencies.partition { d =>
-    val m = d.mavenDependency
-    val contains = hierarchy.contains(m)
-    val parentOption = hierarchy(p.projectDependency).parent
-    val parentMatch = parentOption.fold(false) {
-      parent =>
-        parent == m
-    }
-    contains || parentMatch
+  private def splitToDependsOnLibraries(p: Project, information: ProjectInformation) = p.dependencies.partition {
+    d =>
+      val m = d.mavenDependency
+      val contains = hierarchy.contains(m)
+      val parentOption = hierarchy(p.projectDependency).parent
+      val parentMatch = parentOption.fold(false) {
+        parent =>
+          parent == m
+      }
+      contains || parentMatch
   }
 
   private def handlePlugins(file: File, plugins: Seq[(PluginDescription, Plugin)]): (Set[String], Set[String], Set[Dependency]) = {
@@ -162,12 +171,12 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
 
   def dependenciesToString(libraries: TraversableOnce[Dependency]) = libraries.flatMap { d =>
     val md = d.mavenDependency
-    val lib = s"${doubleQuote(md.groupId)} % ${doubleQuote(md.artifactId)} % ${doubleQuote(md.versionId)}"
+    val lib = s""" "${md.groupId}" % "${md.artifactId}" % "${md.versionId}" """
     d.scope match {
       case Scope.system => None
       case Scope.compile => Some(lib)
-      case test@Scope.test if d.classifierTests => Some( s"""$lib % ${doubleQuote(test)} classifier ${doubleQuote("tests")}""")
-      case x => Some(s"$lib % ${doubleQuote(x)}")
+      case test@Scope.test if d.classifierTests => Some( s"""$lib % "$test" classifier "tests" """)
+      case x => Some( s"""$lib % "$x" """)
     }
 
   }.mkString("", ",\n   ", "")
@@ -175,10 +184,10 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
 
   private def dependsOnToString(dependsOn: TraversableOnce[Dependency], information: ProjectInformation) = dependsOn.map { d =>
     val test = d.scope match {
-      case Scope.test => s"% ${doubleQuote("test -> test")}"
+      case Scope.test => s"""% "test -> test" """
       case _ => ""
     }
-    s"""`${d.mavenDependency.artifactId}`$test"""
+    s"""`${changeNotSupportedSymbols(d.mavenDependency.artifactId)}`$test"""
   }.mkString(",")
 
   def sort(set: Set[Dependency]): TraversableOnce[Dependency] = {
@@ -188,7 +197,7 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
   private def createBuildSbt(sbtProjectContent: SbtProjectContent) = {
     val SbtProjectContent(project, path, libraries, dependsOn, information, settings) = sbtProjectContent
 
-    val projectName = project.projectDependency.artifactId
+    val projectName = changeNotSupportedSymbols(project.projectDependency.artifactId)
 
     val dependencies = dependenciesToString(sort(libraries))
 
