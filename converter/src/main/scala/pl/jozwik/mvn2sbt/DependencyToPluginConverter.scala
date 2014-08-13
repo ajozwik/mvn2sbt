@@ -2,18 +2,19 @@ package pl.jozwik.mvn2sbt
 
 import java.io.File
 
-import com.typesafe.scalalogging.StrictLogging
+import com.typesafe.scalalogging.LazyLogging
 
 
-object DependencyToPluginConverter extends StrictLogging {
+object DependencyToPluginConverter extends LazyLogging {
 
   val TESTNG_XML = "src/test/resources/testng.xml"
+  final val SEQ = " :_* "
 
   def addSeqToArray(equal: Boolean) =
     if (equal) {
       ""
     } else {
-      " :_* "
+      SEQ
     }
 
 
@@ -28,7 +29,6 @@ object DependencyToPluginConverter extends StrictLogging {
           } else {
             TESTNG_XML
           }
-          logger.info("add {} to project", rp)
           (tuple._1 +(s"de.johoop.testngplugin.TestNGPlugin.testNGSettings$endSettings", s"""testNGSuites := Seq("$rp")"""),
             tuple._2 + """addSbtPlugin("de.johoop" % "sbt-testng-plugin" % "3.0.2")""")
         case _ => tuple

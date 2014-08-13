@@ -6,7 +6,7 @@ val scalaxbVersion = "1.1.2"
 
 addSbtPlugin("org.scalaxb" % "sbt-scalaxb" % scalaxbVersion)
 
-addSbtPlugin("org.xerial.sbt" % "sbt-pack" % "0.5.1")
+addSbtPlugin("org.xerial.sbt" % "sbt-pack" % "0.6.2")
 
 addSbtPlugin("org.scoverage" %% "sbt-scoverage" % "0.99.5.1")
 

@@ -44,7 +44,9 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
       dependOn =>
         val setWithoutDep = dependsOn - dependOn
         dependOn.scope match {
-          case Scope.test if dependOn.classifierTests => None
+          case Scope.test  =>
+            logger.debug(s" $dependOn")
+            None
           case _ =>
             val project = sbtProjectsMap(dependOn.mavenDependency)
             project.dependsOn.find(d => setWithoutDep.contains(d))
@@ -61,6 +63,7 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
   private def optimizeProject(sbtProjectsMap: Map[MavenDependency, SbtProjectContent], content: SbtProjectContent): SbtProjectContent = {
 
     val optimizedLibraries = optimizeLibraries(sbtProjectsMap, content)
+    logger.debug(s"${content.project.projectDependency}")
     val optimizedDependsOn = optimizeDependsOn(content.dependsOn, sbtProjectsMap)
     content.copy(libraries = optimizedLibraries, dependsOn = optimizedDependsOn)
   }
