@@ -39,13 +39,12 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
   import pl.jozwik.mvn2sbt.PluginConverter._
   import pl.jozwik.mvn2sbt.SbtContent._
 
-  private def optimizeDependsOn(dependsOn: Set[Dependency], sbtProjectsMap: Map[MavenDependency, SbtProjectContent]): Set[Dependency] = {
+  private def optimizeDependsOn(project:Project,dependsOn: Set[Dependency], sbtProjectsMap: Map[MavenDependency, SbtProjectContent]): Set[Dependency] = {
     val toRemove = dependsOn.flatMap {
       dependOn =>
         val setWithoutDep = dependsOn - dependOn
         dependOn.scope match {
-          case Scope.test  =>
-            logger.debug(s" $dependOn")
+          case Scope.test =>
             None
           case _ =>
             val project = sbtProjectsMap(dependOn.mavenDependency)
@@ -55,23 +54,27 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
     if (toRemove.isEmpty) {
       dependsOn
     } else {
-      optimizeDependsOn(dependsOn.diff(toRemove), sbtProjectsMap)
+      logger.debug(s"${project.projectDependency}: Remove $toRemove")
+      optimizeDependsOn(project,dependsOn.diff(toRemove), sbtProjectsMap)
     }
   }
 
 
   private def optimizeProject(sbtProjectsMap: Map[MavenDependency, SbtProjectContent], content: SbtProjectContent): SbtProjectContent = {
-
     val optimizedLibraries = optimizeLibraries(sbtProjectsMap, content)
-    logger.debug(s"${content.project.projectDependency}")
-    val optimizedDependsOn = optimizeDependsOn(content.dependsOn, sbtProjectsMap)
+    val optimizedDependsOn = optimizeDependsOn(content.project,content.dependsOn, sbtProjectsMap)
     content.copy(libraries = optimizedLibraries, dependsOn = optimizedDependsOn)
   }
 
   private def optimizeLibraries(map: Map[MavenDependency, SbtProjectContent], content: SbtProjectContent): Set[Dependency] = {
     val parentDependencies = content.dependsOn.flatMap { dep =>
-      map(dep.mavenDependency).libraries
+      if (dep.scope == Scope.compile) {
+        map(dep.mavenDependency).libraries
+      } else {
+        Nil
+      }
     }
+
     val parentDependenciesSet = parentDependencies.toSet
     val optimizedLibraries = content.libraries.flatMap { dep =>
       if (parentDependenciesSet.contains(dep) && dep.scope == Scope.compile && content.libraries.find(p => p.mavenDependency == dep.mavenDependency && p.scope != Scope.compile).isEmpty) {

@@ -35,6 +35,7 @@
 [INFO] +- ch.qos.logback:logback-classic:jar:1.1.2:compile
 [INFO] |  \- ch.qos.logback:logback-core:jar:1.1.2:compile
 [INFO] +- org.slf4j:slf4j-api:jar:1.7.7:provided
+[INFO] +- org.mockito:mockito-all:jar:1.9.5:provided
 [INFO] +- junit:junit:jar:4.11:test
 [INFO] |  \- org.hamcrest:hamcrest-core:jar:1.3:test
 [INFO] \- org.easytesting:fest-assert:jar:1.2:test
@@ -125,6 +126,7 @@
 [INFO] |  |  \- org.apache.httpcomponents:httpcore:jar:4.2.4:compile
 [INFO] |  \- ch.qos.logback:logback-classic:jar:1.1.2:compile
 [INFO] |     \- ch.qos.logback:logback-core:jar:1.1.2:compile
+[INFO] +- org.mockito:mockito-all:jar:1.9.5:compile
 [INFO] +- pl.jozwik:test:test-jar:tests:1.0.0:test
 [INFO] +- junit:junit:jar:4.11:test
 [INFO] |  \- org.hamcrest:hamcrest-core:jar:1.3:test
@@ -133,16 +135,16 @@
 [INFO] ------------------------------------------------------------------------
 [INFO] Reactor Summary:
 [INFO] 
-[INFO] multi .............................................. SUCCESS [  0.830 s]
-[INFO] Cxf bindings ....................................... SUCCESS [  0.086 s]
-[INFO] Thrift interfaces 1 ................................ SUCCESS [  0.021 s]
-[INFO] Thrift interfaces 2 ................................ SUCCESS [  0.014 s]
-[INFO] For test ........................................... SUCCESS [  0.016 s]
-[INFO] Scala project ...................................... SUCCESS [  0.041 s]
+[INFO] multi .............................................. SUCCESS [  0.644 s]
+[INFO] Cxf bindings ....................................... SUCCESS [  0.097 s]
+[INFO] Thrift interfaces 1 ................................ SUCCESS [  0.024 s]
+[INFO] Thrift interfaces 2 ................................ SUCCESS [  0.016 s]
+[INFO] For test ........................................... SUCCESS [  0.018 s]
+[INFO] Scala project ...................................... SUCCESS [  0.027 s]
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
 [INFO] ------------------------------------------------------------------------
-[INFO] Total time: 1.452 s
-[INFO] Finished at: 2014-08-13T10:40:02+02:00
-[INFO] Final Memory: 11M/190M
+[INFO] Total time: 1.115 s
+[INFO] Finished at: 2014-08-13T14:30:36+02:00
+[INFO] Final Memory: 13M/171M
 [INFO] ------------------------------------------------------------------------
