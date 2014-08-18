@@ -15,7 +15,7 @@ scalacOptions ++= Seq("-deprecation", "-unchecked", "-feature")
 scalacOptions in Test ++= Seq("-Yrangepos")
 
 libraryDependencies in Global ++= Seq(
-  "com.typesafe.scala-logging" %% "scala-logging" % "3.0.0",
+  "com.typesafe.scala-logging" %% "scala-logging" % "3.1.0",
   "org.scalacheck" %% "scalacheck" % "1.11.5" % "test",
   "org.scalatest" %% "scalatest" % "2.2.1" % "test",
   "ch.qos.logback" % "logback-classic" % "1.1.2",
