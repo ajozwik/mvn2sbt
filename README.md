@@ -21,8 +21,9 @@ Without parameters ( default configuration)
  * maven-thrift-plugin
  * maven-war-plugin
  * cxf-codegen-plugin
- * testng plugin (as dependency)
  * gwt-maven-plugin
+ * testng plugin (as dependency)
+ 
 
  Example converters are in package: pl.jozwik.mvn2sbt.pom2sbt
 
