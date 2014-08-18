@@ -56,13 +56,14 @@ object PluginConverter {
 
 
 trait PomToSbtPluginConverter {
+
   final def convert(plugin: Plugin, rootDir: File): Set[String] = findConfiguration(plugin) match {
     case (Some(confHead: Configuration4) :: tail) =>
-      configurationToSet(confHead, rootDir)
+      configurationToSet(confHead, rootDir)(plugin)
     case _ => Set.empty
   }
 
-  protected def configurationToSet(confHead: Configuration4, rootDir: File): Set[String]
+  protected def configurationToSet(confHead: Configuration4, rootDir: File)(implicit plugin:Plugin): Set[String]
 
   private[mvn2sbt] def findConfiguration(plugin: Plugin) = {
     val execution = plugin.executions.get.execution

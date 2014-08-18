@@ -15,6 +15,7 @@
         <module>cxf</module>
         <module>scala</module>
         <module>test</module>
+        <module>gwt</module>
     </modules>
 
     <properties>

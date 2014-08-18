@@ -22,8 +22,9 @@ Without parameters ( default configuration)
  * maven-war-plugin
  * cxf-codegen-plugin
  * testng plugin (as dependency)
- 
-Project is still in phase alfa - source will be rebuilt in spare time.
+ * gwt-maven-plugin
+
+ Example converters are in package: pl.jozwik.mvn2sbt.pom2sbt
 
 
 

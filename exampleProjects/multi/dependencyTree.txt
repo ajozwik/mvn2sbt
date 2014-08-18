@@ -8,6 +8,7 @@
 [INFO] Thrift interfaces 2
 [INFO] For test
 [INFO] Scala project
+[INFO] Gwt project
 [INFO]                                                                         
 [INFO] ------------------------------------------------------------------------
 [INFO] Building multi 1.1.2
@@ -132,19 +133,48 @@
 [INFO] |  \- org.hamcrest:hamcrest-core:jar:1.3:test
 [INFO] \- org.easytesting:fest-assert:jar:1.2:test
 [INFO]    \- org.easytesting:fest-util:jar:1.1:test
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building Gwt project 1.0.0
+[INFO] ------------------------------------------------------------------------
+[INFO] 
+[INFO] --- maven-dependency-plugin:2.8:tree (default-cli) @ gwt ---
+[INFO] pl.jozwik:gwt:jar:1.0.0
+[INFO] +- pl.jozwik:thrift22:jar:1.0.0:compile
+[INFO] |  +- pl.jozwik:cxf2:jar:1.0.0:compile
+[INFO] |  |  +- org.apache.thrift:libthrift:jar:0.9.1:compile
+[INFO] |  |  |  +- org.slf4j:slf4j-api:jar:1.5.8:compile
+[INFO] |  |  |  +- org.apache.commons:commons-lang3:jar:3.1:compile
+[INFO] |  |  |  +- org.apache.httpcomponents:httpclient:jar:4.2.5:compile
+[INFO] |  |  |  |  +- commons-logging:commons-logging:jar:1.1.1:compile
+[INFO] |  |  |  |  \- commons-codec:commons-codec:jar:1.6:compile
+[INFO] |  |  |  \- org.apache.httpcomponents:httpcore:jar:4.2.4:compile
+[INFO] |  |  \- ch.qos.logback:logback-classic:jar:1.1.2:compile
+[INFO] |  |     \- ch.qos.logback:logback-core:jar:1.1.2:compile
+[INFO] |  \- pl.jozwik:thrift11:jar:1.0.0:compile
+[INFO] |     \- commons-lang:commons-lang:jar:2.6:compile
+[INFO] +- com.google.gwt:gwt-user:jar:2.5.1:provided
+[INFO] |  +- javax.validation:validation-api:jar:1.0.0.GA:provided
+[INFO] |  +- javax.validation:validation-api:jar:sources:1.0.0.GA:provided
+[INFO] |  \- org.json:json:jar:20090211:provided
+[INFO] +- junit:junit:jar:4.11:test
+[INFO] |  \- org.hamcrest:hamcrest-core:jar:1.3:test
+[INFO] \- org.easytesting:fest-assert:jar:1.2:test
+[INFO]    \- org.easytesting:fest-util:jar:1.1:test
 [INFO] ------------------------------------------------------------------------
 [INFO] Reactor Summary:
 [INFO] 
-[INFO] multi .............................................. SUCCESS [  0.644 s]
-[INFO] Cxf bindings ....................................... SUCCESS [  0.097 s]
-[INFO] Thrift interfaces 1 ................................ SUCCESS [  0.024 s]
-[INFO] Thrift interfaces 2 ................................ SUCCESS [  0.016 s]
-[INFO] For test ........................................... SUCCESS [  0.018 s]
-[INFO] Scala project ...................................... SUCCESS [  0.027 s]
+[INFO] multi .............................................. SUCCESS [  1.193 s]
+[INFO] Cxf bindings ....................................... SUCCESS [  0.091 s]
+[INFO] Thrift interfaces 1 ................................ SUCCESS [  0.023 s]
+[INFO] Thrift interfaces 2 ................................ SUCCESS [  0.015 s]
+[INFO] For test ........................................... SUCCESS [  0.029 s]
+[INFO] Scala project ...................................... SUCCESS [  0.024 s]
+[INFO] Gwt project ........................................ SUCCESS [  0.030 s]
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
 [INFO] ------------------------------------------------------------------------
-[INFO] Total time: 1.115 s
-[INFO] Finished at: 2014-08-13T14:30:36+02:00
-[INFO] Final Memory: 13M/171M
+[INFO] Total time: 2.177 s
+[INFO] Finished at: 2014-08-18T12:03:22+02:00
+[INFO] Final Memory: 12M/187M
 [INFO] ------------------------------------------------------------------------

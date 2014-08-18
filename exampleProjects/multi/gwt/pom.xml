@@ -1,0 +1,49 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>gwt</artifactId>
+    <version>1.0.0</version>
+    <name>Gwt project</name>
+
+    <parent>
+        <groupId>pl.jozwik</groupId>
+        <artifactId>multi</artifactId>
+        <version>1.1.2</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+    <properties>
+        <gwt-user.version>2.5.1</gwt-user.version>
+    </properties>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>gwt-maven-plugin</artifactId>
+                <version>${gwt-user.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                        <configuration>
+                            <module>pl.jozwik.gwt.gui</module>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+    <dependencies>
+        <dependency>
+            <groupId>pl.jozwik</groupId>
+            <artifactId>thrift22</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.gwt</groupId>
+            <artifactId>gwt-user</artifactId>
+            <version>${gwt-user.version}</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+</project>

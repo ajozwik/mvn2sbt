@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module>
+	<!-- Specify the paths for translatable code -->
+	<source path="client" />
+	<source path="shared" />
+    <!-- Inherit the core Web Toolkit stuff.                        -->
+    <inherits name='com.google.gwt.user.User'/>
+
+    <inherits name='com.google.gwt.user.theme.standard.Standard'/>
+	<entry-point class="pl.jozwik.gwt.client.HelloGwt" />
+	
+</module>

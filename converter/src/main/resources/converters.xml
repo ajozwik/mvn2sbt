@@ -93,4 +93,25 @@
         <artifactId>scala-maven-plugin</artifactId>
         <converter/>
     </converter>
+    <converter>
+        <artifactId>gwt-maven-plugin</artifactId>
+        <sbtSetting>net.thunderklaus.GwtPlugin.gwtSettings</sbtSetting>
+        <pluginsSbtPluginConfiguration>
+            <dependency>
+                <groupId>net.thunderklaus</groupId>
+                <artifactId>sbt-gwt-plugin</artifactId>
+                <version>1.1-SNAPSHOT</version>
+            </dependency>
+        </pluginsSbtPluginConfiguration>
+        <extraRepository>"GWT plugin repo" at "http://thunderklaus.github.com/maven"</extraRepository>
+        <dependencies>
+            <dependency>
+                <groupId>org.mortbay.jetty</groupId>
+                <artifactId>jetty</artifactId>
+                <version>6.1.26</version>
+                <scope>container</scope>
+            </dependency>
+        </dependencies>
+        <converter>pl.jozwik.mvn2sbt.pom2sbt.GwtPluginConverter</converter>
+    </converter>
 </converters>

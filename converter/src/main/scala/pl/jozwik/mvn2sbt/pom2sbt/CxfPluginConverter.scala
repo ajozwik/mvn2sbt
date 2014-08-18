@@ -2,7 +2,7 @@ package pl.jozwik.mvn2sbt.pom2sbt
 
 import java.io.File
 
-import org.maven.Configuration4
+import org.maven.{Plugin, Configuration4}
 import pl.jozwik.mvn2sbt.PomToSbtPluginConverter
 
 import scala.xml.{Node, NodeSeq}
@@ -35,7 +35,7 @@ class CxfPluginConverter extends PomToSbtPluginConverter {
 
   private val ignoredArgs = Set("-wsdlLocation", "-autoNameResolution", "-verbose")
 
-  def configurationToSet(confHead: Configuration4, rootDir: File): Set[String] = {
+  def configurationToSet(confHead: Configuration4, rootDir: File)(implicit plugin:Plugin): Set[String] = {
     val cxfSeqClousure: Node => Seq[String] = buildCxfSeq(rootDir)
     val defaultOptSeq = createKeySeqMap(confHead, "wsdl", cxfSeqClousure, "defaultOptions").getOrElse("", Seq.empty[String])
 
