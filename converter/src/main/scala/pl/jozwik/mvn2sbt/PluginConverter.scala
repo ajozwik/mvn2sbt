@@ -3,6 +3,7 @@ package pl.jozwik.mvn2sbt
 import java.io.File
 
 import org.maven.{Configuration4, Plugin}
+import pl.jozwik.mvn2sbt.PluginConverter._
 
 import scala.xml.{Node, NodeSeq}
 import scalaxb.DataRecord
@@ -68,6 +69,12 @@ trait PomToSbtPluginConverter {
   private[mvn2sbt] def findConfiguration(plugin: Plugin) = {
     val execution = plugin.executions.get.execution
     execution.map { ex => ex.configuration}
+  }
+
+  protected final def toOption(confHead: Configuration4,name:String,f:(String)=>String) = {
+    val node = findElement(confHead, name)
+    val moduleName = node.map(v => v.value.asInstanceOf[Node].text)
+    moduleName.map(s => f(s))
   }
 
 }

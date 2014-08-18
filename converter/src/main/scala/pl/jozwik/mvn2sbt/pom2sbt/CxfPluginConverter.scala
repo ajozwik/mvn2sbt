@@ -35,11 +35,11 @@ class CxfPluginConverter extends PomToSbtPluginConverter {
 
   private val ignoredArgs = Set("-wsdlLocation", "-autoNameResolution", "-verbose")
 
-  def configurationToSet(confHead: Configuration4, rootDir: File)(implicit plugin:Plugin): Set[String] = {
-    val cxfSeqClousure: Node => Seq[String] = buildCxfSeq(rootDir)
-    val defaultOptSeq = createKeySeqMap(confHead, "wsdl", cxfSeqClousure, "defaultOptions").getOrElse("", Seq.empty[String])
+  def configurationToSet(confHead: Configuration4, rootDir: File)(implicit plugin: Plugin): Set[String] = {
+    val cxfSeqClosure: Node => Seq[String] = buildCxfSeq(rootDir)
+    val defaultOptSeq = createKeySeqMap(confHead, "wsdl", cxfSeqClosure, "defaultOptions").getOrElse("", Seq.empty[String])
 
-    val wsdlOptionSeq = createKeySeqMap(confHead, "wsdl", cxfSeqClousure, "wsdlOptions", "wsdlOption")
+    val wsdlOptionSeq = createKeySeqMap(confHead, "wsdl", cxfSeqClosure, "wsdlOptions", "wsdlOption")
 
     val wsdls = wsdlOptionSeq.map {
       case (wsdl, seq) =>
@@ -63,8 +63,8 @@ class CxfPluginConverter extends PomToSbtPluginConverter {
 
   def buildCxfSeq(rootDir: File)(node: Node): Seq[String] = {
     val packages = findNode(node, "packagenames", "packagename").flatMap(n => Seq("-p", n.text))
-    val extraArgs = findNode(node, "extraargs", "extraarg").map(_.text).filterNot(ignoredArgs.contains)
     val bindings = findNode(node, "bindingFiles", "bindingFile").flatMap(x => Seq("-b", toPath(x.text, rootDir)))
+    val extraArgs = findNode(node, "extraargs", "extraarg").map(_.text).filterNot(ignoredArgs.contains)
     val extra = remove(extraArgs, ignored: _*)
     packages ++ extra ++ bindings
   }
