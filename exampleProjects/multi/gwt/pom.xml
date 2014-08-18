@@ -27,6 +27,7 @@
                         </goals>
                         <configuration>
                             <module>pl.jozwik.gwt.gui</module>
+                            <extraJvmArgs>-Xms256m -Xmx1024m -Xss1024k</extraJvmArgs>
                         </configuration>
                     </execution>
                 </executions>

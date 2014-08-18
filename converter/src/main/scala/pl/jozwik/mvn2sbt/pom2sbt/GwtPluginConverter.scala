@@ -19,9 +19,15 @@ class GwtPluginConverter extends PomToSbtPluginConverter {
   protected [pom2sbt] def configurationToSet(confHead: Configuration4, rootDir: File)(implicit plugin:Plugin): Set[String] = {
     import GwtPluginConverter._
     val version = plugin.version.getOrElse(DEFAULT_GWT_VERSION)
-    val node = findElement(confHead, "module")
+    val moduleOption = toOption(confHead,"module",s => s"""gwtModules := List("$s")""" )
+    val extraArgsOption = toOption(confHead,"extraJvmArgs",s => s"""javaOptions in Gwt += "$s"""" )
+    extraArgsOption ++ moduleOption ++ Set( s"""gwtVersion := "$version" """)
+  }
+
+
+  private def toOption(confHead: Configuration4,name:String,f:(String)=>String) = {
+    val node = findElement(confHead, name)
     val moduleName = node.map(v => v.value.asInstanceOf[Node].text)
-    val moduleOption = moduleName.fold(Set.empty[String])(s => Set(s"""gwtModules := List("$s")"""))
-    moduleOption ++ Set( s"""gwtVersion := "$version" """)
+    moduleName.fold(Set.empty[String])(s => Set(f(s)))
   }
 }
