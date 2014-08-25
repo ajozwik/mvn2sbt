@@ -2,6 +2,7 @@
 *.iml
 .idea*
 *~
+.history
 # sbt specific
 dist/*
 target/
