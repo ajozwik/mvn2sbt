@@ -8,9 +8,9 @@ import org.maven.Plugin
 case class SbtProjectContent(project: Project, path: String, libraries: Set[Dependency], dependsOn: Set[Dependency], information: ProjectInformation, settings: Set[String])
 
 object SbtContent {
-  final val SCALA_VERSION_IN_GLOBAL = "scala.version"
+  val SCALA_VERSION_IN_GLOBAL = "scala.version"
 
-  final val PROHIBITED_CHARS = "."
+  val PROHIBITED_CHARS = "."
 
   private[mvn2sbt] def resolversToOption(resolvers: Set[String]) = {
 

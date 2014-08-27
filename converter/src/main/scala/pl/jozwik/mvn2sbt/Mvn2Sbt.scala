@@ -7,14 +7,15 @@ import org.apache.commons.io.IOUtils
 
 import scala.io.Source
 
+
 object Mvn2Sbt extends StrictLogging {
   val SBT_VERSION = "sbt.version"
-  private final val BUILD_PROPERTIES= "build.properties"
-  private final val DEFAULT_SBT_VERSION = "0.13.5"
-  final val BUILD_SBT = "build.sbt"
-  final val PROJECT = "project"
-  final val PLUGINS_SBT = "plugins.sbt"
-  final val DEPENDENCY_TREE_TXT = "dependencyTree.txt"
+  val BUILD_PROPERTIES= "build.properties"
+  val DEFAULT_SBT_VERSION = "0.13.5"
+  val BUILD_SBT = "build.sbt"
+  val PROJECT = "project"
+  val PLUGINS_SBT = "plugins.sbt"
+  val DEPENDENCY_TREE_TXT = "dependencyTree.txt"
 
   private def projectsFromFile(inputFile: File) = {
     val source = Source.fromFile(inputFile)

@@ -9,8 +9,8 @@ import pl.jozwik.mvn2sbt.PluginConverter._
 
 object MavenSbtPluginMapper extends StrictLogging {
   private [mvn2sbt]final val EMPTY_SEQ = Seq.empty[(PluginDescription, Plugin)]
-  final val DEFAULT_CONVERTERS_PATH = "/converters.xml"
-  final val CONVERTERS_PATH = "converters.path"
+  val DEFAULT_CONVERTERS_PATH = "/converters.xml"
+  val CONVERTERS_PATH = "converters.path"
   private[mvn2sbt] lazy val artifactIdToPluginDescriptionMap: Map[String, PluginDescription] = {
     val path = System.getProperty(CONVERTERS_PATH, DEFAULT_CONVERTERS_PATH)
     val stream = getClass.getResourceAsStream(path)

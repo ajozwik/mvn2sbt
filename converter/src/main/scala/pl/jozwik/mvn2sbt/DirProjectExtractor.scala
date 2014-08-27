@@ -8,7 +8,7 @@ import org.maven.{Model, Parent}
 import scala.util.{Failure, Success, Try}
 
 object DirProjectExtractor extends LazyLogging {
-  final val EFFECTIVE_POM_XML = "effective-pom.xml"
+  val EFFECTIVE_POM_XML = "effective-pom.xml"
 
   private[mvn2sbt] def valueFromOptions(option: Option[String], default: Option[String]) =
     (option, default) match {

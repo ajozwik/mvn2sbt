@@ -8,7 +8,7 @@ import com.typesafe.scalalogging.LazyLogging
 object DependencyToPluginConverter extends LazyLogging {
 
   val TESTNG_XML = "src/test/resources/testng.xml"
-  final val SEQ = " :_* "
+  val SEQ = " :_* "
 
   def addSeqToArray(equal: Boolean) =
     if (equal) {

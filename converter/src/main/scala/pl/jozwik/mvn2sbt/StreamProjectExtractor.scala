@@ -5,9 +5,9 @@ import com.typesafe.scalalogging.StrictLogging
 import scala.util.{Failure, Success, Try}
 
 object StreamProjectExtractor extends StrictLogging {
-  final val PROJECT_START: String = "--- maven-dependency-plugin:"
-  final val INFO = "[INFO] "
-  final val START_DEPENDENCY = Seq("+- ", "\\- ")
+  val PROJECT_START = "--- maven-dependency-plugin:"
+  val INFO = "[INFO] "
+  val START_DEPENDENCY = Seq("+- ", "\\- ")
 
   def parseProjectLine(line: String) = {
     toOrderedTuple((0, 1, 2, 3, false), line.split(":"))
