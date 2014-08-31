@@ -1,5 +1,5 @@
 package pl.jozwik.mvn2sbt;
 
 public enum Scope {
-    compile, test, provided, system, container
+    compile, test, provided, system, container, runtime
 }
