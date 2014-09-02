@@ -43,12 +43,13 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
     val toRemove = dependsOn.flatMap {
       dependOn =>
         val setWithoutDep = dependsOn - dependOn
+
         dependOn.scope match {
           case Scope.test =>
             None
           case _ =>
-            val project = sbtProjectsMap(dependOn.mavenDependency)
-            project.dependsOn.find(d => setWithoutDep.contains(d))
+            val projectContent = sbtProjectsMap(dependOn.mavenDependency)
+            projectContent.dependsOn.find(d => setWithoutDep.contains(d) &&  d.scope != Scope.test)
         }
     }
     if (toRemove.isEmpty) {

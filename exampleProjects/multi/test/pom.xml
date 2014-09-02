@@ -4,7 +4,7 @@
     <artifactId>test</artifactId>
     <version>1.0.0</version>
     <properties>
-        <maven-jar-plugin.version>2.5</maven-jar-plugin.version>
+
     </properties>
     <name>For test</name>
 
@@ -42,6 +42,13 @@
             <artifactId>cxf2</artifactId>
             <groupId>pl.jozwik</groupId>
             <version>1.0.0</version>
+        </dependency>
+        <dependency>
+            <artifactId>cxf2</artifactId>
+            <groupId>pl.jozwik</groupId>
+            <version>1.0.0</version>
+            <scope>test</scope>
+            <type>test-jar</type>
         </dependency>
     </dependencies>
 

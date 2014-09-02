@@ -26,6 +26,7 @@
 
         <scala-plugin.version>3.1.6</scala-plugin.version>
         <scala.version>2.11.2</scala.version>
+        <maven-jar-plugin.version>2.5</maven-jar-plugin.version>
     </properties>
 
     <repositories>
