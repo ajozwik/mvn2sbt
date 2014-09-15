@@ -61,5 +61,12 @@
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>pl.jozwik</groupId>
+            <artifactId>cxf2</artifactId>
+            <version>1.0.0</version>
+            <scope>test</scope>
+            <type>test-jar</type>
+        </dependency>
     </dependencies>
 </project>

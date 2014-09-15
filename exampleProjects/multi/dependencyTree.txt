@@ -106,6 +106,7 @@
 [INFO] |  |  \- org.apache.httpcomponents:httpcore:jar:4.2.4:compile
 [INFO] |  \- ch.qos.logback:logback-classic:jar:1.1.2:compile
 [INFO] |     \- ch.qos.logback:logback-core:jar:1.1.2:compile
+[INFO] +- pl.jozwik:cxf2:test-jar:tests:1.0.0:test
 [INFO] +- junit:junit:jar:4.11:test
 [INFO] |  \- org.hamcrest:hamcrest-core:jar:1.3:test
 [INFO] \- org.easytesting:fest-assert:jar:1.2:test
@@ -129,6 +130,7 @@
 [INFO] |     \- ch.qos.logback:logback-core:jar:1.1.2:compile
 [INFO] +- org.mockito:mockito-all:jar:1.9.5:compile
 [INFO] +- pl.jozwik:test:test-jar:tests:1.0.0:test
+[INFO] +- pl.jozwik:cxf2:test-jar:tests:1.0.0:test
 [INFO] +- junit:junit:jar:4.11:test
 [INFO] |  \- org.hamcrest:hamcrest-core:jar:1.3:test
 [INFO] \- org.easytesting:fest-assert:jar:1.2:test
@@ -164,17 +166,17 @@
 [INFO] ------------------------------------------------------------------------
 [INFO] Reactor Summary:
 [INFO] 
-[INFO] multi .............................................. SUCCESS [  0.657 s]
-[INFO] Cxf bindings ....................................... SUCCESS [  0.095 s]
-[INFO] Thrift interfaces 1 ................................ SUCCESS [  0.023 s]
-[INFO] Thrift interfaces 2 ................................ SUCCESS [  0.014 s]
-[INFO] For test ........................................... SUCCESS [  0.029 s]
-[INFO] Scala project ...................................... SUCCESS [  0.026 s]
-[INFO] Gwt project ........................................ SUCCESS [  0.030 s]
+[INFO] multi .............................................. SUCCESS [  1.028 s]
+[INFO] Cxf bindings ....................................... SUCCESS [  0.120 s]
+[INFO] Thrift interfaces 1 ................................ SUCCESS [  0.027 s]
+[INFO] Thrift interfaces 2 ................................ SUCCESS [  0.013 s]
+[INFO] For test ........................................... SUCCESS [  0.013 s]
+[INFO] Scala project ...................................... SUCCESS [  0.024 s]
+[INFO] Gwt project ........................................ SUCCESS [  0.031 s]
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
 [INFO] ------------------------------------------------------------------------
-[INFO] Total time: 1.169 s
-[INFO] Finished at: 2014-08-18T12:28:24+02:00
-[INFO] Final Memory: 12M/187M
+[INFO] Total time: 1.609 s
+[INFO] Finished at: 2014-09-01T17:19:32+02:00
+[INFO] Final Memory: 13M/208M
 [INFO] ------------------------------------------------------------------------
