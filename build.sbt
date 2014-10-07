@@ -10,7 +10,9 @@ version in Global := "0.3.1"
 
 scalaVersion in Global := "2.11.2"
 
-scalacOptions ++= Seq("-deprecation", "-unchecked", "-feature")
+scalacOptions ++= Seq("-deprecation", "-unchecked", "-feature","-Yrangepos")
+
+scalacOptions in Global ++= Seq("-deprecation", "-unchecked", "-feature","-Yrangepos")
 
 scalacOptions in Test ++= Seq("-Yrangepos")
 
@@ -18,7 +20,7 @@ releaseSettings
 
 libraryDependencies in Global ++= Seq(
   "com.typesafe.scala-logging" %% "scala-logging" % "3.1.0",
-  "org.scalacheck" %% "scalacheck" % "1.11.5" % "test",
+  "org.scalacheck" %% "scalacheck" % "1.11.6" % "test",
   "org.scalatest" %% "scalatest" % "2.2.2" % "test",
   "ch.qos.logback" % "logback-classic" % "1.1.2",
   "org.scala-lang.modules" %% "scala-xml" % "1.0.2",
