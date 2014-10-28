@@ -39,7 +39,39 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
   import pl.jozwik.mvn2sbt.PluginConverter._
   import pl.jozwik.mvn2sbt.SbtContent._
 
-  private def removeDuplicatedDedendsOn(project: Project, dependsOn: Set[Dependency], sbtProjectsMap: Map[MavenDependency, SbtProjectContent]): Set[Dependency] = {
+
+  def buildSbtContentPluginContentAsString: (String, String) = {
+    val buildSbtWriter = new StringBuilder
+    val pluginsSbtWriter = new StringBuilder
+    val defaultScalaVersion = System.getProperty(SCALA_VERSION_IN_GLOBAL, "2.11.2")
+    buildSbtWriter.append( s"""scalaVersion in Global := "$defaultScalaVersion" """).append("\n\n")
+    buildSbtWriter.append("def ProjectName(name: String,path:String): Project =  Project(name, file(path))").append("\n\n")
+    val (contentOfPluginSbt, resolvers, buildSbtProjects) = projects.foldLeft((Set.empty[String], Set.empty[String], Map.empty[MavenDependency, SbtProjectContent])) {
+      case ((accContent, accResolvers, stbProjectContent), p) =>
+        val (projectContent, pluginsSbt, resolvers) = handleProject(p)
+        (accContent ++ pluginsSbt, accResolvers ++ resolvers, stbProjectContent + (p.projectDependency -> projectContent))
+    }
+
+
+    buildSbtWriter.append(resolversToOption(resolvers))
+    val optimizedMaps = optimizeProjects(buildSbtProjects)
+    val (ps, libraries) = projectsToString(optimizedMaps)
+    val lib = libraries.toSeq.sortBy { case (d, _) => d.groupId}
+    lib.foreach {
+      case (d, variable) =>
+        val dependency = s""""${d.groupId}" % "${d.artifactId}" % "${d.versionId}""""
+        val txt = s"""val $variable = $dependency"""
+        buildSbtWriter.append(txt).append("\n\n")
+    }
+
+    ps.foreach(buildSbtWriter.append)
+
+    pluginsSbtWriter.append(contentOfPluginSbt.mkString("\n\n"))
+    (buildSbtWriter.toString(), pluginsSbtWriter.toString())
+  }
+
+
+  private def removeDuplicatedDependsOn(project: Project, dependsOn: Set[Dependency], sbtProjectsMap: Map[MavenDependency, SbtProjectContent]): Set[Dependency] = {
     val toRemove = dependsOn.flatMap {
       dependOn =>
         val setWithoutDep = dependsOn - dependOn
@@ -56,14 +88,14 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
       dependsOn
     } else {
       logger.debug(s"${project.projectDependency}: Remove $toRemove")
-      removeDuplicatedDedendsOn(project, dependsOn.diff(toRemove), sbtProjectsMap)
+      removeDuplicatedDependsOn(project, dependsOn.diff(toRemove), sbtProjectsMap)
     }
   }
 
 
   private def optimizeProject(sbtProjectsMap: Map[MavenDependency, SbtProjectContent], content: SbtProjectContent): SbtProjectContent = {
     val optimizedLibraries = removeDuplicatedLibraries(sbtProjectsMap, content)
-    val optimizedDependsOn = removeDuplicatedDedendsOn(content.project, content.dependsOn, sbtProjectsMap)
+    val optimizedDependsOn = removeDuplicatedDependsOn(content.project, content.dependsOn, sbtProjectsMap)
     content.copy(libraries = optimizedLibraries, dependsOn = optimizedDependsOn)
   }
 
@@ -101,32 +133,13 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
     }
   }
 
-  def buildSbtContentPluginContentAsString: (String, String) = {
-    val buildSbtWriter = new StringBuilder
-    val pluginsSbtWriter = new StringBuilder
-    val defaultScalaVersion = System.getProperty(SCALA_VERSION_IN_GLOBAL, "2.11.2")
-    buildSbtWriter.append( s"""scalaVersion in Global := "$defaultScalaVersion" """).append("\n\n")
-    buildSbtWriter.append("def ProjectName(name: String,path:String): Project =  Project(name, file(path))").append("\n\n")
-    val (contentOfPluginSbt, resolvers, buildSbtProjects) = projects.foldLeft((Set.empty[String], Set.empty[String], Map.empty[MavenDependency, SbtProjectContent])) {
-      (acc, p) =>
-        val (accContent, accResolvers, stbProjectContent) = acc
-        val (projectContent, pluginsSbt, resolvers) = handleProject(p)
-        (accContent ++ pluginsSbt, accResolvers ++ resolvers, stbProjectContent + (p.projectDependency -> projectContent))
-    }
 
-
-    buildSbtWriter.append(resolversToOption(resolvers))
-    val optimizedMaps = optimizeProjects(buildSbtProjects)
-    writeProjects(buildSbtWriter, optimizedMaps)
-
-    pluginsSbtWriter.append(contentOfPluginSbt.mkString("\n\n"))
-    (buildSbtWriter.toString(), pluginsSbtWriter.toString())
-  }
-
-  private def writeProjects(sb: StringBuilder, projectsMap: Map[MavenDependency, SbtProjectContent]) {
-    val sorted = projectsMap.toSeq.sortBy((a) => a._1.artifactId)
-    sorted.foreach {
-      case (name, content) => sb.append(createBuildSbt(content))
+  private def projectsToString(projectsMap: Map[MavenDependency, SbtProjectContent]) = {
+    val sorted = projectsMap.toSeq.sortBy { case (d, _) => d.artifactId}
+    sorted.foldLeft((Seq.empty[String], Map.empty[MavenDependency, String])) {
+      case ((accSeqString, accMap), (_, content)) =>
+        val (project, newMap) = createBuildSbt(content, accMap)
+        (project +: accSeqString, newMap)
     }
   }
 
@@ -173,17 +186,28 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
   }
 
 
-  def dependenciesToString(libraries: TraversableOnce[Dependency]) = libraries.flatMap { d =>
-    val md = d.mavenDependency
-    val lib = s""" "${md.groupId}" % "${md.artifactId}" % "${md.versionId}" """
-    d.scope match {
-      case Scope.system => None
-      case Scope.compile => Some(lib)
-      case test@Scope.test if d.classifierTests => Some( s"""$lib % "$test" classifier "tests" """)
-      case x => Some( s"""$lib % "$x" """)
-    }
+  private def dependenciesToString(libraries: TraversableOnce[Dependency], cache: Map[MavenDependency, String]) = {
+    val (depSeq, newCache) = libraries.foldLeft((Seq.empty[String], cache)) { case ((accLibSeq, accCache), d) =>
+      val md = d.mavenDependency
+      val (lib, c) = accCache.get(md) match {
+        case Some(l) =>
+          (l, accCache)
+        case None =>
+          val lib = s"""`${md.groupId}_${md.artifactId}_${md.versionId}`"""
+          (lib, accCache + (md -> lib))
+      }
 
-  }.mkString("", ",\n   ", "")
+      val opt = d.scope match {
+        case Scope.system => None
+        case Scope.compile => Some(lib)
+        case test@Scope.test if d.classifierTests => Some( s"""$lib % "$test" classifier "tests" """)
+        case x => Some( s"""$lib % "$x" """)
+      }
+
+      (opt.fold(accLibSeq)(l => l +: accLibSeq), c)
+    }
+    (depSeq.mkString("", ",\n   ", ""), newCache)
+  }
 
 
   private def dependsOnToString(dependsOn: TraversableOnce[Dependency], information: ProjectInformation) = dependsOn.map { d =>
@@ -194,20 +218,20 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
     s"""`${changeNotSupportedSymbols(d.mavenDependency.artifactId)}`$test"""
   }.mkString(",")
 
-  def sort(set: Set[Dependency]): TraversableOnce[Dependency] = {
+  private def sort(set: Set[Dependency]): TraversableOnce[Dependency] =
     set.toIndexedSeq.sorted(Ordering.by[Dependency, (String, String)](x => (x.mavenDependency.groupId, x.mavenDependency.artifactId)))
-  }
 
-  private def createBuildSbt(sbtProjectContent: SbtProjectContent) = {
+
+  private def createBuildSbt(sbtProjectContent: SbtProjectContent, cache: Map[MavenDependency, String]) = {
     val SbtProjectContent(project, path, libraries, dependsOn, information, settings) = sbtProjectContent
 
     val projectName = changeNotSupportedSymbols(project.projectDependency.artifactId)
 
-    val dependencies = dependenciesToString(sort(libraries))
+    val (dependencies, newCache) = dependenciesToString(sort(libraries), cache)
 
     val dependsOnString = dependsOnToString(sort(dependsOn), information)
 
-    if (path.isEmpty) {
+    val projectString = if (path.isEmpty) {
       s"""
         |version := "${project.projectDependency.versionId}"
         |
@@ -230,6 +254,8 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
       |
 """.stripMargin
     }
+
+    (projectString, newCache)
   }
 
 

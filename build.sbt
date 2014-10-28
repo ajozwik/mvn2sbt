@@ -6,7 +6,7 @@ name := "mvn2sbt"
 
 organization in Global := "pl.jozwik"
 
-version in Global := "0.3.1"
+version in Global := "0.4"
 
 scalaVersion in Global := "2.11.2"
 
@@ -18,9 +18,13 @@ scalacOptions in Test ++= Seq("-Yrangepos")
 
 releaseSettings
 
+val scalaLogging = "com.typesafe.scala-logging" %% "scala-logging" % "3.1.0"
+
+val scalacheck = "org.scalacheck" %% "scalacheck" % "1.11.6"
+
 libraryDependencies in Global ++= Seq(
-  "com.typesafe.scala-logging" %% "scala-logging" % "3.1.0",
-  "org.scalacheck" %% "scalacheck" % "1.11.6" % "test",
+  scalaLogging,
+  scalacheck % "test",
   "org.scalatest" %% "scalatest" % "2.2.2" % "test",
   "ch.qos.logback" % "logback-classic" % "1.1.2",
   "org.scala-lang.modules" %% "scala-xml" % "1.0.2",
