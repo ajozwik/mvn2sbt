@@ -188,16 +188,14 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
   }
 
 
-
-
   private def dependenciesToString(libraries: TraversableOnce[Dependency], cache: Map[GroupArtifact, (MavenDependency, String)]) = {
     val (depSeq, newCache) = libraries.foldLeft((Seq.empty[String], cache)) { case ((accLibSeq, accCache), d) =>
       val md = d.mavenDependency
       val groupArtifact = GroupArtifact(md.groupId, md.artifactId)
       val (lib, c) = accCache.get(groupArtifact) match {
         case Some((mavenDep, l)) =>
-          val version = VersionComparator.computeLarge(md.versionId, mavenDep.versionId)
-          if (version == mavenDep.versionId) {
+          val res = VersionComparator.compare(mavenDep.versionId,md.versionId)
+          if (res >= 0) {
             (l, accCache)
           }
           else {

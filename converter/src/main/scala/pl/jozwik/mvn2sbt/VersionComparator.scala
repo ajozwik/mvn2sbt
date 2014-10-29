@@ -6,27 +6,25 @@ import scala.util.{Failure, Success, Try}
 
 object VersionComparator extends LazyLogging {
 
-  def computeLarge(a: String, b: String): String = {
+  def compare(a: String, b: String): Int = {
     val aa = tokenize(a)
     val bb = tokenize(b)
-    if (computeLarge(aa, bb)) {
-      a
-    } else {
-      b
-    }
+    computeLarge(aa, bb)
   }
 
-  private def computeLarge(a: Seq[Either[String, Long]], b: Seq[Either[String, Long]]): Boolean = (a, b) match {
+  private def computeLarge(a: Seq[Either[String, Long]], b: Seq[Either[String, Long]]): Int = (a, b) match {
+    case (Seq(), Seq()) =>
+      0
     case (Seq(), _) =>
-      false
+      -1
     case (_, Seq()) =>
-      true
+      1
     case (h1 +: t1, h2 +: t2) =>
       val res = compare(h1, h2)
       if (res == 0) {
         computeLarge(t1, t2)
       } else {
-        res > 0
+        res
       }
 
   }
@@ -36,7 +34,7 @@ object VersionComparator extends LazyLogging {
       case Success(i) =>
         Right(i)
       case Failure(th) =>
-        logger.error("", th)
+        logger.error(s"${th.getMessage}")
         Left(x)
     })
   }
