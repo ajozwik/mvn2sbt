@@ -4,6 +4,8 @@ import java.io.File
 
 import org.maven.Plugin
 
+case class GroupArtifact(groupId: String, artifactId: String)
+
 case class MavenDependency(groupId: String, artifactId: String, versionId: String)
 
 case class Dependency(mavenDependency: MavenDependency, scope: Scope, classifierTests: Boolean = false)

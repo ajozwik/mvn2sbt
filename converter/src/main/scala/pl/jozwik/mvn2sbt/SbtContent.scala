@@ -5,6 +5,8 @@ import java.io.File
 import com.typesafe.scalalogging.LazyLogging
 import org.maven.Plugin
 
+import scala.util.{Success, Failure, Try}
+
 case class SbtProjectContent(project: Project, path: String, libraries: Set[Dependency], dependsOn: Set[Dependency], information: ProjectInformation, settings: Set[String])
 
 object SbtContent {
@@ -58,7 +60,7 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
     val (ps, libraries) = projectsToString(optimizedMaps)
     val lib = libraries.toSeq.sortBy { case (d, _) => d.groupId}
     lib.foreach {
-      case (d, variable) =>
+      case (_, (d, variable)) =>
         val dependency = s""""${d.groupId}" % "${d.artifactId}" % "${d.versionId}""""
         val txt = s"""val $variable = $dependency"""
         buildSbtWriter.append(txt).append("\n\n")
@@ -136,7 +138,7 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
 
   private def projectsToString(projectsMap: Map[MavenDependency, SbtProjectContent]) = {
     val sorted = projectsMap.toSeq.sortBy { case (d, _) => d.artifactId}
-    sorted.foldLeft((Seq.empty[String], Map.empty[MavenDependency, String])) {
+    sorted.foldLeft((Seq.empty[String], Map.empty[GroupArtifact, (MavenDependency, String)])) {
       case ((accSeqString, accMap), (_, content)) =>
         val (project, newMap) = createBuildSbt(content, accMap)
         (project +: accSeqString, newMap)
@@ -186,15 +188,24 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
   }
 
 
-  private def dependenciesToString(libraries: TraversableOnce[Dependency], cache: Map[MavenDependency, String]) = {
+
+
+  private def dependenciesToString(libraries: TraversableOnce[Dependency], cache: Map[GroupArtifact, (MavenDependency, String)]) = {
     val (depSeq, newCache) = libraries.foldLeft((Seq.empty[String], cache)) { case ((accLibSeq, accCache), d) =>
       val md = d.mavenDependency
-      val (lib, c) = accCache.get(md) match {
-        case Some(l) =>
-          (l, accCache)
+      val groupArtifact = GroupArtifact(md.groupId, md.artifactId)
+      val (lib, c) = accCache.get(groupArtifact) match {
+        case Some((mavenDep, l)) =>
+          val version = CompareVersion.computeLarge(md.versionId, mavenDep.versionId)
+          if (version == mavenDep.versionId) {
+            (l, accCache)
+          }
+          else {
+            (l, accCache + (groupArtifact ->(md, l)))
+          }
         case None =>
-          val lib = s"""`${md.groupId}_${md.artifactId}_${md.versionId}`"""
-          (lib, accCache + (md -> lib))
+          val lib = s"""`${md.groupId}_${md.artifactId}`"""
+          (lib, accCache + (groupArtifact ->(md, lib)))
       }
 
       val opt = d.scope match {
@@ -222,7 +233,7 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
     set.toIndexedSeq.sorted(Ordering.by[Dependency, (String, String)](x => (x.mavenDependency.groupId, x.mavenDependency.artifactId)))
 
 
-  private def createBuildSbt(sbtProjectContent: SbtProjectContent, cache: Map[MavenDependency, String]) = {
+  private def createBuildSbt(sbtProjectContent: SbtProjectContent, cache: Map[GroupArtifact, (MavenDependency, String)]) = {
     val SbtProjectContent(project, path, libraries, dependsOn, information, settings) = sbtProjectContent
 
     val projectName = changeNotSupportedSymbols(project.projectDependency.artifactId)
