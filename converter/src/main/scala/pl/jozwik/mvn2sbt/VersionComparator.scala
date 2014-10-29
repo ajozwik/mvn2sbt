@@ -4,90 +4,105 @@ import com.typesafe.scalalogging.LazyLogging
 
 import scala.util.{Failure, Success, Try}
 
+/**
+ * See http://docs.codehaus.org/display/MAVEN/Versioning
+ */
+
 object VersionComparator extends LazyLogging {
 
   def compare(a: String, b: String): Int = {
     val aa = tokenize(a)
     val bb = tokenize(b)
-    computeLarge(aa, bb)
+    compare(aa, bb)
   }
 
-  private def computeLarge(a: Seq[Either[String, Long]], b: Seq[Either[String, Long]]): Int = (a, b) match {
+  private def compare(a: Seq[Either[String, Long]], b: Seq[Either[String, Long]]): Int = (a, b) match {
     case (Seq(), Seq()) =>
       0
-    case (Seq(), _) =>
+    case (Seq(), Right(_) +: t) =>
       -1
-    case (_, Seq()) =>
+    case (Seq(), Left(_) +: t) =>
       1
+    case (Right(_) +: t, Seq()) =>
+      1
+    case (Left(_) +: t, Seq()) =>
+      -1
     case (h1 +: t1, h2 +: t2) =>
       val res = compare(h1, h2)
       if (res == 0) {
-        computeLarge(t1, t2)
+        compare(t1, t2)
       } else {
         res
       }
 
   }
 
-  private def tokenize(a: String): Seq[Either[String, Long]] = {
-    a.split("\\.").map(x => Try(x.toLong) match {
-      case Success(i) =>
-        Right(i)
-      case Failure(th) =>
-        logger.error(s"${th.getMessage}")
-        Left(x)
-    })
-  }
+  private def tokenize(a: String): Seq[Either[String, Long]] = a.split("\\.|-").map(x => Try(x.toLong) match {
+    case Success(i) =>
+      Right(i)
+    case Failure(th) =>
+      logger.error(s"${th.getMessage}")
+      Left(x)
+  })
 
   private def compare(a: Either[String, Long], b: Either[String, Long]) = (a, b) match {
     case (Right(x), Right(y)) =>
       x.compareTo(y)
     case (_, Left(y)) =>
-      compareString(a.fold(x => x, i => i.toString), y)
+      compareWithPrefix(a.fold(x => x, i => i.toString), y)
     case (Left(x), _) =>
-      compareString(x, b.fold(x => x, i => i.toString))
+      compareWithPrefix(x, b.fold(x => x, i => i.toString))
   }
 
-  private def split(s: String): Long = {
-    def split(s: String, acc: Seq[Int]): Long = {
-      if (s.isEmpty) {
-        toLong(acc)
-      }
-      else {
-        val c = s.charAt(0)
-        if (c >= '0' && c <= '9') {
-          split(s.substring(1), (c - '0') +: acc)
-        } else {
-          toLong(acc)
-        }
-      }
+  private def split(s: Seq[Char]): (Option[Long], Seq[Char]) = {
+    def split(s: Seq[Char], acc: Seq[Int]): (Option[Long], Seq[Char]) = s match {
+      case c +: t if c.toInt >= '0' && c.toInt <= '9' =>
+        split(t, (c.toInt - '0') +: acc)
+      case _ =>
+        (toOptionLong(acc), s)
     }
     split(s, Seq())
   }
 
-  private def toLong(seq: Seq[Int]) = {
-    val (l, _) = seq.foldLeft((0, 1)) { case ((acc, deep), el) => (acc + el * deep, deep * 10)}
-    l
+  private def toOptionLong(seq: Seq[Int]): Option[Long] = {
+    if (seq.isEmpty) {
+      None
+    } else {
+      val (l, _) = seq.foldLeft((0, 1)) { case ((acc, deep), el) => (acc + el * deep, deep * 10)}
+      Some(l)
+    }
   }
 
-  private def compareString(a: String, b: String) = {
-    val x = split(a)
-    val y = split(b)
-    if (x > 0 && y > 0) {
-      val res = x.compareTo(y)
-      if (res == 0) {
-        a.compareTo(b)
-      } else {
-        res
-      }
-    } else if (x > 0) {
-      1
-    } else if (y > 0) {
-      -1
-    } else {
-      a.compareTo(b)
+  private def compareWithPrefix(a: String, b: String) = {
+    val (optA, restA) = split(a)
+    val (optB, restB) = split(b)
+    (optA, optB) match {
+      case (Some(x), Some(y)) =>
+        val res = x.compareTo(y)
+        if (res == 0) {
+          compareNonDigitsStrings(restA, restB)
+        } else {
+          res
+        }
+      case (Some(x), _) =>
+        1
+      case (_, Some(y)) =>
+        -1
+      case _ =>
+        compareNonDigitsStrings(restA, restB)
     }
+  }
 
+
+  private def compareNonDigitsStrings(a: Seq[Char], b: Seq[Char]): Int = (a, b) match {
+    case (Seq(), Seq()) =>
+      0
+    case (Seq(), _) =>
+      1
+    case (_, Seq()) =>
+      -1
+    case _ =>
+      String.copyValueOf(a.toArray).compareTo(String.copyValueOf(b.toArray))
   }
 
 }
