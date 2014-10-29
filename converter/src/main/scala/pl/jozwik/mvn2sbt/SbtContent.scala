@@ -196,7 +196,7 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
       val groupArtifact = GroupArtifact(md.groupId, md.artifactId)
       val (lib, c) = accCache.get(groupArtifact) match {
         case Some((mavenDep, l)) =>
-          val version = CompareVersion.computeLarge(md.versionId, mavenDep.versionId)
+          val version = VersionComparator.computeLarge(md.versionId, mavenDep.versionId)
           if (version == mavenDep.versionId) {
             (l, accCache)
           }
