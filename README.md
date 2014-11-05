@@ -1,4 +1,4 @@
-Mvn2Sbt [![Build Status](https://travis-ci.org/ajozwik/mvn2sbt.svg?branch=master "Build Status")](https://travis-ci.org/ajozwik/mvn2sbt)[![Coverage Status](https://coveralls.io/repos/ajozwik/mvn2sbt/badge.png)](https://coveralls.io/r/ajozwik/mvn2sbt)
+Mvn2Sbt [![Build Status](https://travis-ci.org/ajozwik/mvn2sbt.svg?branch=master "Build Status")](https://travis-ci.org/ajozwik/mvn2sbt)[![Coverage Status](https://coveralls.io/repos/ajozwik/mvn2sbt/badge.png)](https://coveralls.io/r/ajozwik/mvn2sbt)[![Codacy Badge](https://www.codacy.com/project/badge/c2c836104f254cafa3f4c34dc5243400)](https://www.codacy.com)
 =========
 **Convert maven multi module project (pom.xml files) to sbt project (build.sbt with plugins).**
 
