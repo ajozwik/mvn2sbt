@@ -11,6 +11,7 @@ case class SbtProjectContent(project: Project, path: String, libraries: Set[Depe
 
 object SbtContent {
   val SCALA_VERSION_IN_GLOBAL = "scala.version"
+  val DEFAULT_SCALA_VERSION = "2.11.4"
 
   val PROHIBITED_CHARS = "."
 
@@ -87,7 +88,6 @@ object SbtContent {
     set.toIndexedSeq.sorted(Ordering.by[Dependency, (String, String)](x => (x.mavenDependency.groupId, x.mavenDependency.artifactId)))
 
 
-
   private def dependenciesToString(libraries: TraversableOnce[Dependency], cache: Map[GroupArtifact, (MavenDependency, String)]) = {
     val (depSeq, newCache) = libraries.foldLeft((Seq.empty[String], cache)) {
       case ((accLibSeq, accCache), d) =>
@@ -141,13 +141,12 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
   import SbtContent._
   import OptimizeProject._
 
+  val (sbtContent, pluginContent) = {
 
-  def buildSbtContentPluginContentAsString: (String, String) = {
+    val (contentOfPluginSbt, resolvers, projectContents, aliases) = projectsToStringCollections
 
-    val (contentOfPluginSbt, resolvers, projectContents, aliases) = projectsToStringColletions
-
-    val defaultScalaVersion = System.getProperty(SCALA_VERSION_IN_GLOBAL, "2.11.2")
-    val buildSbtWriter = new mutable.StringBuilder(s"""scalaVersion in Global := "$defaultScalaVersion" """).append("\n\n")
+    val defaultScalaVersion = System.getProperty(SCALA_VERSION_IN_GLOBAL, DEFAULT_SCALA_VERSION)
+    val buildSbtWriter = new mutable.StringBuilder( s"""scalaVersion in Global := "$defaultScalaVersion" """).append("\n\n")
     buildSbtWriter.append("def ProjectName(name: String,path:String): Project =  Project(name, file(path))").append("\n\n")
     buildSbtWriter.append(resolversToOption(resolvers))
     aliases.foreach {
@@ -160,7 +159,7 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
   }
 
 
- private def projectsToStringColletions: (Set[String], Set[String], Seq[String], Seq[(GroupArtifact, (MavenDependency, String))]) = {
+  private def projectsToStringCollections: (Set[String], Set[String], Seq[String], Seq[(GroupArtifact, (MavenDependency, String))]) = {
     val (contentOfPluginSbt, resolvers, optimizedMaps) = handleProjects
     val (ps, libraries) = projectsToString(optimizedMaps)
     val aliases = libraries.toSeq.sortBy { case (d, _) => d.groupId}
@@ -211,9 +210,6 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
       (settings ++ customPluginSettings, plugins, accPluginDependencies ++ pluginDescription.dependencies)
     }
   }
-
-
-
 
 
 }

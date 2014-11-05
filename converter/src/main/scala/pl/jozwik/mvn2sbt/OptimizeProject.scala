@@ -8,7 +8,7 @@ object OptimizeProject extends LazyLogging{
   def optimizeProjects(sbtProjectsMap: Map[MavenDependency, SbtProjectContent]): Map[MavenDependency, SbtProjectContent] = {
     val optimizedMap = sbtProjectsMap.map {
       case (name, content) =>
-        val optimized = OptimizeProject.optimizeProject(sbtProjectsMap, content)
+        val optimized = optimizeProject(sbtProjectsMap, content)
         if (optimized != content) {
           (name, optimized)
         } else {
@@ -22,7 +22,7 @@ object OptimizeProject extends LazyLogging{
     }
   }
 
-  def optimizeProject(sbtProjectsMap: Map[MavenDependency, SbtProjectContent], content: SbtProjectContent): SbtProjectContent = {
+  private def optimizeProject(sbtProjectsMap: Map[MavenDependency, SbtProjectContent], content: SbtProjectContent): SbtProjectContent = {
     val optimizedLibraries = removeDuplicatedLibraries(sbtProjectsMap, content)
     val optimizedDependsOn = removeDuplicatedDependsOn(content.project, content.dependsOn, sbtProjectsMap)
     content.copy(libraries = optimizedLibraries, dependsOn = optimizedDependsOn)
@@ -45,7 +45,7 @@ object OptimizeProject extends LazyLogging{
     if (toRemove.isEmpty) {
       dependsOn
     } else {
-      logger.debug(s"${project.projectDependency}: Remove $toRemove")
+      logger.debug(s"${project.projectDependency}: RemoveDuplicate $toRemove")
       removeDuplicatedDependsOn(project, dependsOn.diff(toRemove), sbtProjectsMap)
     }
   }
@@ -63,7 +63,11 @@ object OptimizeProject extends LazyLogging{
     val parentDependenciesSet = parentDependencies.toSet
     val optimizedLibraries = content.libraries.filterNot {
       dep =>
-        parentDependenciesSet.contains(dep) && dep.scope == Scope.compile && content.libraries.find(p => p.mavenDependency == dep.mavenDependency && p.scope != Scope.compile).isEmpty
+        val parentDep = parentDependenciesSet.contains(dep)
+        val isCompileScope = dep.scope == Scope.compile
+        val res = parentDep && isCompileScope && !content.libraries.exists(p => p.mavenDependency == dep.mavenDependency && p.scope != Scope.compile)
+        logger.debug(s"RemoveLibrary $dep from ${content.project.projectDependency}")
+        res
     }
     optimizedLibraries
   }

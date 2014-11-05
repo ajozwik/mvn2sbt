@@ -8,7 +8,7 @@ organization in Global := "pl.jozwik"
 
 version in Global := "0.4"
 
-scalaVersion in Global := "2.11.2"
+scalaVersion in Global := "2.11.4"
 
 scalacOptions ++= Seq("-deprecation", "-unchecked", "-feature","-Yrangepos")
 

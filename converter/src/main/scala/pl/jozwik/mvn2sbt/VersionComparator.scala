@@ -7,7 +7,6 @@ import scala.util.{Failure, Success, Try}
 /**
  * See http://docs.codehaus.org/display/MAVEN/Versioning
  */
-
 object VersionComparator extends LazyLogging {
 
   def compare(a: String, b: String): Int = {
@@ -41,7 +40,7 @@ object VersionComparator extends LazyLogging {
     case Success(i) =>
       Right(i)
     case Failure(th) =>
-      logger.error(s"${th.getMessage}")
+      logger.trace(s"${th.getMessage}")
       Left(x)
   })
 
