@@ -4,19 +4,19 @@ import java.io.File
 
 class DirProjectExtractorSpec extends AbstractSpec {
 
-
+  val first = Some("ee")
+  val second = Some("tt")
   "DirProjectExtractor " should {
     "Get first option " in {
-      val first = Some("ee")
-      val second = Some("tt")
-      DirProjectExtractor.valueFromOptions(first, second) === first.get
-      DirProjectExtractor.valueFromOptions(first, None) === first.get
+      compare(DirProjectExtractor.valueFromOptions(first, second), first)
+    }
+    "Get first option2" in {
+      compare(DirProjectExtractor.valueFromOptions(first, None), first)
     }
 
     "Get second option " in {
-      val first = None
-      val second = Some("tt")
-      DirProjectExtractor.valueFromOptions(first, second) === second.get
+      val none = None
+      compare(DirProjectExtractor.valueFromOptions(none, second), second)
     }
 
     "Throw exception " in {
@@ -28,9 +28,13 @@ class DirProjectExtractorSpec extends AbstractSpec {
     "Empty pom file" in {
       DirProjectExtractor(new File(TestConstants.EXAMPLES_PROJECTS, "emptyPom")).projectsMap.forall {
         case (k, v) => v.resolvers.isEmpty
-      } should be (true)
+      } should be(true)
     }
 
+  }
+
+  private def compare(str: String, option: Option[String]) {
+    Some(str) should be(option)
   }
 
 }

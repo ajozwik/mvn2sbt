@@ -121,7 +121,7 @@ object SbtContent {
     case Scope.system => None
     case Scope.compile => Some(alias)
     case test@Scope.test if d.classifierTests => Some( s"""$alias % "$test" classifier "tests" """)
-    case x => Some( s"""$alias % "$x" """)
+    case _ => Some( s"""$alias % "${d.scope}" """)
   }
 
 

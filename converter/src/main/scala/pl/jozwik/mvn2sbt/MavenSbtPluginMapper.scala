@@ -57,7 +57,7 @@ object MavenSbtPluginMapper extends StrictLogging {
 
 
   private def toPluginConverter(converterClass: String) = {
-    if (converterClass == null || converterClass.isEmpty) {
+    if (Option(converterClass).forall(_.isEmpty)) {
       PluginConverter.defaultConverter
     } else {
       val clazz = Class.forName(converterClass)
