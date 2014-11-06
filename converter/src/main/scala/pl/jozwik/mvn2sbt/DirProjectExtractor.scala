@@ -20,10 +20,15 @@ object DirProjectExtractor extends LazyLogging {
         throw new IllegalArgumentException("Both None")
     }
 
+  private[mvn2sbt] def extractOption[T](op: Option[T]): T = op match {
+    case Some(t) => t
+    case None => sys.error("None")
+  }
+
   private[mvn2sbt] def createProjectMap(dir: File, pomModel: Model, parent: Option[MavenDependency]): Map[MavenDependency, ProjectInformation] = {
     val groupId = valueFromOptions(pomModel.groupId, parent.map(_.groupId))
     val version = valueFromOptions(pomModel.version, parent.map(_.versionId))
-    val dependency = MavenDependency(groupId, pomModel.artifactId.get, version)
+    val dependency = MavenDependency(groupId, extractOption(pomModel.artifactId), version)
     val pomParent = toPomParent(pomModel.parent)
     val plugins = MavenSbtPluginMapper(pomModel).plugins
     val resolversOptions = pomModel.repositories.map(r => r.repository.flatMap(_.url))
@@ -42,7 +47,7 @@ object DirProjectExtractor extends LazyLogging {
   }
 
   private def toPomParent(parent: Option[Parent]) = parent.map(
-    p => MavenDependency(p.groupId.get, p.artifactId.get, p.version.get)
+    p => MavenDependency(extractOption(p.groupId), extractOption(p.artifactId), extractOption(p.version))
   )
 
   private def toProjectMap(dir: File, parent: Option[MavenDependency]) = {

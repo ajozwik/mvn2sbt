@@ -30,7 +30,11 @@ class DirProjectExtractorSpec extends AbstractSpec {
         case (k, v) => v.resolvers.isEmpty
       } should be(true)
     }
-
+    "Empty option " in {
+     intercept[RuntimeException]{
+       DirProjectExtractor.extractOption(None)
+     }
+    }
   }
 
   private def compare(str: String, option: Option[String]) {
