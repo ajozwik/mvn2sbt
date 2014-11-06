@@ -36,11 +36,6 @@
     </build>
     <dependencies>
         <dependency>
-            <groupId>pl.jozwik</groupId>
-            <artifactId>thrift22</artifactId>
-            <version>1.0.0</version>
-        </dependency>
-        <dependency>
             <groupId>com.google.gwt</groupId>
             <artifactId>gwt-user</artifactId>
             <version>${gwt-user.version}</version>
@@ -52,5 +47,12 @@
             <version>6.1.1</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+	  <groupId>com.sun</groupId>
+	  <artifactId>tools</artifactId>
+	  <scope>system</scope>
+	  <version>1.8.0</version>
+	  <systemPath>${java.home}/../lib/tools.jar</systemPath>
+	</dependency>
     </dependencies>
 </project>

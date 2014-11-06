@@ -10,8 +10,6 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>thrift1</module>
-        <module>thrift2</module>
         <module>cxf</module>
         <module>scala</module>
         <module>test</module>
