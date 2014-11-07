@@ -6,7 +6,7 @@ Logback and slf4j are used as reference projects.
 
 Quick start:
 
-1. Clone project2. 
+1. Clone mvn2sbt. 
 1. Run `scala Eff.sc mavenProject`, where mavenProject - directory with your maven project to prepare for conversion.
 1. Run `sbt "converter/run mavenProject [outputDir] [-Dscala.version=2.11.2] [-Dsbt.version=0.13.7]"`
 	* Optional (if outputDir specified): copy <outputDir>/build.sbt to &lt;mavenProject&gt;/build.sbt
