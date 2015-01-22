@@ -43,7 +43,6 @@ lazy val `genscalaxb` = ProjectName("genscalaxb", "genscalaxb").settings(scalaxb
 
 lazy val `converter` = ProjectName("converter", "converter").settings(CoverallsPlugin.coverallsSettings: _*).settings(xerial.sbt.Pack.packSettings: _*)
   .settings(packMain := Map("mvn2sbt" -> "pl.jozwik.mvn2sbt.Mvn2Sbt"))
-//  .settings(instrumentSettings: _*)
   .dependsOn(`genscalaxb`)
 
 

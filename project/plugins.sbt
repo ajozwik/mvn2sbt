@@ -8,7 +8,7 @@ addSbtPlugin("org.scalaxb" % "sbt-scalaxb" % scalaxbVersion)
 
 addSbtPlugin("org.xerial.sbt" % "sbt-pack" % "0.6.2")
 
-addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.0.1")
+addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.0.2")
 
 addSbtPlugin("com.sksamuel.scoverage" %% "sbt-coveralls" % "0.0.5")
 
