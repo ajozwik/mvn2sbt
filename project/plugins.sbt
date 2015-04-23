@@ -2,13 +2,11 @@ resolvers += Resolver.sonatypeRepo("public")
 
 resolvers += Classpaths.sbtPluginReleases
 
-val scalaxbVersion = "1.2.1"
-
-addSbtPlugin("org.scalaxb" % "sbt-scalaxb" % scalaxbVersion)
+addSbtPlugin("org.scalaxb" % "sbt-scalaxb" % "1.3.0")
 
 addSbtPlugin("org.xerial.sbt" % "sbt-pack" % "0.6.2")
 
-addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.0.2")
+addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.0.4")
 
 addSbtPlugin("com.sksamuel.scoverage" %% "sbt-coveralls" % "0.0.5")
 
