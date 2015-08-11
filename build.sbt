@@ -6,9 +6,9 @@ name := "mvn2sbt"
 
 organization in Global := "pl.jozwik"
 
-version in Global := "0.4"
+version in Global := "0.5"
 
-scalaVersion in Global := "2.11.6"
+scalaVersion in Global := "2.11.7"
 
 scalacOptions ++= Seq("-deprecation", "-unchecked", "-feature","-Yrangepos")
 
@@ -20,15 +20,15 @@ releaseSettings
 
 val scalaLogging = "com.typesafe.scala-logging" %% "scala-logging" % "3.1.0"
 
-val scalacheck = "org.scalacheck" %% "scalacheck" % "1.12.2"
+val scalacheck = "org.scalacheck" %% "scalacheck" % "1.12.4"
 
 libraryDependencies in Global ++= Seq(
   scalaLogging,
   scalacheck % "test",
-  "org.scalatest" %% "scalatest" % "2.2.4" % "test",
+  "org.scalatest" %% "scalatest" % "2.2.5" % "test",
   "ch.qos.logback" % "logback-classic" % "1.1.3",
-  "org.scala-lang.modules" %% "scala-xml" % "1.0.3",
-  "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.3",
+  "org.scala-lang.modules" %% "scala-xml" % "1.0.5",
+  "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.4",
   "commons-io" % "commons-io" % "2.4"
 )
 
@@ -41,7 +41,7 @@ lazy val `genscalaxb` = ProjectName("genscalaxb", "genscalaxb").settings(scalaxb
 )
 
 
-lazy val `converter` = ProjectName("converter", "converter").settings(CoverallsPlugin.coverallsSettings: _*).settings(xerial.sbt.Pack.packSettings: _*)
+lazy val `converter` = ProjectName("converter", "converter").settings(xerial.sbt.Pack.packSettings: _*)
   .settings(packMain := Map("mvn2sbt" -> "pl.jozwik.mvn2sbt.Mvn2Sbt"))
   .dependsOn(`genscalaxb`)
 

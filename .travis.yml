@@ -2,4 +2,9 @@ language: scala
 
 jdk:
   - oraclejdk8
-script: "sbt coveralls"
+
+script:
+  - sbt clean coverage test &&
+    sbt coverageAggregate
+after_success:
+  - sbt coveralls

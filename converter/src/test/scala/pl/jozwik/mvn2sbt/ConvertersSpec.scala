@@ -18,7 +18,7 @@ class ConvertersSpec extends AbstractSpec {
     "Empty elements handling " in {
       import org.maven._
       val name = "aaa"
-      val any = DataRecord[Exclusion](Exclusion())
+      val any = Seq(DataRecord(Exclusion()))
       val conf4 = Configuration4(any)
       PluginConverter.findElement(conf4, name) shouldBe None
     }
