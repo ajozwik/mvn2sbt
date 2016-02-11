@@ -8,7 +8,7 @@ import pl.jozwik.gen.{Converter, Dependencies}
 import pl.jozwik.mvn2sbt.PluginConverter._
 
 object MavenSbtPluginMapper extends StrictLogging {
-  private [mvn2sbt]final val EMPTY_SEQ = Seq.empty[(PluginDescription, Plugin)]
+  private[mvn2sbt] final val EMPTY_SEQ = Seq.empty[(PluginDescription, Plugin)]
   val DEFAULT_CONVERTERS_PATH = "/converters.xml"
   val CONVERTERS_PATH = "converters.path"
   private[mvn2sbt] lazy val artifactIdToPluginDescriptionMap: Map[String, PluginDescription] = {
@@ -55,13 +55,12 @@ object MavenSbtPluginMapper extends StrictLogging {
   private def toScope(scope: Option[String]) =
     scope.fold(Scope.compile)(s => Scope.valueOf(s))
 
-
   private def toPluginConverter(converterClass: String) = {
     if (Option(converterClass).forall(_.isEmpty)) {
       PluginConverter.defaultConverter
     } else {
       val clazz = Class.forName(converterClass)
-      val converter = clazz.newInstance().asInstanceOf[PomToSbtPluginConverter]
+      val converter = ReflectionUtils.newInstance[PomToSbtPluginConverter](clazz)
       (rootDir: File, plugin: Plugin) => converter.convert(plugin, rootDir)
     }
   }
@@ -75,7 +74,6 @@ object MavenSbtPluginMapper extends StrictLogging {
 
   private def findPlugin(plugin: Plugin): Option[PluginDescription] =
     artifactIdToPluginDescriptionMap.get(orEmpty(plugin.artifactId))
-
 
   private def orEmpty(opt: Option[String]) = opt.getOrElse("")
 

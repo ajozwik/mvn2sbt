@@ -3,7 +3,7 @@ package pl.jozwik.mvn2sbt.pom2sbt
 import java.io.File
 
 import org.maven.{Plugin, Configuration4}
-import pl.jozwik.mvn2sbt.PomToSbtPluginConverter
+import pl.jozwik.mvn2sbt.{ReflectionUtils, PomToSbtPluginConverter}
 
 import scala.xml.{Node, NodeSeq}
 
@@ -11,11 +11,11 @@ object CxfPluginConverter {
 
   private[pom2sbt] final val ignored = Seq("-exsh", "-fe")
 
-  private[pom2sbt] def remove(seq: Seq[String], names: String*): Seq[String] = {
-    if (names.isEmpty) {
+  private[pom2sbt] def remove(seq: Seq[String], names: String*): Seq[String] = names match {
+    case Seq() =>
       seq
-    } else {
-      val index = seq.indexOf(names.head)
+    case h +: t =>
+      val index = seq.indexOf(h)
       val toRet = if (index == -1) {
         seq
       } else {
@@ -23,8 +23,7 @@ object CxfPluginConverter {
         val (_, rest) = after.splitAt(2)
         before ++ rest
       }
-      remove(toRet, names.tail: _*)
-    }
+      remove(toRet, t: _*)
   }
 }
 
@@ -49,14 +48,14 @@ class CxfPluginConverter extends PomToSbtPluginConverter {
           s.mkString("\"", "\",\"", "\"")
         }), "$diff")"""
     }
-    Set( s"""cxf.wsdls :=Seq(${wsdls.mkString(",\n\t")})""")
+    Set(s"""cxf.wsdls :=Seq(${wsdls.mkString(",\n\t")})""")
   }
 
   def createKeySeqMap(confHead: Configuration4, key: String, buildSeq: (Node) => Seq[String], name: String, elements: String*): Map[String, Seq[String]] = {
     val element = findElement(confHead, name)
     element.fold(Map.empty[String, Seq[String]]) {
       node =>
-        val nodeSeq = node.value.asInstanceOf[NodeSeq]
+        val nodeSeq = ReflectionUtils.castTo[NodeSeq](node.value)
         toKeySeqMap(nodeSeq, key, buildSeq, elements: _*)
     }
   }
@@ -68,6 +67,5 @@ class CxfPluginConverter extends PomToSbtPluginConverter {
     val extra = remove(extraArgs, ignored: _*)
     packages ++ extra ++ bindings
   }
-
 
 }

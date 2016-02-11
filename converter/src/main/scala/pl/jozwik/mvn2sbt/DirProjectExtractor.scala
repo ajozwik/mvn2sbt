@@ -22,7 +22,7 @@ object DirProjectExtractor extends LazyLogging {
 
   private[mvn2sbt] def extractOption[T](op: Option[T]): T = op match {
     case Some(t) => t
-    case None => sys.error("None")
+    case None    => sys.error("None")
   }
 
   private[mvn2sbt] def createProjectMap(dir: File, pomModel: Model, parent: Option[MavenDependency]): Map[MavenDependency, ProjectInformation] = {
@@ -39,8 +39,7 @@ object DirProjectExtractor extends LazyLogging {
     pomModel.modules match {
       case None =>
         currMap
-      case
-        Some(modules) =>
+      case Some(modules) =>
         val seq = modules.module.map(m => toProjectMap(new File(dir, m), Some(dependency)))
         seq.foldLeft(currMap)((map, acc) => map ++ acc)
     }
@@ -52,12 +51,13 @@ object DirProjectExtractor extends LazyLogging {
 
   private def toProjectMap(dir: File, parent: Option[MavenDependency]) = {
     val pomOption = dir.listFiles.find(f => f.getName == EFFECTIVE_POM_XML)
-    pomOption.fold(throw new IllegalStateException( s"""$EFFECTIVE_POM_XML file missing in ${dir.getAbsolutePath}, run "scala Eff.sc ${dir.getAbsolutePath}" first""")) {
-      (pomXml) =>
+    pomOption.map {
+      pomXml =>
         handlePomFile(pomXml, parent)
-    }
+    }.getOrElse(
+      sys.error(s"""$EFFECTIVE_POM_XML file missing in ${dir.getAbsolutePath}, run "scala Eff.sc ${dir.getAbsolutePath}" first""")
+    )
   }
-
 
   private def handlePomFile(pomXml: File, parent: Option[MavenDependency]) = {
     val xmlFromFile = Try(xml.XML.loadFile(pomXml)) match {
@@ -77,6 +77,5 @@ case class DirProjectExtractor(rootDir: File) {
   import pl.jozwik.mvn2sbt.DirProjectExtractor._
 
   val projectsMap = toProjectMap(rootDir, None)
-
 
 }

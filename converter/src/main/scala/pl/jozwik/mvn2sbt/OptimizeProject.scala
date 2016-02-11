@@ -2,8 +2,7 @@ package pl.jozwik.mvn2sbt
 
 import com.typesafe.scalalogging.LazyLogging
 
-object OptimizeProject extends LazyLogging{
-
+object OptimizeProject extends LazyLogging {
 
   def optimizeProjects(sbtProjectsMap: Map[MavenDependency, SbtProjectContent]): Map[MavenDependency, SbtProjectContent] = {
     val optimizedMap = sbtProjectsMap.map {
@@ -28,8 +27,11 @@ object OptimizeProject extends LazyLogging{
     content.copy(libraries = optimizedLibraries, dependsOn = optimizedDependsOn)
   }
 
-
-  private def removeDuplicatedDependsOn(project: Project, dependsOn: Set[Dependency], sbtProjectsMap: Map[MavenDependency, SbtProjectContent]): Set[Dependency] = {
+  private def removeDuplicatedDependsOn(
+    project: Project,
+    dependsOn: Set[Dependency],
+    sbtProjectsMap: Map[MavenDependency, SbtProjectContent]
+  ): Set[Dependency] = {
     val toRemove = dependsOn.flatMap {
       dependOn =>
         val setWithoutDep = dependsOn - dependOn
@@ -49,8 +51,6 @@ object OptimizeProject extends LazyLogging{
       removeDuplicatedDependsOn(project, dependsOn.diff(toRemove), sbtProjectsMap)
     }
   }
-
-
 
   private def removeDuplicatedLibraries(map: Map[MavenDependency, SbtProjectContent], content: SbtProjectContent): Set[Dependency] = {
     val parentDependencies = content.dependsOn.flatMap { dep =>

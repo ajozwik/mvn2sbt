@@ -1,4 +1,7 @@
 import ScalaxbKeys._
+import com.typesafe.sbt.SbtScalariform.ScalariformKeys
+
+import scalariform.formatter.preferences.{SpacesAroundMultiImports, AlignSingleLineCaseStatements}
 
 incOptions := incOptions.value.withNameHashing(true)
 
@@ -34,20 +37,30 @@ libraryDependencies in Global ++= Seq(
 
 
 
-lazy val `genscalaxb` = ProjectName("genscalaxb", "genscalaxb").settings(scalaxbSettings: _*).settings(
+lazy val `genscalaxb` = projectName("genscalaxb", "genscalaxb").settings(scalaxbSettings: _*).settings(
   packageNames in scalaxb in Compile := Map(new URI("https://github.com/ajozwik/mvn2sbt") -> "pl.jozwik.gen",
     new URI("http://maven.apache.org/POM/4.0.0") -> "org.maven"),
   sourceGenerators in Compile <+= scalaxb in Compile
 )
 
 
-lazy val `converter` = ProjectName("converter", "converter").settings(xerial.sbt.Pack.packSettings: _*)
+lazy val `converter` = projectName("converter", "converter").settings(xerial.sbt.Pack.packSettings: _*)
   .settings(packMain := Map("mvn2sbt" -> "pl.jozwik.mvn2sbt.Mvn2Sbt"))
   .dependsOn(`genscalaxb`)
 
 
 
 
-def ProjectName(name: String, path: String) = Project(name, file(path))
+def projectName(name: String, path: String): Project = Project(name, file(path)).settings(
+  SbtScalariform.scalariformSettings,
+  publishArtifact in(Compile, packageDoc) := false,
+  sources in(Compile, doc) := Seq.empty,
+  scalariformSettings,
+  scapegoatVersion := "1.1.1",
+  scapegoatIgnoredFiles := Seq(".*/target/.*"),
+  ScalariformKeys.preferences := ScalariformKeys.preferences.value.
+    setPreference(AlignSingleLineCaseStatements, true).
+    setPreference(SpacesAroundMultiImports, false)
+)
 
 

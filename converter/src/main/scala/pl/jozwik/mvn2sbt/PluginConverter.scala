@@ -27,7 +27,6 @@ object PluginConverter {
 
   val defaultConverter = (rootDir: File, plugin: Plugin) => Set.empty[String]
 
-
   def findElement(confHead: Configuration4, name: String): Option[DataRecord[Any]] = {
     confHead.any.find { r =>
       r.key.fold(false) {
@@ -55,7 +54,6 @@ object PluginConverter {
 
 }
 
-
 trait PomToSbtPluginConverter {
 
   final def convert(plugin: Plugin, rootDir: File): Set[String] = findConfiguration(plugin) match {
@@ -64,20 +62,20 @@ trait PomToSbtPluginConverter {
     case _ => Set.empty
   }
 
-  protected def configurationToSet(confHead: Configuration4, rootDir: File)(implicit plugin:Plugin): Set[String]
+  protected def configurationToSet(confHead: Configuration4, rootDir: File)(implicit plugin: Plugin): Set[String]
 
   private[mvn2sbt] def findConfiguration(plugin: Plugin) = {
-    plugin.executions match{
+    plugin.executions match {
       case Some(executions) =>
-        executions.execution.map { ex => ex.configuration}
+        executions.execution.map { ex => ex.configuration }
       case None =>
-        Seq()
+        Seq.empty
     }
   }
 
-  protected final def toOption(confHead: Configuration4,name:String,f:(String)=>String) = {
+  protected final def toOption(confHead: Configuration4, name: String, f: (String) => String) = {
     val node = findElement(confHead, name)
-    val moduleName = node.map(v => v.value.asInstanceOf[Node].text)
+    val moduleName = node.map(v => ReflectionUtils.castTo[Node](v.value).text)
     moduleName.map(s => f(s))
   }
 

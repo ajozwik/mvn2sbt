@@ -60,14 +60,14 @@ object VersionComparator extends LazyLogging {
       case _ =>
         (toOptionLong(acc), s)
     }
-    split(s, Seq())
+    split(s, Seq.empty)
   }
 
   private def toOptionLong(seq: Seq[Int]): Option[Long] = {
     if (seq.isEmpty) {
       None
     } else {
-      val (l, _) = seq.foldLeft((0, 1)) { case ((acc, deep), el) => (acc + el * deep, deep * 10)}
+      val (l, _) = seq.foldLeft((0, 1)) { case ((acc, deep), el) => (acc + el * deep, deep * 10) }
       Some(l)
     }
   }
@@ -91,7 +91,6 @@ object VersionComparator extends LazyLogging {
         compareNonDigitsStrings(restA, restB)
     }
   }
-
 
   private def compareNonDigitsStrings(a: Seq[Char], b: Seq[Char]): Int = (a, b) match {
     case (Seq(), Seq()) =>

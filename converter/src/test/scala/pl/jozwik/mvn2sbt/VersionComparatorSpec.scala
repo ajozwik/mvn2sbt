@@ -24,7 +24,6 @@ class VersionComparatorSpec extends AbstractSpec {
     ("1.3c", "1.3a", 1)
   )
 
-
   "version " should {
     seq.foreach {
       case (a, b, result) =>

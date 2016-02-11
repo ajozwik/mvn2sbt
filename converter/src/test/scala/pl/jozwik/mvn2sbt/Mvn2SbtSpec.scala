@@ -30,7 +30,6 @@ class Mvn2SbtSpec extends AbstractSpec {
       testLine("org.apache.httpcomponents", "httpclient", "4.2.3", "test", (g, a, v, s) => s"+- $g:$a:test-jar:tests:$v:$s")
     }
 
-
     "Expects parameters" in {
       intercept[IllegalArgumentException] {
         Mvn2Sbt.main(Array())
@@ -38,13 +37,12 @@ class Mvn2SbtSpec extends AbstractSpec {
     }
 
     "Wrong maven project root directory" in {
-      intercept[IllegalStateException] {
+      intercept[RuntimeException] {
         val target = new File("target")
         target.mkdirs()
         Mvn2Sbt.scanHierarchy(target)
       }
     }
-
 
     "Wrong pom file" in {
       intercept[Exception] {

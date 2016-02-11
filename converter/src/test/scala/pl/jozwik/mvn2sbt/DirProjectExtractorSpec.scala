@@ -31,9 +31,9 @@ class DirProjectExtractorSpec extends AbstractSpec {
       } should be(true)
     }
     "Empty option " in {
-     intercept[RuntimeException]{
-       DirProjectExtractor.extractOption(None)
-     }
+      intercept[RuntimeException] {
+        DirProjectExtractor.extractOption(None)
+      }
     }
   }
 

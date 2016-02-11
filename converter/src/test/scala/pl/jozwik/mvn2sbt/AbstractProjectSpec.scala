@@ -5,7 +5,6 @@ import java.nio.file.Paths
 
 import pl.jozwik.mvn2sbt.Mvn2Sbt._
 
-
 object TestConstants {
   final val EXAMPLES_PROJECTS = "exampleProjects"
 }
@@ -36,12 +35,9 @@ class Slf4jPomSpec extends AbstractProjectSpec("slf4j")
 
 class ThriftSpec extends AbstractProjectSpec("thrift")
 
-
 class LogbackPomSpec extends AbstractProjectSpec("logback")
 
-
 abstract class AbstractProjectSpec(project: String) extends AbstractSpec {
-
 
   private def checkBuildSbtContent(buildSbt: File) {
     val source = scala.io.Source.fromFile(buildSbt)
@@ -56,7 +52,6 @@ abstract class AbstractProjectSpec(project: String) extends AbstractSpec {
   protected def checkBuildSbtContent(content: String) {
 
   }
-
 
   getClass.getSimpleName should {
 
