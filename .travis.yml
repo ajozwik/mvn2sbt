@@ -11,8 +11,9 @@ jdk:
   - oraclejdk8
 
 script:
-  - sbt clean coverage test &&
-    sbt coverageAggregate
+  - sbt clean coverage test
+  - sbt coverageReport
+  - sbt coverageAggregate
   # Tricks to avoid unnecessary cache updates
   - find $HOME/.sbt -name "*.lock" | xargs rm
   - find $HOME/.ivy2 -name "ivydata-*.properties" | xargs rm
