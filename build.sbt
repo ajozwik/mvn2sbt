@@ -3,7 +3,7 @@ import com.typesafe.sbt.SbtScalariform.ScalariformKeys
 
 import scalariform.formatter.preferences.{SpacesAroundMultiImports, AlignSingleLineCaseStatements}
 
-incOptions := incOptions.value.withNameHashing(true)
+resolvers += Resolvers.typesafeRepo("releases")
 
 name := "mvn2sbt"
 
