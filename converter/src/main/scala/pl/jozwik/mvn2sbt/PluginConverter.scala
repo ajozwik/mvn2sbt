@@ -52,6 +52,14 @@ object PluginConverter {
         acc + (findNode(node, key).text -> buildSeq(node))
     }
 
+  private[mvn2sbt] def findConfiguration(plugin: Plugin) =
+    plugin.executions match {
+      case Some(executions) =>
+        executions.execution.map { ex => ex.configuration }
+      case _ =>
+        Seq.empty
+    }
+
 }
 
 trait PomToSbtPluginConverter {
@@ -59,19 +67,11 @@ trait PomToSbtPluginConverter {
   final def convert(plugin: Plugin, rootDir: File): Set[String] = findConfiguration(plugin) match {
     case (Some(confHead: Configuration4) +: tail) =>
       configurationToSet(confHead, rootDir)(plugin)
-    case _ => Set.empty
+    case _ =>
+      Set.empty
   }
 
   protected def configurationToSet(confHead: Configuration4, rootDir: File)(implicit plugin: Plugin): Set[String]
-
-  private[mvn2sbt] def findConfiguration(plugin: Plugin) = {
-    plugin.executions match {
-      case Some(executions) =>
-        executions.execution.map { ex => ex.configuration }
-      case None =>
-        Seq.empty
-    }
-  }
 
   protected final def toOption(confHead: Configuration4, name: String, f: (String) => String) = {
     val node = findElement(confHead, name)

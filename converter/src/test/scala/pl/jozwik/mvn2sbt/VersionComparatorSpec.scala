@@ -21,6 +21,7 @@ class VersionComparatorSpec extends AbstractSpec {
     ("2.0.1-xyz", "2.0.1-123", -1),
     ("1.0-alpha-1", "1.0", -1),
     ("1.3", "1.3a", 1),
+    ("1.4a", "1.3a", 1),
     ("1.3c", "1.3a", 1)
   )
 

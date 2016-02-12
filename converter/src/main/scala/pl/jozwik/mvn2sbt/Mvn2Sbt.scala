@@ -58,9 +58,10 @@ object Mvn2Sbt extends StrictLogging {
       }
   }
 
+  private def toAbsolutePath(f: File) = f.getAbsolutePath
+
   def main(args: Array[String]) {
 
-    def toAbsolutePath(f: File) = f.getAbsolutePath
     val out = if (args.length == 1) {
       args(0)
     } else if (args.length == 2) {
