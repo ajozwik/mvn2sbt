@@ -1,5 +1,6 @@
 import ScalaxbKeys._
 import com.typesafe.sbt.SbtScalariform.ScalariformKeys
+import scoverage.ScoverageKeys
 
 import scalariform.formatter.preferences.{SpacesAroundMultiImports, AlignSingleLineCaseStatements}
 
@@ -21,12 +22,14 @@ releaseSettings
 
 val scalaLogging = "com.typesafe.scala-logging" %% "scala-logging" % "3.1.0"
 
-val scalacheck = "org.scalacheck" %% "scalacheck" % "1.12.4"
+val scalacheck = "org.scalacheck" %% "scalacheck" % "1.12.5"
+
+
 
 libraryDependencies in Global ++= Seq(
   scalaLogging,
   scalacheck % "test",
-  "org.scalatest" %% "scalatest" % "2.2.5" % "test",
+  "org.scalatest" %% "scalatest" % "2.2.6" % "test",
   "ch.qos.logback" % "logback-classic" % "1.1.3",
   "org.scala-lang.modules" %% "scala-xml" % "1.0.5",
   "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.4",
@@ -38,7 +41,8 @@ libraryDependencies in Global ++= Seq(
 lazy val `genscalaxb` = projectName("genscalaxb", "genscalaxb").settings(scalaxbSettings: _*).settings(
   packageNames in scalaxb in Compile := Map(new URI("https://github.com/ajozwik/mvn2sbt") -> "pl.jozwik.gen",
     new URI("http://maven.apache.org/POM/4.0.0") -> "org.maven"),
-  sourceGenerators in Compile <+= scalaxb in Compile
+  sourceGenerators in Compile += (scalaxb in Compile).taskValue,
+  ScoverageKeys.coverageExcludedPackages:= "org.maven.*;pl.jozwik.gen.*;scalaxb.*"
 )
 
 
