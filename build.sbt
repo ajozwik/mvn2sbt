@@ -3,8 +3,6 @@ import com.typesafe.sbt.SbtScalariform.ScalariformKeys
 
 import scalariform.formatter.preferences.{SpacesAroundMultiImports, AlignSingleLineCaseStatements}
 
-resolvers += Resolvers.typesafeRepo("releases")
-
 name := "mvn2sbt"
 
 organization in Global := "pl.jozwik"

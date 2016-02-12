@@ -1,7 +1,5 @@
 resolvers += Resolver.sonatypeRepo("public")
 
-resolvers += Resolvers.typesafeRepo("releases")
-
 resolvers += Classpaths.sbtPluginReleases
 
 addSbtPlugin("org.scalaxb" % "sbt-scalaxb" % "1.4.0")
