@@ -10,10 +10,15 @@ language: scala
 jdk:
   - oraclejdk8
 
+env:
+    - CODACY_PROJECT_TOKEN=cfd0b54e62c741c8a485cc0064877392
+
 script:
   - sbt clean coverage test
   - sbt coverageReport
   - sbt coverageAggregate
+  - sbt codacyCoverage
+
   # Tricks to avoid unnecessary cache updates
   - find $HOME/.sbt -name "*.lock" | xargs rm
   - find $HOME/.ivy2 -name "ivydata-*.properties" | xargs rm
