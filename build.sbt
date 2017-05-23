@@ -6,31 +6,29 @@ import scalariform.formatter.preferences.{SpacesAroundMultiImports, AlignSingleL
 
 name := "mvn2sbt"
 
-organization in Global := "pl.jozwik"
+organization in ThisBuild := "pl.jozwik"
 
-version in Global := "0.5"
-
-scalaVersion in Global := "2.11.8"
+scalaVersion in ThisBuild := "2.11.11"
 
 scalacOptions ++= Seq("-deprecation", "-unchecked", "-feature","-Yrangepos")
 
-scalacOptions in Global ++= Seq("-deprecation", "-unchecked", "-feature","-Yrangepos")
+scalacOptions in ThisBuild ++= Seq("-deprecation", "-unchecked", "-feature","-Yrangepos")
 
 scalacOptions in Test ++= Seq("-Yrangepos")
 
 releaseSettings
 
-val scalaLogging = "com.typesafe.scala-logging" %% "scala-logging" % "3.1.0"
+val scalaLogging = "com.typesafe.scala-logging" %% "scala-logging" % "3.5.0"
 
 val scalacheck = "org.scalacheck" %% "scalacheck" % "1.12.5"
 
 
 
-libraryDependencies in Global ++= Seq(
+libraryDependencies in ThisBuild ++= Seq(
   scalaLogging,
   scalacheck % "test",
   "org.scalatest" %% "scalatest" % "2.2.6" % "test",
-  "ch.qos.logback" % "logback-classic" % "1.1.3",
+  "ch.qos.logback" % "logback-classic" % "1.2.3",
   "org.scala-lang.modules" %% "scala-xml" % "1.0.5",
   "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.4",
   "commons-io" % "commons-io" % "2.4"
