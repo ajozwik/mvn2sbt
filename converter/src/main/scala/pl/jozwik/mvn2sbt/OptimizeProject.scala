@@ -30,8 +30,7 @@ object OptimizeProject extends LazyLogging {
   private def removeDuplicatedDependsOn(
     project: Project,
     dependsOn: Set[Dependency],
-    sbtProjectsMap: Map[MavenDependency, SbtProjectContent]
-  ): Set[Dependency] = {
+    sbtProjectsMap: Map[MavenDependency, SbtProjectContent]): Set[Dependency] = {
     val toRemove = dependsOn.flatMap {
       dependOn =>
         val setWithoutDep = dependsOn - dependOn

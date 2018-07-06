@@ -11,8 +11,7 @@ class JaxbPluginConverter extends PomToSbtPluginConverter {
     val packageParametersOption = toOption(confHead, "packageName", toPackageParametersOption)
     Set(
       Some("""sources in (Compile, xjc) <<= sourceDirectory map (_ / "main" / "xsd" ** "*.xsd" get) """),
-      packageParametersOption
-    ).flatten
+      packageParametersOption).flatten
   }
 
   private def toPackageParametersOption(packageName: String) = {

@@ -13,8 +13,7 @@ case class SbtProjectContent(
   libraries: Set[Dependency],
   dependsOn: Set[Dependency],
   information: ProjectInformation,
-  settings: Set[String]
-)
+  settings: Set[String])
 
 object SbtContent {
   val SCALA_VERSION_IN_GLOBAL = "scala.version"
@@ -32,8 +31,7 @@ object SbtContent {
       }.mkString(
         ",",
         """,
-          """.stripMargin, ""
-      )
+          """.stripMargin, "")
 
       Some(resolversString)
     }
@@ -141,7 +139,7 @@ object SbtContent {
 }
 
 case class SbtContent(private val projects: Seq[Project], private val hierarchy: Map[MavenDependency, ProjectInformation], private val rootDir: File)
-    extends LazyLogging {
+  extends LazyLogging {
 
   import PluginConverter._
   import SbtContent._
@@ -192,8 +190,7 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
     (
       SbtProjectContent(p, relativePath, pluginDependencies ++ libraries, dependsOn, information, pluginsDependsOnDependenciesSettings ++ settings),
       pluginsDependsOnDependenciesSet ++ plugins,
-      information.resolvers
-    )
+      information.resolvers)
   }
 
   private def splitToDependsOnLibraries(p: Project) = p.dependencies.partition {

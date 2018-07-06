@@ -46,8 +46,7 @@ object DirProjectExtractor extends LazyLogging {
   }
 
   private def toPomParent(parent: Option[Parent]) = parent.map(
-    p => MavenDependency(extractOption(p.groupId), extractOption(p.artifactId), extractOption(p.version))
-  )
+    p => MavenDependency(extractOption(p.groupId), extractOption(p.artifactId), extractOption(p.version)))
 
   private def toProjectMap(dir: File, parent: Option[MavenDependency]) = {
     val pomOption = dir.listFiles.find(f => f.getName == EFFECTIVE_POM_XML)
@@ -55,8 +54,7 @@ object DirProjectExtractor extends LazyLogging {
       pomXml =>
         handlePomFile(pomXml, parent)
     }.getOrElse(
-      sys.error(s"""$EFFECTIVE_POM_XML file missing in ${dir.getAbsolutePath}, run "scala Eff.sc ${dir.getAbsolutePath}" first""")
-    )
+      sys.error(s"""$EFFECTIVE_POM_XML file missing in ${dir.getAbsolutePath}, run "scala Eff.sc ${dir.getAbsolutePath}" first"""))
   }
 
   private def handlePomFile(pomXml: File, parent: Option[MavenDependency]) = {

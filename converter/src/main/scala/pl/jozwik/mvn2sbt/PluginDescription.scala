@@ -8,5 +8,4 @@ case class PluginDescription(
   pluginsSbtPluginConfiguration: String,
   extraRepository: String,
   dependencies: Seq[Dependency],
-  pomConfigurationToSbtConfiguration: PluginConverter
-)
+  pomConfigurationToSbtConfiguration: PluginConverter)
