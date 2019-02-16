@@ -10,7 +10,7 @@ import scala.io.Source
 object Mvn2Sbt extends StrictLogging {
   val SBT_VERSION = "sbt.version"
   val BUILD_PROPERTIES = "build.properties"
-  val DEFAULT_SBT_VERSION = "0.13.7"
+  val DEFAULT_SBT_VERSION = "1.2.8"
   val BUILD_SBT = "build.sbt"
   val PROJECT = "project"
   val PLUGINS_SBT = "plugins.sbt"

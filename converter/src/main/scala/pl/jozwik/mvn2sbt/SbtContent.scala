@@ -17,7 +17,7 @@ case class SbtProjectContent(
 
 object SbtContent {
   val SCALA_VERSION_IN_GLOBAL = "scala.version"
-  val DEFAULT_SCALA_VERSION = "2.11.4"
+  val DEFAULT_SCALA_VERSION = "2.12.8"
 
   val PROHIBITED_CHARS = "."
 
