@@ -7,9 +7,9 @@ name := "mvn2sbt"
 
 organization in ThisBuild := "pl.jozwik"
 
-scalaVersion in ThisBuild := "2.12.8"
+scalaVersion in ThisBuild := "2.12.9"
 
-scapegoatVersion in ThisBuild := "1.3.8"
+scapegoatVersion in ThisBuild := "1.3.10"
 
 scalacOptions ++= Seq("-deprecation", "-unchecked", "-feature","-Yrangepos")
 
@@ -27,10 +27,10 @@ val scalacheck = "org.scalacheck" %% "scalacheck" % "1.14.0"
 libraryDependencies in ThisBuild ++= Seq(
   scalaLogging,
   scalacheck % "test",
-  "org.scalatest" %% "scalatest" % "3.0.5" % "test",
+  "org.scalatest" %% "scalatest" % "3.0.8" % "test",
   "ch.qos.logback" % "logback-classic" % "1.2.3",
-  "org.scala-lang.modules" %% "scala-xml" % "1.1.1",
-  "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.1",
+  "org.scala-lang.modules" %% "scala-xml" % "1.2.0",
+  "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2",
   "commons-io" % "commons-io" % "2.6"
 )
 

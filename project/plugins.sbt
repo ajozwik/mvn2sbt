@@ -4,9 +4,9 @@ resolvers += Classpaths.sbtPluginReleases
 
 resolvers += "Typesafe Repository" at "https://repo.typesafe.com/typesafe/releases/"
 
-addSbtPlugin("org.scalaxb" % "sbt-scalaxb" % "1.7.0")
+addSbtPlugin("org.scalaxb" % "sbt-scalaxb" % "1.7.2")
 
-addSbtPlugin("org.scalariform" % "sbt-scalariform" % "1.8.2")
+addSbtPlugin("org.scalariform" % "sbt-scalariform" % "1.8.3")
 
 addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.5.1")
 
@@ -25,5 +25,3 @@ libraryDependencies += "org.scalariform" %% "scalariform" % "0.2.7"
 //addSbtPlugin("com.github.gseitz" % "sbt-release" % "1.0.9")
 
 addSbtPlugin("com.codacy" % "sbt-codacy-coverage" % "1.3.15")
-
-addSbtPlugin("io.get-coursier" % "sbt-coursier" % "1.0.3")
