@@ -8,7 +8,7 @@ cache:
 language: scala
 
 jdk:
-  - oraclejdk8
+  - openjdk8
 
 env:
     - CODACY_PROJECT_TOKEN=cfd0b54e62c741c8a485cc0064877392
