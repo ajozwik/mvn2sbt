@@ -1,9 +1,12 @@
 Mvn2Sbt 
 
-[![Build Status](https://travis-ci.com/ajozwik/mvn2sbt.svg?branch=master "Build Status")](https://travis-ci.com/ajozwik/mvn2sbt)[![Coverage Status](https://coveralls.io/repos/ajozwik/mvn2sbt/badge.png)](https://coveralls.io/r/ajozwik/mvn2sbt)[![Codacy Badge](https://www.codacy.com/project/badge/c2c836104f254cafa3f4c34dc5243400)](https://www.codacy.com)
-
+[![Build Status](https://travis-ci.com/ajozwik/mvn2sbt.svg?branch=master "Build Status")](https://travis-ci.com/ajozwik/mvn2sbt)
+[![Coverage Status](https://coveralls.io/repos/ajozwik/mvn2sbt/badge.png)](https://coveralls.io/r/ajozwik/mvn2sbt)
+[![Codacy Badge](https://www.codacy.com/project/badge/c2c836104f254cafa3f4c34dc5243400)](https://www.codacy.com)
 [![License](http://img.shields.io/:license-Apache%202-red.svg)](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
 =========
+
 **Convert maven multi module project (pom.xml files) to sbt project (build.sbt with plugins).**
 
 Logback and slf4j are used as reference projects.
