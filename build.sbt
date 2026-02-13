@@ -1,64 +1,53 @@
-import com.typesafe.sbt.SbtScalariform.ScalariformKeys
 import scoverage.ScoverageKeys
-
-import scalariform.formatter.preferences.{SpacesAroundMultiImports, AlignSingleLineCaseStatements}
 
 name := "mvn2sbt"
 
-organization in ThisBuild := "pl.jozwik"
+ThisBuild / organization := "pl.jozwik"
 
-scalaVersion in ThisBuild := "2.12.9"
+ThisBuild / scalaVersion     := "2.13.18"
+ThisBuild / scapegoatVersion := "1.3.10"
 
-scapegoatVersion in ThisBuild := "1.3.10"
+scalacOptions ++= Seq("-deprecation", "-unchecked", "-feature", "-Yrangepos")
 
-scalacOptions ++= Seq("-deprecation", "-unchecked", "-feature","-Yrangepos")
+ThisBuild / scalacOptions ++= Seq("-deprecation", "-unchecked", "-feature", "-Yrangepos")
+Test / scalacOptions ++= Seq("-Yrangepos")
 
-scalacOptions in ThisBuild ++= Seq("-deprecation", "-unchecked", "-feature","-Yrangepos")
+val scalaTestVersion = "3.2.19"
 
-scalacOptions in Test ++= Seq("-Yrangepos")
+val scalaLogging                        = "com.typesafe.scala-logging" %% "scala-logging"   % "3.9.6"
+val `org.scalatestplus_scalacheck-1-19` = "org.scalatestplus"          %% "scalacheck-1-19" % s"$scalaTestVersion.0" % "test"
+//val scalacheck                          = "org.scalacheck"             %% "scalacheck"      % "1.19.0"
+val `javax.xml.bind_javax.xml.bind-api` = "javax.xml.bind" % "jaxb-api" % "2.3.1"
 
-
-val scalaLogging = "com.typesafe.scala-logging" %% "scala-logging" % "3.9.2"
-
-val scalacheck = "org.scalacheck" %% "scalacheck" % "1.14.0"
-
-
-
-libraryDependencies in ThisBuild ++= Seq(
+ThisBuild / libraryDependencies ++= Seq(
+  `javax.xml.bind_javax.xml.bind-api`,
   scalaLogging,
-  scalacheck % "test",
-  "org.scalatest" %% "scalatest" % "3.0.8" % "test",
-  "ch.qos.logback" % "logback-classic" % "1.2.3",
-  "org.scala-lang.modules" %% "scala-xml" % "1.2.0",
-  "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2",
-  "commons-io" % "commons-io" % "2.6"
+//  scalacheck                % "test",
+  `org.scalatestplus_scalacheck-1-19`,
+  "org.scalatest"          %% "scalatest"                % scalaTestVersion % "test",
+  "ch.qos.logback"          % "logback-classic"          % "1.3.16",
+  "org.scala-lang.modules" %% "scala-xml"                % "2.4.0",
+  "org.scala-lang.modules" %% "scala-parser-combinators" % "2.4.0",
+  "commons-io"              % "commons-io"               % "2.21.0"
 )
 
-
-
-lazy val `genscalaxb` = projectName("genscalaxb", "genscalaxb").settings(
-  scalaxbPackageNames in (Compile, scalaxb) := Map(new URI("https://github.com/ajozwik/mvn2sbt") -> "pl.jozwik.gen",
-    new URI("http://maven.apache.org/POM/4.0.0") -> "org.maven"),
-  ScoverageKeys.coverageExcludedPackages:= "org.maven.*;pl.jozwik.gen.*;scalaxb.*"
-)
-.enablePlugins(ScalaxbPlugin)
+lazy val `genscalaxb` = projectName("genscalaxb", "genscalaxb")
+  .settings(
+    Compile / scalaxb / scalaxbPackageNames := Map(
+      new URI("https://github.com/ajozwik/mvn2sbt") -> "pl.jozwik.gen",
+      new URI("http://maven.apache.org/POM/4.0.0")  -> "org.maven"
+    ),
+    ScoverageKeys.coverageExcludedPackages := "org.maven.*;pl.jozwik.gen.*;scalaxb.*"
+  )
+  .enablePlugins(ScalaxbPlugin)
 
 lazy val `converter` = projectName("converter", "converter")
   .enablePlugins(PackPlugin)
   .settings(packMain := Map("mvn2sbt" -> "pl.jozwik.mvn2sbt.Mvn2Sbt"))
   .dependsOn(`genscalaxb`)
 
-
-
-
 def projectName(name: String, path: String): Project = Project(name, file(path)).settings(
-  scalariformAutoformat := true,
-  publishArtifact in(Compile, packageDoc) := false,
-  sources in(Compile, doc) := Seq.empty,
-  scapegoatIgnoredFiles := Seq(".*/target/.*"),
-  scalariformPreferences := scalariformPreferences.value.
-    setPreference(AlignSingleLineCaseStatements, true).
-    setPreference(SpacesAroundMultiImports, false)
+  Compile / packageDoc / publishArtifact := false,
+  Compile / doc / sources                := Seq.empty,
+  scapegoatIgnoredFiles                  := Seq(".*/target/.*")
 )
-
-

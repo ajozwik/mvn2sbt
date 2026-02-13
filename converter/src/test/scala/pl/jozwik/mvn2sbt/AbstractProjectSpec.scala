@@ -10,14 +10,14 @@ object TestConstants {
 }
 
 class MultiSpec extends AbstractProjectSpec("multi") {
-  override protected def checkBuildSbtContent(content: String) {
+  override protected def checkBuildSbtContent(content: String): Unit = {
     val project = "`cxf2`"
     content should fullyMatch regex s"""(?s)(.*$project){4}.*"""
   }
 }
 
 class CxfSpec extends AbstractProjectSpec("cxf") {
-  override protected def checkBuildSbtContent(content: String) {
+  override protected def checkBuildSbtContent(content: String): Unit = {
     content should not include "-exsh"
     content should not include "-fe"
   }
@@ -26,7 +26,7 @@ class CxfSpec extends AbstractProjectSpec("cxf") {
 class CxfEmptySpec extends AbstractProjectSpec("cxf_empty")
 
 class RootTestngSpec extends AbstractProjectSpec("root_testng") {
-  override protected def checkBuildSbtContent(content: String) {
+  override protected def checkBuildSbtContent(content: String): Unit = {
     content should include("testng")
   }
 }
@@ -39,7 +39,7 @@ class LogbackPomSpec extends AbstractProjectSpec("logback")
 
 abstract class AbstractProjectSpec(project: String) extends AbstractSpec {
 
-  private def checkBuildSbtContent(buildSbt: File) {
+  private def checkBuildSbtContent(buildSbt: File): Unit = {
     val source = scala.io.Source.fromFile(buildSbt)
     val content = try {
       source.mkString
@@ -49,7 +49,7 @@ abstract class AbstractProjectSpec(project: String) extends AbstractSpec {
     checkBuildSbtContent(content)
   }
 
-  protected def checkBuildSbtContent(content: String) {
+  protected def checkBuildSbtContent(content: String): Unit = {
 
   }
 

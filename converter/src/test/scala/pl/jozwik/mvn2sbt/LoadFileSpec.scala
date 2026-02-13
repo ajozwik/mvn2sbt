@@ -5,7 +5,7 @@ class LoadFileSpec extends AbstractSpec {
     "Be loaded " in {
       val converters = MavenSbtPluginMapper.artifactIdToPluginDescriptionMap
       converters.foreach { case (k, v) => logger.debug(s"$k $v") }
-      converters should not be 'empty
+      converters should not be Symbol("empty")
     }
   }
 }

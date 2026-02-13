@@ -90,11 +90,11 @@ object SbtContent {
       |""".stripMargin
     }
 
-  private def sort(set: Set[Dependency]): TraversableOnce[Dependency] =
+  private def sort(set: Set[Dependency]): IterableOnce[Dependency] =
     set.toIndexedSeq.sorted(Ordering.by[Dependency, (String, String)](x => (x.mavenDependency.groupId, x.mavenDependency.artifactId)))
 
-  private def dependenciesToString(libraries: TraversableOnce[Dependency], cache: Map[GroupArtifact, (MavenDependency, String)]) = {
-    val (depSeq, newCache) = libraries.foldLeft((Seq.empty[String], cache)) {
+  private def dependenciesToString(libraries: IterableOnce[Dependency], cache: Map[GroupArtifact, (MavenDependency, String)]) = {
+    val (depSeq, newCache) = libraries.iterator.foldLeft((Seq.empty[String], cache)) {
       case ((accLibSeq, accCache), d) =>
         val md = d.mavenDependency
         val groupArtifact = GroupArtifact(md.groupId, md.artifactId)
@@ -128,7 +128,7 @@ object SbtContent {
     case _                                      => Some(s"""$alias % "${d.scope}" """)
   }
 
-  private def dependsOnToString(dependsOn: TraversableOnce[Dependency]) = dependsOn.map { d =>
+  private def dependsOnToString(dependsOn: IterableOnce[Dependency]) = dependsOn.iterator.map { d =>
     val test = d.scope match {
       case Scope.test => """% "test -> test" """
       case _          => ""
@@ -212,7 +212,7 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
       val endSettings = DependencyToPluginConverter.addSeqToArray(file.equals(rootDir))
       val settings = pluginDescription.sbtSetting.fold(accSett)(x => accSett + (x + endSettings))
       val customPluginSettings = pluginDescription.pomConfigurationToSbtConfiguration(rootDir, plugin)
-      val plugins = accPlug + (pluginDescription.pluginsSbtPluginConfiguration, pluginDescription.extraRepository)
+      val plugins = accPlug ++ Set(pluginDescription.pluginsSbtPluginConfiguration, pluginDescription.extraRepository)
       (settings ++ customPluginSettings, plugins, accPluginDependencies ++ pluginDescription.dependencies)
     }
   }

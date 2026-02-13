@@ -4,9 +4,8 @@ import com.typesafe.scalalogging.LazyLogging
 
 import scala.util.{Failure, Success, Try}
 
-/**
- * See http://docs.codehaus.org/display/MAVEN/Versioning
- */
+/** See http://docs.codehaus.org/display/MAVEN/Versioning
+  */
 object VersionComparator extends LazyLogging {
 
   def compare(a: String, b: String): Int = {
@@ -30,19 +29,25 @@ object VersionComparator extends LazyLogging {
       val res = compare(h1, h2)
       if (res == 0) {
         compare(t1, t2)
-      } else {
+      }
+      else {
         res
       }
 
   }
 
-  private def tokenize(a: String): Seq[Either[String, Long]] = a.split("\\.|-").map(x => Try(x.toLong) match {
-    case Success(i) =>
-      Right(i)
-    case Failure(th) =>
-      logger.trace(s"${th.getMessage}")
-      Left(x)
-  })
+  private def tokenize(a: String): Seq[Either[String, Long]] = a
+    .split("\\.|-")
+    .toIndexedSeq
+    .map(x =>
+      Try(x.toLong) match {
+        case Success(i) =>
+          Right(i)
+        case Failure(th) =>
+          logger.trace(s"${th.getMessage}")
+          Left(x)
+      }
+    )
 
   private def compare(a: Either[String, Long], b: Either[String, Long]) = (a, b) match {
     case (Right(x), Right(y)) =>
@@ -66,7 +71,8 @@ object VersionComparator extends LazyLogging {
   private def toOptionLong(seq: Seq[Int]): Option[Long] = {
     if (seq.isEmpty) {
       None
-    } else {
+    }
+    else {
       val (l, _) = seq.foldLeft((0, 1)) { case ((acc, deep), el) => (acc + el * deep, deep * 10) }
       Some(l)
     }
@@ -80,7 +86,8 @@ object VersionComparator extends LazyLogging {
         val res = x.compareTo(y)
         if (res == 0) {
           compareNonDigitsStrings(restA, restB)
-        } else {
+        }
+        else {
           res
         }
       case (Some(x), _) =>

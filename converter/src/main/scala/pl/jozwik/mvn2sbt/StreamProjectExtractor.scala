@@ -50,7 +50,7 @@ object StreamProjectExtractor extends StrictLogging {
   }
 }
 
-case class StreamProjectExtractor(private val iterator: TraversableOnce[String]) {
+case class StreamProjectExtractor(private val iterator: IterableOnce[String]) {
 
   import pl.jozwik.mvn2sbt.StreamProjectExtractor._
 
@@ -75,7 +75,7 @@ case class StreamProjectExtractor(private val iterator: TraversableOnce[String])
     }
   }
 
-  private def cutInfo = iterator.flatMap {
+  private def cutInfo = iterator.iterator.flatMap {
     line =>
       if (line.startsWith(INFO)) {
         Some(line.substring(INFO.length))

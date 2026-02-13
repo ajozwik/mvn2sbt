@@ -23,7 +23,7 @@ if (args.length == 0) {
 
 val parseModuleName = """<module>(.*)</module>""".r
 
-def callEffectivePom(dir: File) {
+def callEffectivePom(dir: File):Unit =  {
   val effectivePom = "effective-pom.xml"
   val result = Process(Seq(mvn, "-N", "help:effective-pom", s"-Doutput=$effectivePom"), dir).!
   wrongResult(result, new File(dir, effectivePom))
@@ -59,7 +59,7 @@ args.foreach { root =>
 }
 
 
-def wrongResult(result: Int, output: File) {
+def wrongResult(result: Int, output: File):Unit = {
   if (result != 0) {
     println(s"See $output for errors, content below:\n\n\n\n")
     println("==================ERROR MESSAGE==========")
