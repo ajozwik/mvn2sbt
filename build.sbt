@@ -5,11 +5,19 @@ name := "mvn2sbt"
 ThisBuild / organization := "pl.jozwik"
 
 ThisBuild / scalaVersion     := "2.13.18"
-ThisBuild / scapegoatVersion := "1.3.10"
+ThisBuild / scapegoatVersion := "3.3.2"
 
 scalacOptions ++= Seq("-deprecation", "-unchecked", "-feature", "-Yrangepos")
 
-ThisBuild / scalacOptions ++= Seq("-deprecation", "-unchecked", "-feature", "-Yrangepos")
+ThisBuild / scalacOptions ++= Seq("-deprecation", "-unchecked", "-feature", "-Xsource:3") ++ (CrossVersion.partialVersion(
+  scalaVersion.value
+) match {
+  case Some((2, _)) =>
+    Seq("-Yrangepos")
+  case _ =>
+    Seq()
+})
+
 Test / scalacOptions ++= Seq("-Yrangepos")
 
 val scalaTestVersion = "3.2.19"

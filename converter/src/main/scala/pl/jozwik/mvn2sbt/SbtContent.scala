@@ -8,16 +8,18 @@ import org.maven.Plugin
 import scala.collection.mutable
 
 case class SbtProjectContent(
-  project: Project,
-  path: String,
-  libraries: Set[Dependency],
-  dependsOn: Set[Dependency],
-  information: ProjectInformation,
-  settings: Set[String])
+    project: Project,
+    path: String,
+    libraries: Set[Dependency],
+    dependsOn: Set[Dependency],
+    information: ProjectInformation,
+    settings: Set[String]
+)
 
 object SbtContent {
+
   val SCALA_VERSION_IN_GLOBAL = "scala.version"
-  val DEFAULT_SCALA_VERSION = "2.12.8"
+  val DEFAULT_SCALA_VERSION   = "2.13.18"
 
   val PROHIBITED_CHARS = "."
 
@@ -25,13 +27,18 @@ object SbtContent {
 
     val opt = if (resolvers.isEmpty) {
       None
-    } else {
-      val resolversString = resolvers.map { x =>
-        s""" "$x" at "$x" """
-      }.mkString(
-        ",",
-        """,
-          """.stripMargin, "")
+    }
+    else {
+      val resolversString = resolvers
+        .map { x =>
+          s""" "$x" at "$x" """
+        }
+        .mkString(
+          ",",
+          """,
+          """.stripMargin,
+          ""
+        )
 
       Some(resolversString)
     }
@@ -44,10 +51,9 @@ object SbtContent {
 
   private def projectsToString(projectsMap: Map[MavenDependency, SbtProjectContent]) = {
     val sorted = projectsMap.toSeq.sortBy { case (d, _) => d.artifactId }
-    sorted.foldLeft((Seq.empty[String], Map.empty[GroupArtifact, (MavenDependency, String)])) {
-      case ((accSeqString, accMap), (_, content)) =>
-        val (project, newMap) = createBuildSbt(content, accMap)
-        (project +: accSeqString, newMap)
+    sorted.foldLeft((Seq.empty[String], Map.empty[GroupArtifact, (MavenDependency, String)])) { case ((accSeqString, accMap), (_, content)) =>
+      val (project, newMap) = createBuildSbt(content, accMap)
+      (project +: accSeqString, newMap)
     }
   }
 
@@ -78,7 +84,8 @@ object SbtContent {
         |
         |${settings.mkString("", "\n\n", "\n")}
         |""".stripMargin
-    } else {
+    }
+    else {
       val settingString = settings.mkString(".settings(", ").\nsettings(", ")")
       s"""lazy val `$projectName` = ProjectName("$projectName","$path").settings(
       |  libraryDependencies ++= Seq($dependencies),
@@ -94,15 +101,14 @@ object SbtContent {
     set.toIndexedSeq.sorted(Ordering.by[Dependency, (String, String)](x => (x.mavenDependency.groupId, x.mavenDependency.artifactId)))
 
   private def dependenciesToString(libraries: IterableOnce[Dependency], cache: Map[GroupArtifact, (MavenDependency, String)]) = {
-    val (depSeq, newCache) = libraries.iterator.foldLeft((Seq.empty[String], cache)) {
-      case ((accLibSeq, accCache), d) =>
-        val md = d.mavenDependency
-        val groupArtifact = GroupArtifact(md.groupId, md.artifactId)
-        val (alias, newAccCache) = createAliasForDependency(accCache, md, groupArtifact)
+    val (depSeq, newCache) = libraries.iterator.foldLeft((Seq.empty[String], cache)) { case ((accLibSeq, accCache), d) =>
+      val md                   = d.mavenDependency
+      val groupArtifact        = GroupArtifact(md.groupId, md.artifactId)
+      val (alias, newAccCache) = createAliasForDependency(accCache, md, groupArtifact)
 
-        val dependencyOption = toDependencyOption(d, alias)
+      val dependencyOption = toDependencyOption(d, alias)
 
-        (dependencyOption.fold(accLibSeq)(l => l +: accLibSeq), newAccCache)
+      (dependencyOption.fold(accLibSeq)(l => l +: accLibSeq), newAccCache)
     }
     (depSeq.mkString("", ",\n   ", ""), newCache)
   }
@@ -113,7 +119,8 @@ object SbtContent {
         val res = VersionComparator.compare(mavenDep.versionId, md.versionId)
         if (res >= 0) {
           (l, accCache)
-        } else {
+        }
+        else {
           (l, accCache + (groupArtifact -> (md, l)))
         }
       case None =>
@@ -128,13 +135,15 @@ object SbtContent {
     case _                                      => Some(s"""$alias % "${d.scope}" """)
   }
 
-  private def dependsOnToString(dependsOn: IterableOnce[Dependency]) = dependsOn.iterator.map { d =>
-    val test = d.scope match {
-      case Scope.test => """% "test -> test" """
-      case _          => ""
+  private def dependsOnToString(dependsOn: IterableOnce[Dependency]) = dependsOn.iterator
+    .map { d =>
+      val test = d.scope match {
+        case Scope.test => """% "test -> test" """
+        case _          => ""
+      }
+      s"""`${changeNotSupportedSymbols(d.mavenDependency.artifactId)}`$test"""
     }
-    s"""`${changeNotSupportedSymbols(d.mavenDependency.artifactId)}`$test"""
-  }.mkString(",")
+    .mkString(",")
 
 }
 
@@ -150,13 +159,12 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
     val (contentOfPluginSbt, resolvers, projectContents, aliases) = projectsToStringCollections
 
     val defaultScalaVersion = System.getProperty(SCALA_VERSION_IN_GLOBAL, DEFAULT_SCALA_VERSION)
-    val buildSbtWriter = new mutable.StringBuilder(s"""scalaVersion in Global := "$defaultScalaVersion" """).append("\n\n")
+    val buildSbtWriter      = new mutable.StringBuilder(s"""scalaVersion in Global := "$defaultScalaVersion" """).append("\n\n")
     buildSbtWriter.append("def ProjectName(name: String,path:String): Project =  Project(name, file(path))").append("\n\n")
     buildSbtWriter.append(resolversToOption(resolvers))
-    aliases.foreach {
-      case (_, (d, variable)) =>
-        val dependency = s""""${d.groupId}" % "${d.artifactId}" % "${d.versionId}""""
-        buildSbtWriter.append(s"val $variable = $dependency\n\n")
+    aliases.foreach { case (_, (d, variable)) =>
+      val dependency = s""""${d.groupId}" % "${d.artifactId}" % "${d.versionId}""""
+      buildSbtWriter.append(s"val $variable = $dependency\n\n")
     }
     projectContents.foreach(buildSbtWriter.append)
     (buildSbtWriter.toString(), contentOfPluginSbt.mkString("\n\n"))
@@ -164,8 +172,8 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
 
   private def projectsToStringCollections: (Set[String], Set[String], Seq[String], Seq[(GroupArtifact, (MavenDependency, String))]) = {
     val (contentOfPluginSbt, resolvers, optimizedMaps) = handleProjects
-    val (ps, libraries) = projectsToString(optimizedMaps)
-    val aliases = libraries.toSeq.sortBy { case (d, _) => d.groupId }
+    val (ps, libraries)                                = projectsToString(optimizedMaps)
+    val aliases                                        = libraries.toSeq.sortBy { case (d, _) => d.groupId }
     (contentOfPluginSbt, resolvers, ps, aliases)
   }
 
@@ -181,38 +189,37 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
   }
 
   private def handleProject(p: Project): (SbtProjectContent, Set[String], Set[String]) = {
-    val information = hierarchy(p.projectDependency)
-    val relativePath = toRelativePath(information.projectPath, rootDir)
-    val (dependsOn, libraries) = splitToDependsOnLibraries(p)
-    val (settings, plugins, pluginDependencies) = handlePlugins(information.projectPath, information.plugins)
+    val information                                                             = hierarchy(p.projectDependency)
+    val relativePath                                                            = toRelativePath(information.projectPath, rootDir)
+    val (dependsOn, libraries)                                                  = splitToDependsOnLibraries(p)
+    val (settings, plugins, pluginDependencies)                                 = handlePlugins(information.projectPath, information.plugins)
     val (pluginsDependsOnDependenciesSettings, pluginsDependsOnDependenciesSet) =
       DependencyToPluginConverter.addPluginForDependency(rootDir, information.projectPath, libraries)
     (
       SbtProjectContent(p, relativePath, pluginDependencies ++ libraries, dependsOn, information, pluginsDependsOnDependenciesSettings ++ settings),
       pluginsDependsOnDependenciesSet ++ plugins,
-      information.resolvers)
+      information.resolvers
+    )
   }
 
-  private def splitToDependsOnLibraries(p: Project) = p.dependencies.partition {
-    d =>
-      val m = d.mavenDependency
-      val contains = hierarchy.contains(m)
-      val parentOption = hierarchy(p.projectDependency).parent
-      val parentMatch = parentOption.fold(false) {
-        parent =>
-          parent == m
-      }
-      contains || parentMatch
+  private def splitToDependsOnLibraries(p: Project) = p.dependencies.partition { d =>
+    val m            = d.mavenDependency
+    val contains     = hierarchy.contains(m)
+    val parentOption = hierarchy(p.projectDependency).parent
+    val parentMatch  = parentOption.fold(false) { parent =>
+      parent == m
+    }
+    contains || parentMatch
   }
 
   private def handlePlugins(file: File, plugins: Seq[(PluginDescription, Plugin)]): (Set[String], Set[String], Set[Dependency]) = {
     plugins.foldLeft((Set.empty[String], Set.empty[String], Set.empty[Dependency])) { (tuple, p) =>
       val (accSett, accPlug, accPluginDependencies) = tuple
-      val (pluginDescription, plugin) = p
-      val endSettings = DependencyToPluginConverter.addSeqToArray(file.equals(rootDir))
-      val settings = pluginDescription.sbtSetting.fold(accSett)(x => accSett + (x + endSettings))
-      val customPluginSettings = pluginDescription.pomConfigurationToSbtConfiguration(rootDir, plugin)
-      val plugins = accPlug ++ Set(pluginDescription.pluginsSbtPluginConfiguration, pluginDescription.extraRepository)
+      val (pluginDescription, plugin)               = p
+      val endSettings                               = DependencyToPluginConverter.addSeqToArray(file.equals(rootDir))
+      val settings                                  = pluginDescription.sbtSetting.fold(accSett)(x => accSett + (x + endSettings))
+      val customPluginSettings                      = pluginDescription.pomConfigurationToSbtConfiguration(rootDir, plugin)
+      val plugins                                   = accPlug ++ Set(pluginDescription.pluginsSbtPluginConfiguration, pluginDescription.extraRepository)
       (settings ++ customPluginSettings, plugins, accPluginDependencies ++ pluginDescription.dependencies)
     }
   }

@@ -2,14 +2,11 @@
   
   <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
     <encoder>
-      <pattern>[%file].\(%line\) %msg%n</pattern>
+      <pattern>[%.-1level] [%file].\(%line\) %msg%n</pattern>
     </encoder>
   </appender>
-  
-  <logger name="play" level="DEBUG" />
-  <logger name="application" level="DEBUG" />
 
-  <root level="DEBUG">
+  <root level="TRACE">
     <appender-ref ref="STDOUT" />
 <!--     <appender-ref ref="FILE" /> -->
   </root>

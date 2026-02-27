@@ -47,14 +47,16 @@ object StreamProjectExtractor extends StrictLogging {
       val dependency = Dependency(MavenDependency(groupId, artifactId, versionId), sc, tests)
       val projectWithNewDependency = project.copy(dependencies = project.dependencies + dependency)
       (projectWithNewDependency +: tail, false)
+    case _ =>
+      (Seq.empty, false)
   }
 }
 
-case class StreamProjectExtractor(private val iterator: IterableOnce[String]) {
+final case class StreamProjectExtractor(private val iterator: IterableOnce[String]) {
 
   import pl.jozwik.mvn2sbt.StreamProjectExtractor._
 
-  val projects = {
+  val projects: Seq[Project] = {
     val (p, _) = cutInfo.foldLeft((Seq.empty[Project], false)) {
       (acc: (Seq[Project], Boolean), line: String) =>
         val (accProjects, started) = acc
@@ -75,10 +77,10 @@ case class StreamProjectExtractor(private val iterator: IterableOnce[String]) {
     }
   }
 
-  private def cutInfo = iterator.iterator.flatMap {
+  private def cutInfo: Iterator[String] = iterator.iterator.flatMap {
     line =>
       if (line.startsWith(INFO)) {
-        Some(line.substring(INFO.length))
+        Option(line.substring(INFO.length))
       } else {
         None
       }

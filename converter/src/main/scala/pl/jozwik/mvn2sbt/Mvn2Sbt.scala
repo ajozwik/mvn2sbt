@@ -11,13 +11,13 @@ object Mvn2Sbt extends StrictLogging {
 
   private val SBT_VERSION         = "sbt.version"
   private val BUILD_PROPERTIES    = "build.properties"
-  private val DEFAULT_SBT_VERSION = "1.2.8"
+  private val DEFAULT_SBT_VERSION = "1.12.4"
   val BUILD_SBT                   = "build.sbt"
   val PROJECT                     = "project"
   private val PLUGINS_SBT         = "plugins.sbt"
   private val DEPENDENCY_TREE_TXT = "dependencyTree.txt"
 
-  private def projectsFromFile(inputFile: File) = {
+  private def projectsFromFile(inputFile: File): Seq[Project] = {
     val source = Source.fromFile(inputFile)
     try {
       iteratorToProjects(source.getLines())
@@ -51,7 +51,7 @@ object Mvn2Sbt extends StrictLogging {
     createSbtFile(projectsWithoutPath, hierarchy, rootDir, outputDir)
   }
 
-  private def writeToFile(file: File, content: String): Unit = Some(new PrintWriter(file)).foreach { writer =>
+  private def writeToFile(file: File, content: String): Unit = Option(new PrintWriter(file)).foreach { writer =>
     try {
       writer.write(content)
     }
