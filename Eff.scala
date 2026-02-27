@@ -1,6 +1,6 @@
 import scala.io.Source
-import scala.util._
-import sys.process._
+import scala.util.*
+import sys.process.*
 import java.io.File
 
 val mavenCommand = "mvn"
@@ -12,14 +12,9 @@ val mvn =  Try(Process(Seq(mavenCommand,"-version")).!) match{
     "mvn.bat"
 }
 
-println(s"Maven command is: $mvn")
 
-if (args.length == 0) {
-  println( """Call "scala Eff.sc <rootDir1> [<rootDir2>]" """)
-  sys.exit(-1)
-} else {
-  println( s"""You are called "scala Eff ${args.mkString(" ")}" """)
-}
+
+
 
 val parseModuleName = """<module>(.*)</module>""".r
 
@@ -40,24 +35,33 @@ def callEffectivePom(dir: File):Unit =  {
 
 }
 
-args.foreach { root =>
+@main def main(args: String*): Unit = {
+  println(s"Maven command is: $mvn")
+  if (args.length == 0) {
+    println("""Call "scala Eff.sc <rootDir1> [<rootDir2>]" """)
+    sys.exit(-1)
+  } else {
+    println(s"""You are called "scala Eff ${args.mkString(" ")}" """)
+  }
 
-  val rootDir = new File(root)
+  args.foreach { root =>
 
-  val dependencyTree = new File(rootDir, "dependencyTree.txt")
+    val rootDir = new File(root)
 
-  println(s"Creating $dependencyTree.")
+    val dependencyTree = new File(rootDir, "dependencyTree.txt")
 
-  val result = (Process(Seq(mvn, "dependency:tree"), rootDir) #> dependencyTree).!
+    println(s"Creating $dependencyTree.")
 
-  wrongResult(result, dependencyTree)
+    val result = (Process(Seq(mvn, "dependency:tree"), rootDir) #> dependencyTree).!
 
-  println(s"$dependencyTree created")
+    wrongResult(result, dependencyTree)
 
-  callEffectivePom(rootDir)
+    println(s"$dependencyTree created")
 
+    callEffectivePom(rootDir)
+
+  }
 }
-
 
 def wrongResult(result: Int, output: File):Unit = {
   if (result != 0) {
