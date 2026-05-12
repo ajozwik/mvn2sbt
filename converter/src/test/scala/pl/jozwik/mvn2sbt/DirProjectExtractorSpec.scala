@@ -4,8 +4,9 @@ import java.io.File
 
 class DirProjectExtractorSpec extends AbstractSpec {
 
-  val first = Some("ee")
+  val first  = Some("ee")
   val second = Some("tt")
+
   "DirProjectExtractor " should {
     "Get first option " in {
       compare(DirProjectExtractor.valueFromOptions(first, second), first)
@@ -26,9 +27,9 @@ class DirProjectExtractorSpec extends AbstractSpec {
     }
 
     "Empty pom file" in {
-      DirProjectExtractor(new File(TestConstants.EXAMPLES_PROJECTS, "emptyPom")).projectsMap.forall {
-        case (k, v) => v.resolvers.isEmpty
-      } should be(true)
+      DirProjectExtractor(new File(TestConstants.EXAMPLES_PROJECTS, "emptyPom")).projectsMap.forall { case (k, v) =>
+        v.resolvers.isEmpty
+      } shouldBe true
     }
     "Empty option " in {
       intercept[RuntimeException] {
@@ -37,8 +38,8 @@ class DirProjectExtractorSpec extends AbstractSpec {
     }
   }
 
-  private def compare(str: String, option: Option[String]) {
-    Some(str) should be(option)
+  private def compare(str: String, option: Option[String]): Unit = {
+    Some(str) shouldBe option
   }
 
 }

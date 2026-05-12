@@ -7,7 +7,7 @@ class MavenSbtPluginMapperSpec extends AbstractSpec {
   "MavenSbtPluginMapper " should {
     "Return None " in {
       val model = Model()
-      MavenSbtPluginMapper(model).plugins should be('empty)
+      MavenSbtPluginMapper(model).plugins shouldBe Symbol("empty")
     }
 
     "Without plugins " in {
@@ -15,4 +15,5 @@ class MavenSbtPluginMapperSpec extends AbstractSpec {
       MavenSbtPluginMapper.buildToPlugins(build) shouldBe MavenSbtPluginMapper.EMPTY_SEQ
     }
   }
+
 }

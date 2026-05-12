@@ -73,7 +73,7 @@ trait PomToSbtPluginConverter {
 
   protected def configurationToSet(confHead: Configuration4, rootDir: File)(implicit plugin: Plugin): Set[String]
 
-  protected final def toOption(confHead: Configuration4, name: String, f: (String) => String) = {
+  protected final def toOption(confHead: Configuration4, name: String, f: (String) => String): Option[String] = {
     val node = findElement(confHead, name)
     val moduleName = node.map(v => ReflectionUtils.castTo[Node](v.value).text)
     moduleName.map(s => f(s))

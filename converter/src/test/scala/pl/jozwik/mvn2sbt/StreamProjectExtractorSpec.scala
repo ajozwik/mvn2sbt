@@ -6,10 +6,11 @@ class StreamProjectExtractorSpec extends AbstractSpec {
     "Do not support ok scope" in {
       val notSupportedScope = "+- org.codehaus.janino:janino:ok:2.6.1:ok"
       intercept[RuntimeException] {
-        StreamProjectExtractor.addDependency(notSupportedScope, Seq())
+        val fakeDep = MavenDependency("", "", "")
+        StreamProjectExtractor.addDependency(notSupportedScope, Seq(Project(fakeDep, ProjectType.jar)))
+
       }
     }
   }
 
 }
-

@@ -2,33 +2,40 @@ package pl.jozwik.mvn2sbt
 
 import java.io.File
 import java.nio.file.Paths
+import pl.jozwik.mvn2sbt.Mvn2Sbt.*
 
-import pl.jozwik.mvn2sbt.Mvn2Sbt._
+import scala.util.Using
 
 object TestConstants {
   final val EXAMPLES_PROJECTS = "exampleProjects"
 }
 
 class MultiSpec extends AbstractProjectSpec("multi") {
-  override protected def checkBuildSbtContent(content: String) {
+
+  override protected def checkBuildSbtContent(content: String): Unit = {
     val project = "`cxf2`"
     content should fullyMatch regex s"""(?s)(.*$project){4}.*"""
   }
+
 }
 
 class CxfSpec extends AbstractProjectSpec("cxf") {
-  override protected def checkBuildSbtContent(content: String) {
+
+  override protected def checkBuildSbtContent(content: String): Unit = {
     content should not include "-exsh"
     content should not include "-fe"
   }
+
 }
 
 class CxfEmptySpec extends AbstractProjectSpec("cxf_empty")
 
 class RootTestngSpec extends AbstractProjectSpec("root_testng") {
-  override protected def checkBuildSbtContent(content: String) {
+
+  override protected def checkBuildSbtContent(content: String): Unit = {
     content should include("testng")
   }
+
 }
 
 class Slf4jPomSpec extends AbstractProjectSpec("slf4j")
@@ -39,30 +46,27 @@ class LogbackPomSpec extends AbstractProjectSpec("logback")
 
 abstract class AbstractProjectSpec(project: String) extends AbstractSpec {
 
-  private def checkBuildSbtContent(buildSbt: File) {
-    val source = scala.io.Source.fromFile(buildSbt)
-    val content = try {
-      source.mkString
-    } finally {
-      source.close()
+  private def checkBuildSbtContent(buildSbt: File): Unit =
+    Using.resource(scala.io.Source.fromFile(buildSbt)) { source =>
+      val content =
+        source.mkString
+
+      checkBuildSbtContent(content)
     }
-    checkBuildSbtContent(content)
-  }
 
-  protected def checkBuildSbtContent(content: String) {
-
-  }
+  protected def checkBuildSbtContent(content: String): Unit = {}
 
   getClass.getSimpleName should {
 
     s"Create sbt file for $project with file" in {
       val rootDir = Paths.get(TestConstants.EXAMPLES_PROJECTS, project).toFile
-      val output = new File("target", project)
-      Mvn2Sbt.main(Array(rootDir.getAbsolutePath, output.getAbsolutePath))
+      val output  = new File("target", project)
+      Mvn2Sbt.main(rootDir.getAbsolutePath, output.getAbsolutePath)
       val buildSbt = new File(output, BUILD_SBT)
       buildSbt should exist
       checkBuildSbtContent(buildSbt)
     }
 
   }
+
 }
