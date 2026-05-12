@@ -1,11 +1,10 @@
 package pl.jozwik.mvn2sbt
 
 import java.io.{File, PrintWriter}
-
 import com.typesafe.scalalogging.StrictLogging
-import org.apache.commons.io.IOUtils
 
 import scala.io.Source
+import scala.util.Using
 
 object Mvn2Sbt extends StrictLogging {
 
@@ -17,15 +16,10 @@ object Mvn2Sbt extends StrictLogging {
   private val PLUGINS_SBT         = "plugins.sbt"
   private val DEPENDENCY_TREE_TXT = "dependencyTree.txt"
 
-  private def projectsFromFile(inputFile: File): Seq[Project] = {
-    val source = Source.fromFile(inputFile)
-    try {
+  private def projectsFromFile(inputFile: File): Seq[Project] =
+    Using.resource(Source.fromFile(inputFile)) { source =>
       iteratorToProjects(source.getLines())
     }
-    finally {
-      source.close()
-    }
-  }
 
   private def iteratorToProjects(iterator: IterableOnce[String]) = StreamProjectExtractor(iterator).projects
 
@@ -51,13 +45,8 @@ object Mvn2Sbt extends StrictLogging {
     createSbtFile(projectsWithoutPath, hierarchy, rootDir, outputDir)
   }
 
-  private def writeToFile(file: File, content: String): Unit = Option(new PrintWriter(file)).foreach { writer =>
-    try {
-      writer.write(content)
-    }
-    finally {
-      IOUtils.closeQuietly(writer)
-    }
+  private def writeToFile(file: File, content: String): Unit = Using.resource(new PrintWriter(file)) { writer =>
+    writer.write(content)
   }
 
   private def toAbsolutePath(f: File) = f.getAbsolutePath

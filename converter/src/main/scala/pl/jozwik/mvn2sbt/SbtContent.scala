@@ -18,8 +18,8 @@ case class SbtProjectContent(
 
 object SbtContent {
 
-  val SCALA_VERSION_IN_GLOBAL = "scala.version"
-  val DEFAULT_SCALA_VERSION   = "2.13.18"
+  val ScalaVersionInGlobal = "scala.version"
+  val DefaultScalaVersion   = "3.3.7"
 
   val PROHIBITED_CHARS = "."
 
@@ -158,7 +158,7 @@ case class SbtContent(private val projects: Seq[Project], private val hierarchy:
 
     val (contentOfPluginSbt, resolvers, projectContents, aliases) = projectsToStringCollections
 
-    val defaultScalaVersion = System.getProperty(SCALA_VERSION_IN_GLOBAL, DEFAULT_SCALA_VERSION)
+    val defaultScalaVersion = System.getProperty(ScalaVersionInGlobal, DefaultScalaVersion)
     val buildSbtWriter      = new mutable.StringBuilder(s"""scalaVersion in Global := "$defaultScalaVersion" """).append("\n\n")
     buildSbtWriter.append("def ProjectName(name: String,path:String): Project =  Project(name, file(path))").append("\n\n")
     buildSbtWriter.append(resolversToOption(resolvers))

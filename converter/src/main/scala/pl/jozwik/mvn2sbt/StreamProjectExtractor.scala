@@ -54,7 +54,7 @@ object StreamProjectExtractor extends StrictLogging {
 
 final case class StreamProjectExtractor(private val iterator: IterableOnce[String]) {
 
-  import pl.jozwik.mvn2sbt.StreamProjectExtractor._
+  import pl.jozwik.mvn2sbt.StreamProjectExtractor.*
 
   val projects: Seq[Project] = {
     val (p, _) = cutInfo.foldLeft((Seq.empty[Project], false)) {

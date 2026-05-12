@@ -38,7 +38,6 @@ class Mvn2SbtSpec extends AbstractSpec {
 
     "Wrong maven project root directory" in {
       intercept[RuntimeException] {
-        val target = new File("target")
         target.mkdirs()
         Mvn2Sbt.scanHierarchy(target)
       }
@@ -51,7 +50,7 @@ class Mvn2SbtSpec extends AbstractSpec {
     }
 
     "Wrong dir " in {
-      val file = new File("__")
+      val file = new File(target, "__")
       new FileOutputStream(file).close()
       Mvn2Sbt.main(file.getAbsolutePath)
       file should exist
