@@ -4,9 +4,9 @@ name := "mvn2sbt"
 
 ThisBuild / organization := "pl.jozwik"
 
-ThisBuild / scalaVersion            := "3.3.7"
-ThisBuild / scapegoatVersion        := "3.3.4"
-coverageEnabled                     := false
+ThisBuild / scalaVersion     := "3.3.7"
+ThisBuild / scapegoatVersion := "3.3.4"
+coverageEnabled              := false
 
 ThisBuild / scalacOptions ++= Seq("-deprecation", "-unchecked", "-feature") ++ (CrossVersion.partialVersion(
   scalaVersion.value
@@ -19,15 +19,13 @@ ThisBuild / scalacOptions ++= Seq("-deprecation", "-unchecked", "-feature") ++ (
 
 val scalaTestVersion = "3.2.20"
 
-val scalaLogging                        = "com.typesafe.scala-logging" %% "scala-logging"   % "3.9.6"
+val `javax.xml.bind_javax.xml.bind-api` = "javax.xml.bind"              % "jaxb-api"        % "2.3.1"
 val `org.scalatestplus_scalacheck-1-19` = "org.scalatestplus"          %% "scalacheck-1-19" % s"$scalaTestVersion.0" % "test"
-//val scalacheck                          = "org.scalacheck"             %% "scalacheck"      % "1.19.0"
-val `javax.xml.bind_javax.xml.bind-api` = "javax.xml.bind" % "jaxb-api" % "2.3.1"
+val scalaLogging                        = "com.typesafe.scala-logging" %% "scala-logging"   % "3.9.6"
 
 ThisBuild / libraryDependencies ++= Seq(
   `javax.xml.bind_javax.xml.bind-api`,
   scalaLogging,
-//  scalacheck                % "test",
   `org.scalatestplus_scalacheck-1-19`,
   "org.scalatest"          %% "scalatest"                % scalaTestVersion % "test",
   "ch.qos.logback"          % "logback-classic"          % "1.3.16",

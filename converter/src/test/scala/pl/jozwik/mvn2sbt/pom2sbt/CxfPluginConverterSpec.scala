@@ -10,11 +10,9 @@ class CxfPluginConverterSpec extends AbstractSpec {
 
     "Remove " in {
       forAll(alphaStr, alphaStr, listOf(alphaStr), listOf(alphaStr)) { (toRemove, ignored, header, tail) =>
-        (ignored.nonEmpty && toRemove.nonEmpty) ==> {
-          val seq    = header ++ Seq(ignored, toRemove) ++ tail
-          val result = CxfPluginConverter.remove(seq, ignored)
-          result ?= (header ++ tail)
-        }
+        val seq    = header ++ Seq(ignored, toRemove) ++ tail
+        val result = CxfPluginConverter.remove(seq, "f_ake", ignored)
+        result ?= (header ++ tail)
       }
     }
 

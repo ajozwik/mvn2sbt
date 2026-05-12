@@ -1,19 +1,18 @@
 package pl.jozwik.mvn2sbt.pom2sbt
 
 import java.io.File
+import org.maven.{Configuration4, Plugin}
+import pl.jozwik.mvn2sbt.{PomToSbtPluginConverter, ReflectionUtils}
 
-import org.maven.{Plugin, Configuration4}
-import pl.jozwik.mvn2sbt.{ReflectionUtils, PomToSbtPluginConverter}
-
+import scala.annotation.tailrec
 import scala.xml.{Node, NodeSeq}
 
 object CxfPluginConverter {
 
   private[pom2sbt] final val ignored = Seq("-exsh", "-fe")
 
+  @tailrec
   private[pom2sbt] def remove(seq: Seq[String], names: String*): Seq[String] = names match {
-    case Seq() =>
-      seq
     case h +: t =>
       val index = seq.indexOf(h)
       val toRet = if (index == -1) {
@@ -24,6 +23,8 @@ object CxfPluginConverter {
         before ++ rest
       }
       remove(toRet, t: _*)
+    case _ =>
+      seq  
   }
 }
 

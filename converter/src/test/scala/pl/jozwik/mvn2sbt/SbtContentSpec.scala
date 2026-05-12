@@ -12,7 +12,7 @@ class SbtContentSpec extends AbstractSpec {
     }
 
     "Replace not supported " in {
-      Prop.forAll(Gen.oneOf(SbtContent.PROHIBITED_CHARS.toIndexedSeq), Gen.alphaStr, Gen.alphaStr) { (prohibitedChar, header, tail) =>
+      forAll(Gen.oneOf(SbtContent.PROHIBITED_CHARS.toIndexedSeq), Gen.alphaStr, Gen.alphaStr) { (prohibitedChar, header, tail) =>
         val text     = s"$header$prohibitedChar$tail"
         val expected = s"${header}_$tail"
         SbtContent.changeNotSupportedSymbols(text) ?= expected
