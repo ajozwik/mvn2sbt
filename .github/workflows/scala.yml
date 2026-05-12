@@ -8,8 +8,10 @@ name: Scala CI
 on:
   push:
     branches: [ "master" ]
+    tags: [ '*' ]
   pull_request:
     branches: [ "master" ]
+    types: [ opened, reopened, labeled, synchronize ]
 
 permissions:
   contents: read
