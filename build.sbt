@@ -4,8 +4,9 @@ name := "mvn2sbt"
 
 ThisBuild / organization := "pl.jozwik"
 
-ThisBuild / scalaVersion     := "3.3.7"
-ThisBuild / scapegoatVersion := "3.3.4"
+ThisBuild / scalaVersion            := "3.3.7"
+ThisBuild / scapegoatVersion        := "3.3.4"
+coverageEnabled                     := false
 
 ThisBuild / scalacOptions ++= Seq("-deprecation", "-unchecked", "-feature") ++ (CrossVersion.partialVersion(
   scalaVersion.value
@@ -40,8 +41,7 @@ lazy val `genscalaxb` = projectName("genscalaxb", "genscalaxb")
     Compile / scalaxb / scalaxbPackageNames := Map(
       new URI("https://github.com/ajozwik/mvn2sbt") -> "pl.jozwik.gen",
       new URI("http://maven.apache.org/POM/4.0.0")  -> "org.maven"
-    ),
-    ScoverageKeys.coverageExcludedPackages := "org.maven.*;pl.jozwik.gen.*;scalaxb.*"
+    )
   )
   .enablePlugins(ScalaxbPlugin)
 
@@ -53,5 +53,7 @@ lazy val `converter` = projectName("converter", "converter")
 def projectName(name: String, path: String): Project = Project(name, file(path)).settings(
   Compile / packageDoc / publishArtifact := false,
   Compile / doc / sources                := Seq.empty,
-  scapegoatIgnoredFiles                  := Seq(".*/target/.*")
+  scapegoatIgnoredFiles                  := Seq(".*/target/.*"),
+  ScoverageKeys.coverageExcludedPackages := "<empty>;org.maven.*;pl.jozwik.gen.*;scalaxb.*",
+  ScoverageKeys.coverageExcludedFiles    := "Eff.*"
 )
