@@ -1,5 +1,4 @@
-Mvn2Sbt 
-
+Mvn2Sbt
 [![Coverage Status](https://coveralls.io/repos/ajozwik/mvn2sbt/badge.png)](https://coveralls.io/r/ajozwik/mvn2sbt)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/c2c836104f254cafa3f4c34dc5243400)](https://app.codacy.com/gh/ajozwik/mvn2sbt/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 [![License](http://img.shields.io/:license-Apache%202-red.svg)](http://www.apache.org/licenses/LICENSE-2.0.txt)
@@ -24,7 +23,7 @@ arguments added as `[..]` are optional.
 
 Supported plugins:
 
-Without parameters ( default configuration)
+Without parameters (default configuration)
 
  * gmaven-plugin
  * maven-thrift-plugin
@@ -34,7 +33,7 @@ Without parameters ( default configuration)
  * testng plugin (as dependency)
  
 
- Example converters are in package: pl.jozwik.mvn2sbt.pom2sbt
+ Example converters are in the package: pl.jozwik.mvn2sbt.pom2sbt
 
 
 
