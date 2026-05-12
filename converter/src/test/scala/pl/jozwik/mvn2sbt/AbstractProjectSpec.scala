@@ -58,7 +58,7 @@ abstract class AbstractProjectSpec(project: String) extends AbstractSpec {
     s"Create sbt file for $project with file" in {
       val rootDir = Paths.get(TestConstants.EXAMPLES_PROJECTS, project).toFile
       val output = new File("target", project)
-      Mvn2Sbt.main(Array(rootDir.getAbsolutePath, output.getAbsolutePath))
+      Mvn2Sbt.main(rootDir.getAbsolutePath, output.getAbsolutePath)
       val buildSbt = new File(output, BUILD_SBT)
       buildSbt should exist
       checkBuildSbtContent(buildSbt)

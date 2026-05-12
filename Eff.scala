@@ -4,7 +4,7 @@ import sys.process.*
 import java.io.File
 
 
-object Eff {
+
   val mavenCommand = "mvn"
 
   val mvn = Try(Process(Seq(mavenCommand, "-version")).!) match {
@@ -34,7 +34,7 @@ object Eff {
 
   }
 
-
+  @main
   def main(args: String*): Unit = {
     println(s"Maven command is: $mvn")
     if (args.length == 0) {
@@ -73,4 +73,4 @@ object Eff {
     }
   }
 
-}
+

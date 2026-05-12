@@ -11,7 +11,7 @@ object Mvn2Sbt extends StrictLogging {
 
   private val SBT_VERSION         = "sbt.version"
   private val BUILD_PROPERTIES    = "build.properties"
-  private val DEFAULT_SBT_VERSION = "1.12.4"
+  private val DEFAULT_SBT_VERSION = "1.12.11"
   val BUILD_SBT                   = "build.sbt"
   val PROJECT                     = "project"
   private val PLUGINS_SBT         = "plugins.sbt"
@@ -61,6 +61,9 @@ object Mvn2Sbt extends StrictLogging {
   }
 
   private def toAbsolutePath(f: File) = f.getAbsolutePath
+
+  def main(args: String*): Unit =
+    main(args.toArray)
 
   def main(args: Array[String]): Unit = {
 

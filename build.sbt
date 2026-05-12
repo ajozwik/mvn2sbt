@@ -4,23 +4,19 @@ name := "mvn2sbt"
 
 ThisBuild / organization := "pl.jozwik"
 
-ThisBuild / scalaVersion     := "2.13.18"
-ThisBuild / scapegoatVersion := "3.3.2"
+ThisBuild / scalaVersion     := "3.3.7"
+ThisBuild / scapegoatVersion := "3.3.4"
 
-scalacOptions ++= Seq("-deprecation", "-unchecked", "-feature", "-Yrangepos")
-
-ThisBuild / scalacOptions ++= Seq("-deprecation", "-unchecked", "-feature", "-Xsource:3") ++ (CrossVersion.partialVersion(
+ThisBuild / scalacOptions ++= Seq("-deprecation", "-unchecked", "-feature") ++ (CrossVersion.partialVersion(
   scalaVersion.value
 ) match {
   case Some((2, _)) =>
-    Seq("-Yrangepos")
+    Seq("-Yrangepos", "-Xsource:3", "-Yrangepos")
   case _ =>
     Seq()
 })
 
-Test / scalacOptions ++= Seq("-Yrangepos")
-
-val scalaTestVersion = "3.2.19"
+val scalaTestVersion = "3.2.20"
 
 val scalaLogging                        = "com.typesafe.scala-logging" %% "scala-logging"   % "3.9.6"
 val `org.scalatestplus_scalacheck-1-19` = "org.scalatestplus"          %% "scalacheck-1-19" % s"$scalaTestVersion.0" % "test"
@@ -36,7 +32,7 @@ ThisBuild / libraryDependencies ++= Seq(
   "ch.qos.logback"          % "logback-classic"          % "1.3.16",
   "org.scala-lang.modules" %% "scala-xml"                % "2.4.0",
   "org.scala-lang.modules" %% "scala-parser-combinators" % "2.4.0",
-  "commons-io"              % "commons-io"               % "2.21.0"
+  "commons-io"              % "commons-io"               % "2.22.0"
 )
 
 lazy val `genscalaxb` = projectName("genscalaxb", "genscalaxb")

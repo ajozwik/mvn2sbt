@@ -9,12 +9,12 @@ class Mvn2SbtSpec extends AbstractSpec {
   "Mvn2Sbt " should {
 
     "Parse project line" in {
-      val g = "groupId"
-      val v = "1.0-GEN"
-      val a = "artifactId"
-      val t = ProjectType.jar.name()
+      val g           = "groupId"
+      val v           = "1.0-GEN"
+      val a           = "artifactId"
+      val t           = ProjectType.jar.name()
       val projectLine = s"$g:$a:$t:$v"
-      val parsed = parseProjectLine(projectLine)
+      val parsed      = parseProjectLine(projectLine)
       parsed should be(g, a, t, v, false)
     }
 
@@ -32,7 +32,7 @@ class Mvn2SbtSpec extends AbstractSpec {
 
     "Expects parameters" in {
       intercept[IllegalArgumentException] {
-        Mvn2Sbt.main(Array())
+        Mvn2Sbt.main()
       }
     }
 
@@ -46,14 +46,14 @@ class Mvn2SbtSpec extends AbstractSpec {
 
     "Wrong pom file" in {
       intercept[Exception] {
-        Mvn2Sbt.main(Array(new File(TestConstants.EXAMPLES_PROJECTS, "brokenPom").getAbsolutePath))
+        Mvn2Sbt.main(new File(TestConstants.EXAMPLES_PROJECTS, "brokenPom").getAbsolutePath)
       }
     }
 
     "Wrong dir " in {
       val file = new File("__")
       new FileOutputStream(file).close()
-      Mvn2Sbt.main(Array(file.getAbsolutePath))
+      Mvn2Sbt.main(file.getAbsolutePath)
       file should exist
       file.delete()
       file shouldNot exist
@@ -62,8 +62,8 @@ class Mvn2SbtSpec extends AbstractSpec {
   }
 
   private def testLine(g: String, a: String, v: String, s: String, f: (String, String, String, String) => String) = {
-    val line = f(g, a, v, s)
-    val res = parseDependencyLine(line)
+    val line                                       = f(g, a, v, s)
+    val res                                        = parseDependencyLine(line)
     val (groupId, artifactId, versionId, scope, _) = res
     (groupId, artifactId, versionId, scope) should be(g, a, v, s)
   }
