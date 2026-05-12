@@ -1,5 +1,6 @@
 Mvn2Sbt 
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/dc60755f832a4e31aa9d177fbe0ebb7c)](https://app.codacy.com/gh/ajozwik/mvn2sbt?utm_source=github.com&utm_medium=referral&utm_content=ajozwik/mvn2sbt&utm_campaign=Badge_Grade)
 [![Build Status](https://travis-ci.com/ajozwik/mvn2sbt.svg?branch=master "Build Status")]([https://travis-ci.com/ajozwik/mvn2sbt](https://app.travis-ci.com/ajozwik/mvn2sbt.svg))
 [![Coverage Status](https://coveralls.io/repos/ajozwik/mvn2sbt/badge.png)](https://coveralls.io/r/ajozwik/mvn2sbt)
 [![Codacy Badge](https://www.codacy.com/project/badge/c2c836104f254cafa3f4c34dc5243400)](https://www.codacy.com)
